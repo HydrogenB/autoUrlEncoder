@@ -118,6 +118,11 @@ function encodeUrlParamsInUrl(url, paramNames) {
     }
 }
 
+// Generate parameter state signature for comparison
+function generateParamState(params) {
+    return params.map(p => `${p.name}=${p.encodedValue}`).sort().join('&');
+}
+
 // Process URL and update UI
 function processUrl() {
     const url = inputUrl.value.trim();
@@ -190,11 +195,6 @@ function processUrl() {
         encoded: result.valid,
         paramCount: result.params.length
     });
-}
-
-// Generate parameter state signature for comparison
-function generateParamState(params) {
-    return params.map(p => `${p.name}=${p.encodedValue}`).sort().join('&');
 }
 
 // Update parameter breakdown table
