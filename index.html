@@ -39,7 +39,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1200px;
             margin: 0 auto;
             display: grid;
             grid-template-columns: 1fr;
@@ -58,12 +58,16 @@
             box-shadow: var(--shadow);
             overflow: hidden;
             transition: var(--transition);
+            margin-bottom: 24px;
         }
 
         .card-header {
             background: linear-gradient(to right, var(--primary), var(--secondary));
             color: var(--white);
             padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .card-title {
@@ -244,7 +248,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            margin-top: 20px;
+            margin-bottom: 20px;
             padding: 16px;
             background-color: var(--light);
             border-radius: 8px;
@@ -297,6 +301,7 @@
             word-break: break-all;
             margin-bottom: 4px;
             padding-right: 30px;
+            cursor: pointer;
         }
 
         .history-meta {
@@ -442,6 +447,185 @@
             background-color: var(--success);
         }
 
+        .collapsible-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .collapsible-section.expanded {
+            max-height: 500px;
+        }
+
+        .collapse-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .collapse-toggle i {
+            transition: transform 0.3s ease;
+        }
+
+        .collapse-toggle.expanded i {
+            transform: rotate(180deg);
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .param-table th, .param-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .param-table th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+
+        .param-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .param-name {
+            font-weight: 500;
+            max-width: 150px;
+        }
+
+        .param-value {
+            word-break: break-all;
+        }
+
+        .param-warning {
+            color: var(--warning);
+            font-size: 0.75rem;
+        }
+
+        .mode-toggle {
+            display: flex;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            width: fit-content;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            border: none;
+            background-color: var(--light);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .mode-content {
+            display: none;
+        }
+
+        .mode-content.active {
+            display: block;
+        }
+
+        .post-params {
+            min-height: 100px;
+            margin-top: 10px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+            color: var(--gray);
+            font-size: 0.85rem;
+            border-top: 1px solid #eee;
+        }
+
+        .contact-info {
+            margin-bottom: 10px;
+        }
+
+        .disclaimer {
+            font-size: 0.75rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .history-nickname {
+            display: flex;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        .nickname-display {
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        .nickname-edit {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .nickname-input {
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+            margin-right: 5px;
+        }
+
+        .history-qr {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .history-qr.expanded {
+            max-height: 200px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-qr {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .edit-mode {
+            display: none;
+        }
+
+        .edit-mode.active {
+            display: block;
+        }
+
         @media (max-width: 600px) {
             .action-bar {
                 flex-direction: column;
@@ -457,46 +641,87 @@
 <body>
     <div class="container">
         <!-- Encoder Section -->
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title"><i class="fas fa-link"></i> URL Parameter Encoder</h2>
-            </div>
-            <div class="card-body">
-                <div class="input-group">
-                    <label for="inputUrl">Input URL:</label>
-                    <textarea id="inputUrl" placeholder="Enter URL with parameters (e.g. https://example.com?url=https://another.com)"></textarea>
-                    <div class="validation-bar">
-                        <div id="validationProgress" class="validation-progress"></div>
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-link"></i> URL Parameter Encoder</h2>
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" data-mode="get">GET</button>
+                        <button class="mode-btn" data-mode="post">POST</button>
                     </div>
-                    <div id="validationMessage" class="validation-message"></div>
                 </div>
-                
-                <div class="input-group">
-                    <label for="paramNames">Parameters to Encode (Optional):</label>
-                    <input type="text" id="paramNames" placeholder="Comma-separated names (e.g. url,link,source)">
-                    <div class="validation-message">Leave empty to auto-detect URL parameters</div>
-                </div>
-                
-                <div id="resultContainer" class="result-container" style="display: none;">
-                    <label>Processed URL: <span id="autosaveStatus" class="autosave-indicator"></span> <span id="autosaveText" style="font-size: 0.8rem; color: var(--gray);"></span></label>
-                    <div id="processedUrl" class="result"></div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <label for="inputUrl">Input URL:</label>
+                        <textarea id="inputUrl" placeholder="Enter URL with parameters (e.g. https://example.com?url=https://another.com)"></textarea>
+                        <div class="validation-bar">
+                            <div id="validationProgress" class="validation-progress"></div>
+                        </div>
+                        <div id="validationMessage" class="validation-message"></div>
+                    </div>
                     
-                    <div class="action-bar">
-                        <button id="copyBtn" class="btn tooltip" data-tooltip="Copy to clipboard">
-                            <i class="fas fa-copy"></i> Copy
-                        </button>
-                        <button id="runBtn" class="btn btn-primary tooltip" data-tooltip="Open in new tab">
-                            <i class="fas fa-external-link-alt"></i> Run
-                        </button>
-                        <button id="clearBtn" class="btn tooltip" data-tooltip="Clear all fields">
-                            <i class="fas fa-trash"></i> Clear
-                        </button>
+                    <div class="collapse-toggle" id="paramsToggle">
+                        <label>Parameters to Encode (Optional):</label>
+                        <i class="fas fa-chevron-down"></i>
                     </div>
-                </div>
-                
-                <div id="qrContainer" class="qr-container" style="display: none;">
-                    <div id="qrCode"></div>
-                    <p class="qr-caption">Scan with your phone to open this link directly</p>
+                    <div class="collapsible-section" id="paramsSection">
+                        <input type="text" id="paramNames" placeholder="Comma-separated names (e.g. url,link,source)">
+                        <div class="validation-message">Leave empty to auto-detect URL parameters</div>
+                    </div>
+                    
+                    <!-- POST Parameters (hidden by default) -->
+                    <div class="mode-content" id="postParamsContent">
+                        <div class="input-group">
+                            <label for="postParams">POST Parameters:</label>
+                            <textarea id="postParams" class="post-params" placeholder="key1=value1&key2=value2
+# Or use JSON format:
+{
+  &quot;key1&quot;: &quot;value1&quot;,
+  &quot;key2&quot;: &quot;value2&quot;
+}"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="resultContainer" class="result-container" style="display: none;">
+                        <!-- QR Code First -->
+                        <div id="qrContainer" class="qr-container">
+                            <div id="qrCode"></div>
+                            <p class="qr-caption">Scan with your phone to open this link directly</p>
+                        </div>
+                        
+                        <!-- URL Result -->
+                        <label>Processed URL: <span id="autosaveStatus" class="autosave-indicator"></span> <span id="autosaveText" style="font-size: 0.8rem; color: var(--gray);"></span></label>
+                        <div id="processedUrl" class="result"></div>
+                        
+                        <!-- Parameter Breakdown -->
+                        <div id="paramBreakdown">
+                            <h3 style="margin: 15px 0 10px;">Parameter Breakdown:</h3>
+                            <table class="param-table" id="paramTable">
+                                <thead>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        <th>Value</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Parameters will be inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="action-bar">
+                            <button id="copyBtn" class="btn tooltip" data-tooltip="Copy to clipboard">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button id="runBtn" class="btn btn-primary tooltip" data-tooltip="Open in new tab">
+                                <i class="fas fa-external-link-alt"></i> Run
+                            </button>
+                            <button id="clearBtn" class="btn tooltip" data-tooltip="Clear all fields">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -523,7 +748,7 @@
             </div>
             
             <!-- Starred Links -->
-            <div class="card" style="margin-top: 24px;">
+            <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">
                         <i class="fas fa-star"></i> Starred Links
@@ -536,6 +761,19 @@
             </div>
         </div>
     </div>
+    
+    <footer>
+        <div class="contact-info">
+            For any adjustment, contact <strong>Jirad Srirattana-arporn</strong>
+        </div>
+        <div class="deploy-info">
+            Last deployed: <span id="deployDate">April 3, 2025</span>
+        </div>
+        <div class="disclaimer">
+            This tool is provided "as is" without warranty of any kind. The encoded URLs are processed client-side and no data is stored on our servers. 
+            Always verify the encoded URLs for security-sensitive applications.
+        </div>
+    </footer>
     
     <div id="statusMessage" class="status-message"></div>
     
@@ -560,7 +798,12 @@
                 // Split URL into base and query string
                 const queryIndex = url.indexOf("?");
                 if (queryIndex === -1) {
-                    return { result: url, valid: true, message: "No parameters to encode" };
+                    return { 
+                        result: url, 
+                        valid: true, 
+                        message: "No parameters to encode",
+                        params: [] 
+                    };
                 }
                 
                 const baseUrl = url.substring(0, queryIndex);
@@ -569,6 +812,7 @@
                 // Split query string into parameters
                 const params = queryString.split("&");
                 let encodedCount = 0;
+                let paramDetails = [];
                 
                 // Process each parameter
                 for (let i = 0; i < params.length; i++) {
@@ -576,6 +820,9 @@
                     if (eqIndex !== -1) {
                         const name = params[i].substring(0, eqIndex);
                         const value = params[i].substring(eqIndex + 1);
+                        let encodedValue = value;
+                        let wasEncoded = false;
+                        let paramNote = "";
                         
                         // Check if we should encode this parameter
                         if (
@@ -583,15 +830,35 @@
                             (paramsToEncode !== null && paramsToEncode.includes(name))  // Specifically listed parameters
                         ) {
                             const originalValue = value;
-                            const encodedValue = encodeURIComponent(value);
+                            encodedValue = encodeURIComponent(value);
                             
                             // Only count as encoded if the value actually changed
                             if (originalValue !== encodedValue) {
                                 encodedCount++;
+                                wasEncoded = true;
                             }
                             
                             params[i] = name + "=" + encodedValue;
                         }
+                        
+                        // Check for special parameters and add notes
+                        if (name.toLowerCase().startsWith('utm_')) {
+                            paramNote = "UTM tracking parameter for analytics";
+                        } else if (name.toLowerCase() === 'url' || name.toLowerCase() === 'link' || name.toLowerCase() === 'href') {
+                            paramNote = "URL parameter - encoding recommended";
+                        } else if (name.toLowerCase() === 'redirect' || name.toLowerCase() === 'return' || name.toLowerCase() === 'returnurl') {
+                            paramNote = "Redirect URL - verify for security";
+                        } else if (name.toLowerCase() === 'token' || name.toLowerCase() === 'auth' || name.toLowerCase() === 'key') {
+                            paramNote = "Security token - handle with care";
+                        }
+                        
+                        paramDetails.push({
+                            name,
+                            originalValue: value,
+                            encodedValue: encodedValue,
+                            wasEncoded,
+                            note: paramNote
+                        });
                     }
                 }
                 
@@ -604,11 +871,12 @@
                     valid: true, 
                     message: encodedCount > 0 ? 
                         `${encodedCount} parameter${encodedCount > 1 ? 's' : ''} encoded` : 
-                        "No parameters needed encoding"
+                        "No parameters needed encoding",
+                    params: paramDetails
                 };
             } catch (error) {
                 console.error("Error encoding URL:", error);
-                return { result: url, valid: false, message: `Error: ${error.message}` };
+                return { result: url, valid: false, message: `Error: ${error.message}`, params: [] };
             }
         }
 
@@ -665,10 +933,12 @@
         // DOM elements
         const inputUrl = document.getElementById('inputUrl');
         const paramNames = document.getElementById('paramNames');
+        const postParams = document.getElementById('postParams');
         const validationProgress = document.getElementById('validationProgress');
         const validationMessage = document.getElementById('validationMessage');
         const resultContainer = document.getElementById('resultContainer');
         const processedUrl = document.getElementById('processedUrl');
+        const paramTable = document.getElementById('paramTable');
         const copyBtn = document.getElementById('copyBtn');
         const runBtn = document.getElementById('runBtn');
         const clearBtn = document.getElementById('clearBtn');
@@ -683,6 +953,11 @@
         const statusMessage = document.getElementById('statusMessage');
         const autosaveStatus = document.getElementById('autosaveStatus');
         const autosaveText = document.getElementById('autosaveText');
+        const paramsToggle = document.getElementById('paramsToggle');
+        const paramsSection = document.getElementById('paramsSection');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const postParamsContent = document.getElementById('postParamsContent');
+        const deployDate = document.getElementById('deployDate');
 
         // URL history array and state variables
         let urlHistory = StorageManager.get('urlHistory', []);
@@ -690,6 +965,7 @@
         let autoSaveTimer = null;
         let lastInputTime = 0;
         let qrDebounceTimer = null;
+        let currentMode = 'get';
 
         // Update history counts
         function updateCounts() {
@@ -717,7 +993,6 @@
                 validationProgress.style.width = '0';
                 validationMessage.textContent = '';
                 resultContainer.style.display = 'none';
-                qrContainer.style.display = 'none';
                 return;
             }
             
@@ -737,6 +1012,9 @@
             processedUrl.textContent = result.result;
             resultContainer.style.display = 'block';
             
+            // Update parameter breakdown table
+            updateParamTable(result.params);
+            
             // Set auto-save timer for 10 seconds of inactivity
             autoSaveTimer = setTimeout(() => {
                 if (url && result.valid) {
@@ -746,14 +1024,36 @@
                 }
             }, 10000);
             
-            // Update QR code with debounce
-            if (qrDebounceTimer) {
-                clearTimeout(qrDebounceTimer);
+            // Update QR code immediately
+            updateQRCode(result.result);
+        }
+        
+        // Update parameter breakdown table
+        function updateParamTable(params) {
+            const tbody = paramTable.querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            if (params.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="3" style="text-align: center;">No parameters found</td>';
+                tbody.appendChild(row);
+                return;
             }
             
-            qrDebounceTimer = setTimeout(() => {
-                updateQRCode(result.result);
-            }, 500);
+            params.forEach(param => {
+                const row = document.createElement('tr');
+                
+                row.innerHTML = `
+                    <td class="param-name">${escapeHtml(param.name)}</td>
+                    <td class="param-value">${escapeHtml(param.encodedValue)}</td>
+                    <td>
+                        ${param.wasEncoded ? '<span class="param-warning">Encoded</span><br>' : ''}
+                        ${param.note ? `<span class="param-warning">${escapeHtml(param.note)}</span>` : ''}
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
         }
         
         // Update QR code
@@ -769,9 +1069,9 @@
             try {
                 new QRCode(qrCode, {
                     text: url,
-                    width: 160,
-                    height: 160,
-                    colorDark: "#4361ee",
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
                     colorLight: "#ffffff",
                     correctLevel: QRCode.CorrectLevel.H
                 });
@@ -781,11 +1081,91 @@
             }
         }
         
+        // Generate QR code for history item
+        function generateHistoryQR(container, url) {
+            container.innerHTML = '';
+            
+            try {
+                new QRCode(container, {
+                    text: url,
+                    width: 150,
+                    height: 150,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                console.error("Error generating QR code:", e);
+                container.innerHTML = '<div style="color: var(--danger)">Error generating QR code</div>';
+            }
+        }
+        
+        // Toggle QR code visibility for history item
+        function toggleHistoryQR(id) {
+            const qrElement = document.getElementById(`qr-${id}`);
+            const toggleBtn = document.getElementById(`toggle-qr-${id}`);
+            
+            if (qrElement.classList.contains('expanded')) {
+                qrElement.classList.remove('expanded');
+                toggleBtn.innerHTML = '<i class="fas fa-qrcode"></i> Show QR';
+            } else {
+                qrElement.classList.add('expanded');
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide QR';
+                
+                // Generate QR code if container is empty
+                if (qrElement.children.length === 0) {
+                    const item = urlHistory.find(entry => entry.id === id);
+                    if (item) {
+                        generateHistoryQR(qrElement, item.encodedUrl);
+                    }
+                }
+            }
+        }
+        
+        // Edit nickname for history item
+        function editNickname(id) {
+            const nameDisplay = document.getElementById(`nickname-display-${id}`);
+            const nameEdit = document.getElementById(`nickname-edit-${id}`);
+            
+            nameDisplay.style.display = 'none';
+            nameEdit.style.display = 'block';
+            
+            const inputElement = document.getElementById(`nickname-input-${id}`);
+            inputElement.focus();
+            inputElement.select();
+        }
+        
+        // Save nickname for history item
+        function saveNickname(id) {
+            const nameDisplay = document.getElementById(`nickname-display-${id}`);
+            const nameEdit = document.getElementById(`nickname-edit-${id}`);
+            const inputElement = document.getElementById(`nickname-input-${id}`);
+            
+            const newNickname = inputElement.value.trim();
+            
+            // Update in history array
+            const itemIndex = urlHistory.findIndex(entry => entry.id === id);
+            if (itemIndex !== -1) {
+                urlHistory[itemIndex].nickname = newNickname;
+                StorageManager.set('urlHistory', urlHistory);
+                
+                // Update display
+                const displayElement = document.getElementById(`nickname-text-${id}`);
+                displayElement.textContent = newNickname || 'No nickname';
+                
+                nameDisplay.style.display = 'flex';
+                nameEdit.style.display = 'none';
+                
+                showStatusMessage('Nickname updated');
+            }
+        }
+        
         // Save URL to history
         function saveToHistory(showNotification = true) {
             const url = inputUrl.value.trim();
             const params = paramNames.value.trim();
             const processedResult = lastProcessedUrl;
+            const postParamsValue = postParams.value.trim();
             
             if (!url || !processedResult) return;
             
@@ -800,7 +1180,7 @@
                 });
                 
                 // Generate a consistent ID based on URL content to avoid duplicates
-                const urlId = btoa(url + params).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+                const urlId = btoa(url + params + currentMode).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
                 
                 // Check if URL already exists
                 const existingIndex = urlHistory.findIndex(item => item.id === urlId);
@@ -823,7 +1203,10 @@
                         timestamp,
                         displayDate,
                         starred: false,
-                        lastUsed: now.getTime()
+                        lastUsed: now.getTime(),
+                        nickname: '',
+                        requestMode: currentMode,
+                        postParams: currentMode === 'post' ? postParamsValue : ''
                     };
                     
                     urlHistory.unshift(entry);
@@ -896,6 +1279,18 @@
                     inputUrl.value = item.originalUrl;
                     paramNames.value = item.params;
                     
+                    // Set request mode
+                    if (item.requestMode) {
+                        setRequestMode(item.requestMode);
+                        
+                        // If POST mode, load post params
+                        if (item.requestMode === 'post' && item.postParams) {
+                            postParams.value = item.postParams;
+                        }
+                    } else {
+                        setRequestMode('get'); // Default to GET if no mode specified
+                    }
+                    
                     // Update item's "last used" timestamp
                     item.lastUsed = Date.now();
                     StorageManager.set('urlHistory', urlHistory);
@@ -936,7 +1331,54 @@
         // Open URL in new tab
         function runUrl(url) {
             try {
-                window.open(url, '_blank');
+                if (currentMode === 'get') {
+                    window.open(url, '_blank');
+                } else if (currentMode === 'post') {
+                    // Create a form to submit POST request
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url.split('?')[0]; // Base URL without query string
+                    form.target = '_blank';
+                    
+                    // Add query parameters from URL
+                    const queryParams = new URLSearchParams(url.split('?')[1] || '');
+                    for (const [key, value] of queryParams.entries()) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value;
+                        form.appendChild(input);
+                    }
+                    
+                    // Add POST parameters
+                    let postData = {};
+                    try {
+                        // Try to parse as JSON
+                        postData = JSON.parse(postParams.value);
+                    } catch (e) {
+                        // Parse as URL encoded string
+                        const params = new URLSearchParams(postParams.value);
+                        for (const [key, value] of params.entries()) {
+                            postData[key] = value;
+                        }
+                    }
+                    
+                    // Add POST parameters to form
+                    for (const key in postData) {
+                        if (postData.hasOwnProperty(key)) {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = postData[key];
+                            form.appendChild(input);
+                        }
+                    }
+                    
+                    // Append form to body, submit it, and remove it
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                }
             } catch (e) {
                 console.error("Error opening URL:", e);
                 showStatusMessage('Error opening URL', true);
@@ -957,6 +1399,27 @@
             } catch (e) {
                 console.error("Error deleting history item:", e);
                 showStatusMessage('Error deleting item', true);
+            }
+        }
+        
+        // Set request mode (GET/POST)
+        function setRequestMode(mode) {
+            currentMode = mode;
+            
+            // Update UI
+            modeBtns.forEach(btn => {
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Show/hide POST parameters
+            if (mode === 'post') {
+                postParamsContent.style.display = 'block';
+            } else {
+                postParamsContent.style.display = 'none';
             }
         }
         
@@ -989,8 +1452,9 @@
                 
                 const filteredHistory = normalizedSearch ? 
                     urlHistory.filter(entry => 
-                        entry.originalUrl.toLowerCase().includes(normalizedSearch) || 
-                        entry.encodedUrl.toLowerCase().includes(normalizedSearch)) : 
+                        (entry.originalUrl.toLowerCase().includes(normalizedSearch) || 
+                        entry.encodedUrl.toLowerCase().includes(normalizedSearch) ||
+                        (entry.nickname && entry.nickname.toLowerCase().includes(normalizedSearch)))) : 
                     urlHistory;
                 
                 if (filteredHistory.length === 0) {
@@ -1012,8 +1476,20 @@
                             <i class="fas fa-star"></i>
                         </button>
                         <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${escapeHtml(entry.encodedUrl)}</div>
+                        
+                        <div class="history-nickname">
+                            <div id="nickname-display-${entry.id}" class="nickname-display">
+                                <span id="nickname-text-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
+                                <button class="nickname-edit" onclick="editNickname('${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
+                            </div>
+                            <div id="nickname-edit-${entry.id}" class="edit-mode">
+                                <input type="text" id="nickname-input-${entry.id}" class="nickname-input" value="${escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
+                                <button class="btn btn-primary" onclick="saveNickname('${entry.id}')">Save</button>
+                            </div>
+                        </div>
+                        
                         <div class="history-meta">
-                            <span>${escapeHtml(entry.displayDate)}</span>
+                            <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
                             <div class="history-actions">
                                 <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
                                     <i class="fas fa-copy"></i>
@@ -1021,11 +1497,16 @@
                                 <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
                                     <i class="fas fa-external-link-alt"></i>
                                 </button>
+                                <button id="toggle-qr-${entry.id}" class="toggle-qr" onclick="toggleHistoryQR('${entry.id}')">
+                                    <i class="fas fa-qrcode"></i> Show QR
+                                </button>
                                 <button class="action-icon tooltip" data-tooltip="Delete" onclick="deleteHistoryItem('${entry.id}')">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
                         </div>
+                        
+                        <div id="qr-${entry.id}" class="history-qr"></div>
                     </div>
                 `).join('');
             } catch (e) {
@@ -1058,8 +1539,20 @@
                             <i class="fas fa-star"></i>
                         </button>
                         <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${escapeHtml(entry.encodedUrl)}</div>
+                        
+                        <div class="history-nickname">
+                            <div id="nickname-display-s-${entry.id}" class="nickname-display">
+                                <span id="nickname-text-s-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
+                                <button class="nickname-edit" onclick="editNickname('s-${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
+                            </div>
+                            <div id="nickname-edit-s-${entry.id}" class="edit-mode">
+                                <input type="text" id="nickname-input-s-${entry.id}" class="nickname-input" value="${escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
+                                <button class="btn btn-primary" onclick="saveNickname('s-${entry.id}')">Save</button>
+                            </div>
+                        </div>
+                        
                         <div class="history-meta">
-                            <span>${escapeHtml(entry.displayDate)}</span>
+                            <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
                             <div class="history-actions">
                                 <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
                                     <i class="fas fa-copy"></i>
@@ -1067,8 +1560,13 @@
                                 <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
                                     <i class="fas fa-external-link-alt"></i>
                                 </button>
+                                <button id="toggle-qr-s-${entry.id}" class="toggle-qr" onclick="toggleHistoryQR('s-${entry.id}')">
+                                    <i class="fas fa-qrcode"></i> Show QR
+                                </button>
                             </div>
                         </div>
+                        
+                        <div id="qr-s-${entry.id}" class="history-qr"></div>
                     </div>
                 `).join('');
             } catch (e) {
@@ -1077,9 +1575,36 @@
             }
         }
         
+        // Log visitor information
+        function logVisitorInfo() {
+            try {
+                const visitorInfo = {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    screenWidth: window.screen.width,
+                    screenHeight: window.screen.height,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    timestamp: new Date().toISOString(),
+                    referrer: document.referrer || 'direct'
+                };
+                
+                // Store in local storage for demo purposes
+                // In a real application, you would send this to your analytics server
+                let visitors = StorageManager.get('visitors', []);
+                visitors.push(visitorInfo);
+                StorageManager.set('visitors', visitors);
+                
+                console.log('Visitor information logged:', visitorInfo);
+            } catch (e) {
+                console.error('Error logging visitor information:', e);
+            }
+        }
+        
         // Escape HTML to prevent XSS
         function escapeHtml(unsafe) {
-            return unsafe
+            if (unsafe === null || unsafe === undefined) return '';
+            return String(unsafe)
                 .replace(/&/g, "&amp;")
                 .replace(/</g, "&lt;")
                 .replace(/>/g, "&gt;")
@@ -1088,9 +1613,12 @@
         }
         
         // Event listeners
+        // URL processing
         inputUrl.addEventListener('input', processUrl);
         paramNames.addEventListener('input', processUrl);
+        postParams.addEventListener('input', processUrl);
         
+        // Action buttons
         copyBtn.addEventListener('click', () => {
             copyUrl(processedUrl.textContent);
         });
@@ -1102,9 +1630,11 @@
         clearBtn.addEventListener('click', () => {
             inputUrl.value = '';
             paramNames.value = '';
+            postParams.value = '';
             processUrl();
         });
         
+        // Search functionality
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim();
             renderHistory(searchTerm);
@@ -1122,12 +1652,39 @@
             renderHistory();
         });
         
+        // Parameters collapsible toggle
+        paramsToggle.addEventListener('click', () => {
+            paramsToggle.classList.toggle('expanded');
+            paramsSection.classList.toggle('expanded');
+        });
+        
+        // Request mode buttons
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setRequestMode(btn.dataset.mode);
+            });
+        });
+        
+        // Set current date in footer
+        const currentDate = new Date();
+        deployDate.textContent = currentDate.toLocaleDateString(undefined, { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        // Log visitor information on page load
+        logVisitorInfo();
+        
         // Expose functions to global scope for event handlers
         window.toggleStar = toggleStar;
         window.copyUrl = copyUrl;
         window.runUrl = runUrl;
         window.deleteHistoryItem = deleteHistoryItem;
         window.loadUrlToEditor = loadUrlToEditor;
+        window.toggleHistoryQR = toggleHistoryQR;
+        window.editNickname = editNickname;
+        window.saveNickname = saveNickname;
         
         // Initial renders
         renderHistory();
