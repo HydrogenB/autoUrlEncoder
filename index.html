@@ -1788,6 +1788,10 @@
         
         // Edit nickname for history item
         function editNickname(id) {
+            // Check if ID has 's-' prefix (from starred section)
+            const actualId = id.startsWith('s-') ? id.substring(2) : id;
+            const prefix = id.startsWith('s-') ? 's-' : '';
+            
             const nameDisplay = document.getElementById(`nickname-display-${id}`);
             const nameEdit = document.getElementById(`nickname-edit-${id}`);
             
@@ -1797,32 +1801,75 @@
             const inputElement = document.getElementById(`nickname-input-${id}`);
             inputElement.focus();
             inputElement.select();
+            
+            // Log edit action
+            logger.log("Nickname edit started", { 
+                id: actualId,
+                from: prefix === 's-' ? "starred-section" : "regular-section"
+            });
         }
         
         // Save nickname for history item
         function saveNickname(id) {
+            // Check if ID has 's-' prefix (from starred section)
+            const actualId = id.startsWith('s-') ? id.substring(2) : id;
+            const prefix = id.startsWith('s-') ? 's-' : '';
+            
             const nameDisplay = document.getElementById(`nickname-display-${id}`);
             const nameEdit = document.getElementById(`nickname-edit-${id}`);
             const inputElement = document.getElementById(`nickname-input-${id}`);
             
             const newNickname = inputElement.value.trim();
             
-            // Update in history array
-            const itemIndex = urlHistory.findIndex(entry => entry.id === id);
+            // Update in history array - use the actual ID without prefix
+            const itemIndex = urlHistory.findIndex(entry => entry.id === actualId);
             if (itemIndex !== -1) {
                 urlHistory[itemIndex].nickname = newNickname;
                 StorageManager.set('urlHistory', urlHistory);
                 
-                // Update display
+                // Update display in both sections
+                // Current section
                 const displayElement = document.getElementById(`nickname-text-${id}`);
-                displayElement.textContent = newNickname || 'No nickname';
+                if (displayElement) {
+                    displayElement.textContent = newNickname || 'No nickname';
+                }
                 
-                // Show or hide nickname section based on presence of nickname
+                // Also update in the other section if it exists
+                const otherSectionDisplay = document.getElementById(`nickname-text-${prefix ? actualId : 's-' + actualId}`);
+                if (otherSectionDisplay) {
+                    otherSectionDisplay.textContent = newNickname || 'No nickname';
+                }
+                
+                // Update visibility in current section
                 const nicknameSection = document.getElementById(`nickname-section-${id}`);
-                if (newNickname) {
-                    nicknameSection.style.display = 'flex';
-                } else {
-                    nicknameSection.style.display = 'none';
+                if (nicknameSection) {
+                    if (newNickname) {
+                        nicknameSection.style.display = 'flex';
+                    } else {
+                        nicknameSection.style.display = 'none';
+                    }
+                }
+                
+                // Update visibility in other section if it exists
+                const otherNicknameSection = document.getElementById(`nickname-section-${prefix ? actualId : 's-' + actualId}`);
+                if (otherNicknameSection) {
+                    if (newNickname) {
+                        otherNicknameSection.style.display = 'flex';
+                    } else {
+                        otherNicknameSection.style.display = 'none';
+                    }
+                }
+                
+                // Update add nickname button in current section
+                const addButton = document.getElementById(`add-nickname-${id}`);
+                if (addButton) {
+                    addButton.style.display = newNickname ? 'none' : 'inline-flex';
+                }
+                
+                // Update add nickname button in other section
+                const otherAddButton = document.getElementById(`add-nickname-${prefix ? actualId : 's-' + actualId}`);
+                if (otherAddButton) {
+                    otherAddButton.style.display = newNickname ? 'none' : 'inline-flex';
                 }
                 
                 nameDisplay.style.display = 'flex';
@@ -1832,8 +1879,9 @@
                 
                 // Log nickname update
                 logger.log("Nickname updated", { 
-                    id: id,
-                    nickname: newNickname
+                    id: actualId,
+                    nickname: newNickname,
+                    from: prefix === 's-' ? "starred-section" : "regular-section"
                 });
             }
         }
@@ -1848,6 +1896,13 @@
             
             // Trigger edit mode
             editNickname(id);
+            
+            // Log add nickname action
+            const actualId = id.startsWith('s-') ? id.substring(2) : id;
+            logger.log("Add nickname initiated", { 
+                id: actualId,
+                from: id.startsWith('s-') ? "starred-section" : "regular-section"
+            });
         }
         
         // Save URL to history
