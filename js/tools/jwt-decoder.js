@@ -77,9 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Call decodeToken on page load if token is present
-    if (jwtInput.value.trim()) {
-        decodeToken();
-    }
+if (jwtInput.value.trim()) {
+    decodeToken();
+}
     
     // Clear input
     clearBtn.addEventListener('click', () => {
