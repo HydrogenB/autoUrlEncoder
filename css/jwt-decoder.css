@@ -1,0 +1,346 @@
+/* JWT Decoder specific styles */
+
+/* Main layout */
+.jwt-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+}
+
+.jwt-input-section {
+    margin-bottom: 20px;
+}
+
+.jwt-output-section {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+@media (min-width: 768px) {
+    .jwt-output-section {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Token input */
+.jwt-input {
+    font-family: monospace;
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Decoded sections */
+.jwt-section {
+    background-color: var(--light);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #ddd;
+    position: relative;
+}
+
+.jwt-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+.jwt-section-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.jwt-section-content {
+    font-family: monospace;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+/* Token parts styling */
+.header-color {
+    color: #fb015b;
+}
+
+.payload-color {
+    color: #d63aff;
+}
+
+.signature-color {
+    color: #00b9f1;
+}
+
+/* Syntax highlighting for JSON */
+.json-key {
+    color: #0070BB;
+}
+
+.json-string {
+    color: #183691;
+}
+
+.json-number {
+    color: #0086b3;
+}
+
+.json-boolean {
+    color: #990000;
+}
+
+.json-null {
+    color: #999;
+}
+
+/* Verification section */
+.verification-section {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.signature-verify-container {
+    padding: 16px;
+    border-radius: var(--border-radius);
+    background-color: var(--light);
+    border: 1px solid #ddd;
+}
+
+.key-input {
+    font-family: monospace;
+    resize: vertical;
+    min-height: 100px;
+}
+
+.verification-result {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 16px;
+    padding: 12px;
+    border-radius: 6px;
+}
+
+.verification-result.success {
+    background-color: rgba(40, 167, 69, 0.1);
+    border: 1px solid rgba(40, 167, 69, 0.2);
+    color: #28a745;
+}
+
+.verification-result.error {
+    background-color: rgba(220, 53, 69, 0.1);
+    border: 1px solid rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.verification-result.warning {
+    background-color: rgba(255, 193, 7, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    color: #ffc107;
+}
+
+/* OIDC claims table */
+.claim-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    font-size: 0.85rem;
+}
+
+.claim-table th, .claim-table td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.claim-table th {
+    background-color: var(--light);
+    font-weight: 600;
+}
+
+.claim-table tr:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+.expired-label {
+    display: inline-block;
+    padding: 3px 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+
+.valid-label {
+    display: inline-block;
+    padding: 3px 6px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    background-color: rgba(40, 167, 69, 0.1);
+    color: #28a745;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+
+/* Token list styling */
+.token-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    position: relative;
+    transition: var(--transition);
+    cursor: pointer;
+}
+
+.token-item:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+.token-item:last-child {
+    border-bottom: none;
+}
+
+.token-item.starred {
+    background-color: rgba(248, 150, 30, 0.08);
+}
+
+.token-text {
+    font-family: monospace;
+    font-size: 0.85rem;
+    word-break: break-all;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-bottom: 4px;
+    padding-right: 30px;
+}
+
+.token-issuer {
+    font-weight: 500;
+    color: var(--primary);
+}
+
+.token-subject {
+    font-size: 0.8rem;
+    margin-bottom: 4px;
+}
+
+.token-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+.algorithm-badge {
+    display: inline-block;
+    background-color: rgba(67, 97, 238, 0.1);
+    color: var(--primary);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+/* Tabs for verification methods */
+.tabs {
+    display: flex;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 16px;
+}
+
+.tab {
+    padding: 8px 16px;
+    cursor: pointer;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.tab:hover {
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
+.tab.active {
+    border-bottom-color: var(--primary);
+    color: var(--primary);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+/* Timing information */
+.timing-info {
+    background-color: var(--light);
+    border-radius: var(--border-radius);
+    padding: 16px;
+    margin-top: 16px;
+    border: 1px solid #ddd;
+}
+
+.timing-progress {
+    height: 8px;
+    width: 100%;
+    background-color: #eee;
+    border-radius: 4px;
+    margin: 8px 0;
+    position: relative;
+    overflow: hidden;
+}
+
+.timing-bar {
+    height: 100%;
+    background: linear-gradient(to right, #4cc9f0, #3f37c9);
+    border-radius: 4px;
+}
+
+.timing-marker {
+    position: absolute;
+    top: -5px;
+    width: 2px;
+    height: 18px;
+    background-color: var(--danger);
+}
+
+.timing-marker.now {
+    background-color: var(--primary);
+}
+
+.timing-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--gray);
+}
+
+/* Discovery field */
+.discovery-input {
+    display: flex;
+}
+
+.discovery-input input {
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+    border-right: none;
+    flex-grow: 1;
+}
+
+.discovery-input button {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+}

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Optimized Title -->
+    <title>JWT Decoder & Validator | MyDebugger</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free JSON Web Token (JWT) decoder and validator tool for debugging authentication, OIDC, and security issues. Inspect token claims and verify signatures.">
+    <meta name="keywords" content="jwt decoder, token validator, json web token, oidc validation, jwt debugger, auth debug tool">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://mydebugger.vercel.app/tools/jwt-decoder.html">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mydebugger.vercel.app/tools/jwt-decoder.html">
+    <meta property="og:title" content="JWT Decoder & Validator | MyDebugger">
+    <meta property="og:description" content="Free online tool to decode, validate and inspect JSON Web Tokens for authentication debugging.">
+    <meta property="og:image" content="https://mydebugger.vercel.app/assets/og-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://mydebugger.vercel.app/tools/jwt-decoder.html">
+    <meta property="twitter:title" content="JWT Decoder & Validator | MyDebugger">
+    <meta property="twitter:description" content="Free online tool to decode, validate and inspect JSON Web Tokens for authentication debugging.">
+    <meta property="twitter:image" content="https://mydebugger.vercel.app/assets/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    
+    <!-- External Scripts and Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.1/jsrsasign-all-min.js"></script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/tools/jwt-decoder.css">
+</head>
+<body>
+    <!-- Header will be injected by common.js -->
+    <div id="header-container"></div>
+    
+    <!-- Breadcrumbs for SEO -->
+    <div class="container">
+        <div class="two-column-span">
+            <nav aria-label="breadcrumb" class="breadcrumbs">
+                <div class="breadcrumb-item"><a href="../index.html">Home</a></div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item"><a href="../index.html#tools">Tools</a></div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item">JWT Decoder</div>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Tool Introduction -->
+    <div class="container">
+        <div class="two-column-span">
+            <section class="intro-section">
+                <div class="intro-collapse-toggle">
+                    <h1 class="intro-title">JWT Decoder & Validator Tool</h1>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="intro-content">
+                    <p class="intro-text">This professional-grade JWT (JSON Web Token) decoder helps you inspect and validate authentication tokens for security debugging and OIDC implementation. Perfect for developers, security professionals, and identity management specialists.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="container">
+        <!-- JWT Input Section -->
+        <div class="two-column-span">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-shield-alt"></i> JWT Decoder</h2>
+                </div>
+                <div class="card-body">
+                    <div class="jwt-input-section">
+                        <div class="input-group">
+                            <label for="jwtInput">Enter JWT Token:</label>
+                            <textarea id="jwtInput" class="jwt-input" placeholder="Paste your JWT token here (e.g. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)"></textarea>
+                        </div>
+                        <div class="action-bar">
+                            <button id="decodeBtn" class="btn btn-primary tooltip" data-tooltip="Decode token">
+                                <i class="fas fa-search"></i> Decode
+                            </button>
+                            <button id="clearBtn" class="btn tooltip" data-tooltip="Clear input">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                            <button id="saveBtn" class="btn tooltip" data-tooltip="Save to history">
+                                <i class="fas fa-save"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="resultContainer" style="display: none;">
+                        <div class="jwt-output-section">
+                            <!-- JWT Parts Column -->
+                            <div>
+                                <!-- Header Section -->
+                                <div class="jwt-section">
+                                    <div class="jwt-section-header">
+                                        <div class="jwt-section-title">
+                                            <span class="header-color">HEADER</span>
+                                        </div>
+                                        <button class="action-icon tooltip copy-btn" data-target="headerJson" data-tooltip="Copy header">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div id="headerJson" class="jwt-section-content"></div>
+                                </div>
+                                
+                                <!-- Payload Section -->
+                                <div class="jwt-section">
+                                    <div class="jwt-section-header">
+                                        <div class="jwt-section-title">
+                                            <span class="payload-color">PAYLOAD</span>
+                                        </div>
+                                        <button class="action-icon tooltip copy-btn" data-target="payloadJson" data-tooltip="Copy payload">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div id="payloadJson" class="jwt-section-content"></div>
+                                </div>
+                                
+                                <!-- Signature Section -->
+                                <div class="jwt-section">
+                                    <div class="jwt-section-header">
+                                        <div class="jwt-section-title">
+                                            <span class="signature-color">SIGNATURE</span>
+                                        </div>
+                                        <button class="action-icon tooltip copy-btn" data-target="signatureData" data-tooltip="Copy signature">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <div id="signatureData" class="jwt-section-content"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Analysis Column -->
+                            <div>
+                                <!-- OIDC Claims Table -->
+                                <div class="jwt-section">
+                                    <div class="jwt-section-header">
+                                        <div class="jwt-section-title">
+                                            <i class="fas fa-id-card"></i> OIDC Claims
+                                        </div>
+                                    </div>
+                                    <div id="oidcClaimsSection">
+                                        <table class="claim-table" id="claimTable">
+                                            <thead>
+                                                <tr>
+                                                    <th>Claim</th>
+                                                    <th>Value</th>
+                                                    <th>Purpose</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <!-- Claims will be inserted here -->
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div id="tokenTiming" class="timing-info">
+                                        <div id="tokenTimingInfo">Token lifetime information will appear here</div>
+                                        <div id="timingProgress" class="timing-progress">
+                                            <div id="timingBar" class="timing-bar"></div>
+                                        </div>
+                                        <div class="timing-labels">
+                                            <span id="issuedLabel">Issued</span>
+                                            <span id="expiresLabel">Expires</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Verification Section -->
+                                <div class="jwt-section">
+                                    <div class="jwt-section-header">
+                                        <div class="jwt-section-title">
+                                            <i class="fas fa-check-circle"></i> Signature Verification
+                                        </div>
+                                    </div>
+                                    <div class="verification-section">
+                                        <!-- Tabs for verification methods -->
+                                        <div class="tabs">
+                                            <button class="tab active" data-tab="secretKey">Secret Key</button>
+                                            <button class="tab" data-tab="publicKey">Public Key</button>
+                                            <button class="tab" data-tab="jwks">JWKS</button>
+                                            <button class="tab" data-tab="discovery">OIDC Discovery</button>
+                                        </div>
+                                        
+                                        <!-- Secret Key Tab -->
+                                        <div id="secretKey" class="tab-content active">
+                                            <div class="input-group">
+                                                <label for="secretKeyInput">HMAC Secret Key:</label>
+                                                <textarea id="secretKeyInput" class="key-input" placeholder="Enter your secret key for HS256/HS384/HS512 algorithms"></textarea>
+                                            </div>
+                                            <button id="verifySecretBtn" class="btn btn-primary">
+                                                <i class="fas fa-signature"></i> Verify Signature
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Public Key Tab -->
+                                        <div id="publicKey" class="tab-content">
+                                            <div class="input-group">
+                                                <label for="publicKeyInput">Public Key or Certificate (PEM):</label>
+                                                <textarea id="publicKeyInput" class="key-input" placeholder="-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...
+-----END PUBLIC KEY-----"></textarea>
+                                            </div>
+                                            <button id="verifyPublicBtn" class="btn btn-primary">
+                                                <i class="fas fa-signature"></i> Verify Signature
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- JWKS Tab -->
+                                        <div id="jwks" class="tab-content">
+                                            <div class="input-group">
+                                                <label for="jwksInput">JWKS (JSON Web Key Set):</label>
+                                                <textarea id="jwksInput" class="key-input" placeholder='{"keys":[{"kty":"RSA","use":"sig","kid":"1","n":"...","e":"..."}]}' ></textarea>
+                                            </div>
+                                            <button id="verifyJwksBtn" class="btn btn-primary">
+                                                <i class="fas fa-signature"></i> Verify Signature
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- OIDC Discovery Tab -->
+                                        <div id="discovery" class="tab-content">
+                                            <div class="input-group">
+                                                <label for="discoveryInput">OIDC Discovery URL:</label>
+                                                <div class="discovery-input">
+                                                    <input type="text" id="discoveryInput" placeholder="https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration">
+                                                    <button id="fetchDiscoveryBtn" class="btn btn-primary">
+                                                        <i class="fas fa-download"></i> Fetch
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            <div class="input-group" style="margin-top: 16px;">
+                                                <label for="discoveredJwksUrl">JWKS URL (auto-populated from discovery):</label>
+                                                <input type="text" id="discoveredJwksUrl" readonly>
+                                            </div>
+                                            <button id="verifyDiscoveryBtn" class="btn btn-primary">
+                                                <i class="fas fa-signature"></i> Verify Signature
+                                            </button>
+                                        </div>
+                                        
+                                        <!-- Verification Result -->
+                                        <div id="verificationResult" class="verification-result" style="display: none;">
+                                            <i id="verifyIcon" class="fas"></i>
+                                            <span id="verifyMessage"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Recent Tokens List -->
+        <div class="two-column-span">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i> Recent Tokens
+                        <span id="tokensCount" class="badge badge-success">0</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search tokens...">
+                        <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
+                    </div>
+                    
+                    <div id="tokensList" class="links-list">
+                        <!-- Tokens will be inserted here, starred items first -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Status message container -->
+    <div id="statusMessage" class="status-message"></div>
+    
+    <!-- Footer will be injected by common.js -->
+    <div id="footer-container"></div>
+    
+    <!-- Common Scripts -->
+    <script src="../js/common.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/tools-registry.js"></script>
+    
+    <!-- Tool-specific Script -->
+    <script src="../js/tools/jwt-decoder.js"></script>
+    
+    <!-- Initialize intro section toggle -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Introduction collapsible toggle
+            const introCollapseToggle = document.querySelector('.intro-collapse-toggle');
+            const introContent = document.querySelector('.intro-content');
+            
+            if (introCollapseToggle && introContent) {
+                introCollapseToggle.addEventListener('click', () => {
+                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
+                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
+                    introContent.classList.toggle('expanded');
+                });
+            }
+        });
+    </script>
+</body>
+</html>

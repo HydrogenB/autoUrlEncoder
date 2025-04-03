@@ -28,6 +28,16 @@ const toolRegistry = [
         comingSoon: true
     },
     {
+        id: "jwt-decoder",
+        name: "JWT Decoder & Validator",
+        description: "Decode, inspect and validate JSON Web Tokens (JWT) for authentication and security debugging",
+        icon: "shield-alt",
+        category: "security-tools",
+        categoryName: "Security Tools",
+        path: "tools/jwt-decoder.html",
+        tags: ["jwt", "token", "authentication", "oidc", "security"]
+    },
+    {
         id: "base64-converter",
         name: "Base64 Converter",
         description: "Encode and decode Base64 strings with support for files and images",
@@ -37,7 +47,8 @@ const toolRegistry = [
         path: "tools/base64-converter.html",
         tags: ["base64", "encode", "decode"],
         comingSoon: true
-    }
+    },
+    
 ];
 
 // Function to get tool by ID
