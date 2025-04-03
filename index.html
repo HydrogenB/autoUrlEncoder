@@ -96,7 +96,7 @@
             max-width: 1200px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 3fr 2fr;
             gap: 24px;
         }
 
@@ -104,9 +104,9 @@
             grid-column: 1 / -1;
         }
 
-        @media (min-width: 1024px) {
+        @media (max-width: 1023px) {
             .container {
-                grid-template-columns: 3fr 2fr;
+                grid-template-columns: 1fr;
             }
         }
 
@@ -313,6 +313,8 @@
             border-radius: 8px;
             position: relative;
             cursor: pointer;
+            width: 100%;
+            text-align: center;
         }
 
         .qr-container::after {
@@ -338,6 +340,14 @@
             margin-top: 12px;
             text-align: center;
         }
+        
+        .qr-processed-url {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            text-align: center;
+        }
 
         .qr-overlay {
             position: fixed;
@@ -345,7 +355,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background-color: rgba(0, 0, 0, 0.85);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -373,28 +383,40 @@
 
         .qr-overlay-close {
             position: absolute;
-            top: 15px;
-            right: 15px;
-            background: none;
-            border: none;
-            font-size: 2rem;
-            cursor: pointer;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--danger);
             color: var(--danger);
-            z-index: 10;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
+            font-size: 1.5rem;
+            border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
+            cursor: pointer;
+            z-index: 1050;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
         .qr-overlay-close:hover {
-            background-color: rgba(247, 37, 133, 0.1);
+            background-color: var(--danger);
+            color: white;
         }
 
         .qr-overlay-image {
             margin: 20px auto;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .qr-overlay-image canvas {
+            max-width: 100%;
+            height: auto;
         }
 
         .qr-overlay-buttons {
@@ -422,42 +444,46 @@
             color: var(--primary);
         }
 
-        .history-list {
+        .links-list {
             max-height: 500px;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: var(--gray) var(--light);
         }
 
-        .history-list::-webkit-scrollbar {
+        .links-list::-webkit-scrollbar {
             width: 6px;
         }
 
-        .history-list::-webkit-scrollbar-track {
+        .links-list::-webkit-scrollbar-track {
             background: var(--light);
         }
 
-        .history-list::-webkit-scrollbar-thumb {
+        .links-list::-webkit-scrollbar-thumb {
             background-color: var(--gray);
             border-radius: 6px;
         }
 
-        .history-item {
+        .list-item {
             padding: 12px;
             border-bottom: 1px solid #eee;
             position: relative;
             transition: var(--transition);
         }
 
-        .history-item:hover {
+        .list-item:hover {
             background-color: rgba(67, 97, 238, 0.05);
         }
 
-        .history-item:last-child {
+        .list-item:last-child {
             border-bottom: none;
         }
+        
+        .list-item.starred {
+            background-color: rgba(248, 150, 30, 0.08);
+        }
 
-        .history-url {
+        .list-url {
             font-size: 0.9rem;
             word-break: break-all;
             margin-bottom: 4px;
@@ -470,7 +496,7 @@
             font-weight: 500;
         }
 
-        .history-meta {
+        .list-meta {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -478,7 +504,7 @@
             color: var(--gray);
         }
 
-        .history-actions {
+        .list-actions {
             display: flex;
             gap: 2px;
         }
@@ -613,34 +639,6 @@
             background-color: var(--success);
         }
 
-        .collapsible-section {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.3s ease;
-        }
-
-        .collapsible-section.expanded {
-            max-height: 500px;
-        }
-
-        .collapse-toggle {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            padding: 10px 0;
-            margin-bottom: 10px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .collapse-toggle i {
-            transition: transform 0.3s ease;
-        }
-
-        .collapse-toggle.expanded i {
-            transform: rotate(180deg);
-        }
-
         .param-table {
             width: 100%;
             border-collapse: collapse;
@@ -732,17 +730,11 @@
             margin: 0 auto;
         }
 
-        .history-nickname {
-            display: none;
-            align-items: center;
-            margin-top: 5px;
-        }
-
         .nickname-display {
             margin-right: 10px;
             font-weight: 500;
         }
-
+        
         .nickname-edit {
             background: none;
             border: none;
@@ -760,7 +752,7 @@
             margin-right: 5px;
         }
 
-        .history-qr {
+        .list-qr {
             max-height: 0;
             overflow: hidden;
             transition: max-height 0.3s ease;
@@ -769,7 +761,7 @@
             padding: 0 20px;
         }
 
-        .history-qr.expanded {
+        .list-qr.expanded {
             max-height: 200px;
             margin-top: 10px;
             margin-bottom: 10px;
@@ -916,11 +908,7 @@
             margin: 0 5px;
         }
 
-        .encoder-container {
-            grid-column: 1 / -1;
-        }
-
-        .history-qr-btn {
+        .list-qr-btn {
             cursor: pointer;
         }
 
@@ -933,6 +921,12 @@
             color: white;
             font-size: 0.9rem;
             opacity: 0.7;
+        }
+        
+        .list-nickname {
+            display: none;
+            align-items: center;
+            margin-top: 5px;
         }
 
         @media (max-width: 600px) {
@@ -950,32 +944,36 @@
 <body>
     <!-- Breadcrumbs for SEO -->
     <div class="container">
-        <nav aria-label="breadcrumb" class="breadcrumbs">
-            <div class="breadcrumb-item"><a href="/">Home</a></div>
-            <div class="breadcrumb-separator">/</div>
-            <div class="breadcrumb-item"><a href="/tools">Web Tools</a></div>
-            <div class="breadcrumb-separator">/</div>
-            <div class="breadcrumb-item">URL Parameter Encoder</div>
-        </nav>
+        <div class="two-column-span">
+            <nav aria-label="breadcrumb" class="breadcrumbs">
+                <div class="breadcrumb-item"><a href="/">Home</a></div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item"><a href="/tools">Web Tools</a></div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item">URL Parameter Encoder</div>
+            </nav>
+        </div>
     </div>
 
     <!-- SEO Introduction Section - Collapsible by default -->
     <div class="container">
-        <section class="intro-section two-column-span">
-            <div class="intro-collapse-toggle">
-                <h1 class="intro-title">URL Parameter Encoder Tool</h1>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="intro-content">
-                <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for secure deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
-            </div>
-        </section>
+        <div class="two-column-span">
+            <section class="intro-section">
+                <div class="intro-collapse-toggle">
+                    <h1 class="intro-title">URL Parameter Encoder Tool</h1>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="intro-content">
+                    <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for secure deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
+                </div>
+            </section>
+        </div>
     </div>
 
     <!-- Main Application -->
     <div class="container">
-        <!-- Encoder Section - Spanning 2 columns -->
-        <div class="encoder-container">
+        <!-- Encoder Section - Left column -->
+        <div>
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title"><i class="fas fa-link"></i> URL Parameter Encoder</h2>
@@ -994,15 +992,6 @@
                         <div id="validationMessage" class="validation-message"></div>
                     </div>
                     
-                    <div class="collapse-toggle" id="paramsToggle">
-                        <label>Parameters to Encode (Optional):</label>
-                        <i class="fas fa-chevron-down"></i>
-                    </div>
-                    <div class="collapsible-section" id="paramsSection">
-                        <input type="text" id="paramNames" placeholder="Comma-separated names (e.g. url,link,source)">
-                        <div class="validation-message">Leave empty to auto-detect URL parameters</div>
-                    </div>
-                    
                     <!-- POST Parameters (hidden by default) -->
                     <div class="mode-content" id="postParamsContent">
                         <div class="input-group">
@@ -1019,6 +1008,7 @@
                     <div id="resultContainer" class="result-container" style="display: none;">
                         <!-- QR Code First -->
                         <div id="qrContainer" class="qr-container">
+                            <div class="qr-processed-url">Processed URL:</div>
                             <div id="qrCode"></div>
                             <p class="qr-caption">Scan with your phone to open this link directly</p>
                         </div>
@@ -1078,13 +1068,13 @@
             </div>
         </div>
         
-        <!-- Recent Links -->
+        <!-- Recent Links - Right column -->
         <div>
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">
                         <i class="fas fa-history"></i> Recent Links 
-                        <span id="historyCount" class="badge badge-success">0</span>
+                        <span id="linksCount" class="badge badge-success">0</span>
                     </h2>
                 </div>
                 <div class="card-body">
@@ -1094,22 +1084,9 @@
                         <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
                     </div>
                     
-                    <div id="historyList" class="history-list"></div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Starred Links -->
-        <div>
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-star"></i> Starred Links
-                        <span id="starredCount" class="badge badge-warning">0</span>
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div id="starredList" class="history-list"></div>
+                    <div id="linksList" class="links-list">
+                        <!-- Links will be inserted here, starred items first -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -1380,7 +1357,6 @@
 
         // DOM elements
         const inputUrl = document.getElementById('inputUrl');
-        const paramNames = document.getElementById('paramNames');
         const postParams = document.getElementById('postParams');
         const validationProgress = document.getElementById('validationProgress');
         const validationMessage = document.getElementById('validationMessage');
@@ -1402,17 +1378,13 @@
         const qrOverlayImage = document.getElementById('qrOverlayImage');
         const qrOverlayUrl = document.getElementById('qrOverlayUrl');
         const qrOverlaySave = document.getElementById('qrOverlaySave');
-        const historyList = document.getElementById('historyList');
-        const starredList = document.getElementById('starredList');
+        const linksList = document.getElementById('linksList');
         const searchInput = document.getElementById('searchInput');
         const clearSearch = document.getElementById('clearSearch');
-        const historyCount = document.getElementById('historyCount');
-        const starredCount = document.getElementById('starredCount');
+        const linksCount = document.getElementById('linksCount');
         const statusMessage = document.getElementById('statusMessage');
         const autosaveStatus = document.getElementById('autosaveStatus');
         const autosaveText = document.getElementById('autosaveText');
-        const paramsToggle = document.getElementById('paramsToggle');
-        const paramsSection = document.getElementById('paramsSection');
         const modeBtns = document.querySelectorAll('.mode-btn');
         const postParamsContent = document.getElementById('postParamsContent');
         const deployDate = document.getElementById('deployDate');
@@ -1430,16 +1402,14 @@
         let isEditingParams = false;
         let currentQrCodeData = '';
 
-        // Update history counts
+        // Update links count
         function updateCounts() {
-            historyCount.textContent = urlHistory.length;
-            starredCount.textContent = urlHistory.filter(item => item.starred).length;
+            linksCount.textContent = urlHistory.length;
         }
 
         // Process URL and update UI
         function processUrl() {
             const url = inputUrl.value.trim();
-            const params = paramNames.value.trim();
             
             // Clear auto-save status
             autosaveStatus.classList.remove('autosave-active');
@@ -1459,7 +1429,7 @@
                 return;
             }
             
-            const result = encodeUrlParamsInUrl(url, params);
+            const result = encodeUrlParamsInUrl(url, null); // Auto-detect all URLs
             lastProcessedUrl = result.result;
             lastProcessedResult = result;
             
@@ -1494,7 +1464,6 @@
             // Log the processed URL
             logger.log("URL processed", { 
                 originalUrl: url,
-                params: params,
                 encoded: result.valid,
                 paramCount: result.params.length
             });
@@ -1719,8 +1688,8 @@
             }
         }
         
-        // Generate QR code for history item
-        function generateHistoryQR(container, url) {
+        // Generate QR code for list item
+        function generateListQR(container, url) {
             container.innerHTML = '';
             
             try {
@@ -1738,8 +1707,8 @@
             }
         }
         
-        // Toggle QR code visibility for history item
-        function toggleHistoryQR(id) {
+        // Toggle QR code visibility for list item
+        function toggleListQR(id) {
             const qrElement = document.getElementById(`qr-${id}`);
             const toggleBtn = document.getElementById(`toggle-qr-${id}`);
             
@@ -1754,14 +1723,14 @@
                 if (qrElement.children.length === 0) {
                     const item = urlHistory.find(entry => entry.id === id);
                     if (item) {
-                        generateHistoryQR(qrElement, item.encodedUrl);
+                        generateListQR(qrElement, item.encodedUrl);
                     }
                 }
             }
         }
         
-        // Show QR code overlay from history item
-        function showHistoryQrOverlay(id) {
+        // Show QR code overlay from list item
+        function showListQrOverlay(id) {
             const item = urlHistory.find(entry => entry.id === id);
             if (item) {
                 showQrOverlay(item.encodedUrl);
@@ -1786,12 +1755,8 @@
             }
         }
         
-        // Edit nickname for history item
+        // Edit nickname for list item
         function editNickname(id) {
-            // Check if ID has 's-' prefix (from starred section)
-            const actualId = id.startsWith('s-') ? id.substring(2) : id;
-            const prefix = id.startsWith('s-') ? 's-' : '';
-            
             const nameDisplay = document.getElementById(`nickname-display-${id}`);
             const nameEdit = document.getElementById(`nickname-edit-${id}`);
             
@@ -1804,43 +1769,31 @@
             
             // Log edit action
             logger.log("Nickname edit started", { 
-                id: actualId,
-                from: prefix === 's-' ? "starred-section" : "regular-section"
+                id: id
             });
         }
         
-        // Save nickname for history item
+        // Save nickname for list item
         function saveNickname(id) {
-            // Check if ID has 's-' prefix (from starred section)
-            const actualId = id.startsWith('s-') ? id.substring(2) : id;
-            const prefix = id.startsWith('s-') ? 's-' : '';
-            
             const nameDisplay = document.getElementById(`nickname-display-${id}`);
             const nameEdit = document.getElementById(`nickname-edit-${id}`);
             const inputElement = document.getElementById(`nickname-input-${id}`);
             
             const newNickname = inputElement.value.trim();
             
-            // Update in history array - use the actual ID without prefix
-            const itemIndex = urlHistory.findIndex(entry => entry.id === actualId);
+            // Update in history array
+            const itemIndex = urlHistory.findIndex(entry => entry.id === id);
             if (itemIndex !== -1) {
                 urlHistory[itemIndex].nickname = newNickname;
                 StorageManager.set('urlHistory', urlHistory);
                 
-                // Update display in both sections
-                // Current section
+                // Update display
                 const displayElement = document.getElementById(`nickname-text-${id}`);
                 if (displayElement) {
                     displayElement.textContent = newNickname || 'No nickname';
                 }
                 
-                // Also update in the other section if it exists
-                const otherSectionDisplay = document.getElementById(`nickname-text-${prefix ? actualId : 's-' + actualId}`);
-                if (otherSectionDisplay) {
-                    otherSectionDisplay.textContent = newNickname || 'No nickname';
-                }
-                
-                // Update visibility in current section
+                // Show or hide nickname section based on presence of nickname
                 const nicknameSection = document.getElementById(`nickname-section-${id}`);
                 if (nicknameSection) {
                     if (newNickname) {
@@ -1850,26 +1803,10 @@
                     }
                 }
                 
-                // Update visibility in other section if it exists
-                const otherNicknameSection = document.getElementById(`nickname-section-${prefix ? actualId : 's-' + actualId}`);
-                if (otherNicknameSection) {
-                    if (newNickname) {
-                        otherNicknameSection.style.display = 'flex';
-                    } else {
-                        otherNicknameSection.style.display = 'none';
-                    }
-                }
-                
-                // Update add nickname button in current section
+                // Update add nickname button
                 const addButton = document.getElementById(`add-nickname-${id}`);
                 if (addButton) {
                     addButton.style.display = newNickname ? 'none' : 'inline-flex';
-                }
-                
-                // Update add nickname button in other section
-                const otherAddButton = document.getElementById(`add-nickname-${prefix ? actualId : 's-' + actualId}`);
-                if (otherAddButton) {
-                    otherAddButton.style.display = newNickname ? 'none' : 'inline-flex';
                 }
                 
                 nameDisplay.style.display = 'flex';
@@ -1877,16 +1814,18 @@
                 
                 showStatusMessage('Nickname updated');
                 
+                // Refresh the links list to reflect changes
+                renderLinksList();
+                
                 // Log nickname update
                 logger.log("Nickname updated", { 
-                    id: actualId,
-                    nickname: newNickname,
-                    from: prefix === 's-' ? "starred-section" : "regular-section"
+                    id: id,
+                    nickname: newNickname
                 });
             }
         }
         
-        // Add nickname to history item
+        // Add nickname to list item
         function addNickname(id) {
             const nicknameSection = document.getElementById(`nickname-section-${id}`);
             const addButton = document.getElementById(`add-nickname-${id}`);
@@ -1898,17 +1837,14 @@
             editNickname(id);
             
             // Log add nickname action
-            const actualId = id.startsWith('s-') ? id.substring(2) : id;
             logger.log("Add nickname initiated", { 
-                id: actualId,
-                from: id.startsWith('s-') ? "starred-section" : "regular-section"
+                id: id
             });
         }
         
         // Save URL to history
         function saveToHistory(showNotification = true) {
             const url = inputUrl.value.trim();
-            const params = paramNames.value.trim();
             const processedResult = lastProcessedUrl;
             const postParamsValue = postParams.value.trim();
             
@@ -1925,7 +1861,7 @@
                 });
                 
                 // Generate a consistent ID based on URL content to avoid duplicates
-                const urlId = btoa(url + params + currentMode).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+                const urlId = btoa(url + currentMode).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
                 
                 // Check if URL already exists
                 const existingIndex = urlHistory.findIndex(item => item.id === urlId);
@@ -1943,7 +1879,6 @@
                     const entry = {
                         id: urlId,
                         originalUrl: url,
-                        params: params,
                         encodedUrl: processedResult,
                         timestamp,
                         displayDate,
@@ -1972,8 +1907,7 @@
                 StorageManager.set('urlHistory', urlHistory);
                 
                 // Update UI
-                renderHistory();
-                renderStarred();
+                renderLinksList();
                 updateCounts();
                 
                 if (showNotification) {
@@ -2006,8 +1940,7 @@
                     urlHistory[itemIndex].starred = !urlHistory[itemIndex].starred;
                     StorageManager.set('urlHistory', urlHistory);
                     
-                    renderHistory();
-                    renderStarred();
+                    renderLinksList();
                     updateCounts();
                     
                     showStatusMessage(
@@ -2035,7 +1968,6 @@
                 
                 if (item) {
                     inputUrl.value = item.originalUrl;
-                    paramNames.value = item.params;
                     
                     // Set request mode
                     if (item.requestMode) {
@@ -2095,16 +2027,18 @@
         }
         
         // Open URL in new tab
-        function runUrl(url) {
+        function runUrl(url, mode = null, postParamsText = null) {
             try {
-                if (currentMode === 'get') {
+                const useMode = mode || currentMode;
+                
+                if (useMode === 'get') {
                     window.open(url, '_blank');
                     
                     // Log GET URL run
                     logger.log("URL opened (GET)", { 
                         url: url
                     });
-                } else if (currentMode === 'post') {
+                } else if (useMode === 'post') {
                     // Create a form to submit POST request
                     const form = document.createElement('form');
                     form.method = 'POST';
@@ -2122,13 +2056,15 @@
                     }
                     
                     // Add POST parameters
+                    const postParamsValue = postParamsText || postParams.value;
                     let postData = {};
+                    
                     try {
                         // Try to parse as JSON
-                        postData = JSON.parse(postParams.value);
+                        postData = JSON.parse(postParamsValue);
                     } catch (e) {
                         // Parse as URL encoded string
-                        const params = new URLSearchParams(postParams.value);
+                        const params = new URLSearchParams(postParamsValue);
                         for (const [key, value] of params.entries()) {
                             postData[key] = value;
                         }
@@ -2168,8 +2104,7 @@
                 urlHistory = urlHistory.filter(entry => entry.id !== id);
                 StorageManager.set('urlHistory', urlHistory);
                 
-                renderHistory();
-                renderStarred();
+                renderLinksList();
                 updateCounts();
                 
                 showStatusMessage('Item deleted');
@@ -2222,11 +2157,11 @@
             }, 2000);
         }
         
-        // Render history list
-        function renderHistory(searchTerm = '') {
+        // Render links list with starred items at the top
+        function renderLinksList(searchTerm = '') {
             try {
                 if (urlHistory.length === 0) {
-                    historyList.innerHTML = `
+                    linksList.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-history"></i>
                             <p>No history yet</p>
@@ -2237,6 +2172,7 @@
                 
                 const normalizedSearch = searchTerm.toLowerCase();
                 
+                // Filter by search term if provided
                 const filteredHistory = normalizedSearch ? 
                     urlHistory.filter(entry => 
                         (entry.originalUrl.toLowerCase().includes(normalizedSearch) || 
@@ -2245,7 +2181,7 @@
                     urlHistory;
                 
                 if (filteredHistory.length === 0) {
-                    historyList.innerHTML = `
+                    linksList.innerHTML = `
                         <div class="empty-state">
                             <i class="fas fa-search"></i>
                             <p>No matching links found</p>
@@ -2254,26 +2190,36 @@
                     return;
                 }
                 
-                // Sort by last used time, most recent first
-                const sortedHistory = [...filteredHistory].sort((a, b) => b.lastUsed - a.lastUsed);
+                // Separate starred and non-starred items
+                const starredItems = filteredHistory.filter(item => item.starred);
+                const regularItems = filteredHistory.filter(item => !item.starred);
                 
-                historyList.innerHTML = sortedHistory.map(entry => {
+                // Sort each group by last used time, most recent first
+                starredItems.sort((a, b) => b.lastUsed - a.lastUsed);
+                regularItems.sort((a, b) => b.lastUsed - a.lastUsed);
+                
+                // Combine with starred items first
+                const sortedHistory = [...starredItems, ...regularItems];
+                
+                linksList.innerHTML = sortedHistory.map(entry => {
                     // Highlight domain if no nickname
                     const domain = extractDomain(entry.originalUrl);
                     const protocol = entry.originalUrl.split('://')[0] || '';
-                    const highlightedUrl = entry.nickname ? 
-                        escapeHtml(entry.encodedUrl) : 
-                        `<span class="highlighted-domain">${protocol}://${domain}</span>${escapeHtml(entry.encodedUrl.substring(protocol.length + 3 + domain.length))}`;
+                    const displayUrl = entry.nickname ? 
+                        entry.nickname : 
+                        `${protocol}://${domain}`;
                     
                     return `
-                        <div class="history-item">
+                        <div class="list-item ${entry.starred ? 'starred' : ''}">
                             <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="toggleStar('${entry.id}')">
                                 <i class="fas fa-star"></i>
                             </button>
                             
-                            <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${highlightedUrl}</div>
+                            <div class="list-url" onclick="loadUrlToEditor('${entry.id}')">
+                                ${escapeHtml(displayUrl)}
+                            </div>
                             
-                            <div id="nickname-section-${entry.id}" class="history-nickname" style="${entry.nickname ? 'display:flex' : 'display:none'}">
+                            <div id="nickname-section-${entry.id}" class="list-nickname" style="${entry.nickname ? 'display:flex' : 'display:none'}">
                                 <div id="nickname-display-${entry.id}" class="nickname-display">
                                     <span id="nickname-text-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
                                     <button class="nickname-edit" onclick="editNickname('${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
@@ -2284,20 +2230,22 @@
                                 </div>
                             </div>
                             
-                            <button id="add-nickname-${entry.id}" class="add-nickname-btn" style="${entry.nickname ? 'display:none' : 'display:inline-flex'}" onclick="addNickname('${entry.id}')">
-                                <i class="fas fa-tag"></i> Add Nickname
-                            </button>
+                            ${!entry.nickname ? `
+                                <button id="add-nickname-${entry.id}" class="add-nickname-btn" onclick="addNickname('${entry.id}')">
+                                    <i class="fas fa-tag"></i> Add Nickname
+                                </button>
+                            ` : ''}
                             
-                            <div class="history-meta">
+                            <div class="list-meta">
                                 <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
-                                <div class="history-actions">
+                                <div class="list-actions">
                                     <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
                                         <i class="fas fa-copy"></i>
                                     </button>
-                                    <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
+                                    <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}', '${entry.requestMode || 'get'}', '${entry.postParams ? escapeHtml(entry.postParams.replace(/'/g, "\\'")) : ''}')">
                                         <i class="fas fa-external-link-alt"></i>
                                     </button>
-                                    <button id="toggle-qr-${entry.id}" class="toggle-qr" onclick="toggleHistoryQR('${entry.id}')">
+                                    <button id="toggle-qr-${entry.id}" class="toggle-qr" onclick="toggleListQR('${entry.id}')">
                                         <i class="fas fa-qrcode"></i> Show QR
                                     </button>
                                     <button class="action-icon tooltip" data-tooltip="Delete" onclick="deleteHistoryItem('${entry.id}')">
@@ -2306,87 +2254,13 @@
                                 </div>
                             </div>
                             
-                            <div id="qr-${entry.id}" class="history-qr" onclick="showHistoryQrOverlay('${entry.id}')"></div>
+                            <div id="qr-${entry.id}" class="list-qr" onclick="showListQrOverlay('${entry.id}')"></div>
                         </div>
                     `;
                 }).join('');
             } catch (e) {
-                logger.error("Error rendering history:", e);
-                historyList.innerHTML = `<div class="empty-state">Error loading history</div>`;
-            }
-        }
-        
-        // Render starred list
-        function renderStarred() {
-            try {
-                const starredItems = urlHistory.filter(entry => entry.starred);
-                
-                if (starredItems.length === 0) {
-                    starredList.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-star"></i>
-                            <p>No starred links yet</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                // Sort by last used time
-                const sortedStarred = [...starredItems].sort((a, b) => b.lastUsed - a.lastUsed);
-                
-                starredList.innerHTML = sortedStarred.map(entry => {
-                    // Highlight domain if no nickname
-                    const domain = extractDomain(entry.originalUrl);
-                    const protocol = entry.originalUrl.split('://')[0] || '';
-                    const highlightedUrl = entry.nickname ? 
-                        escapeHtml(entry.encodedUrl) : 
-                        `<span class="highlighted-domain">${protocol}://${domain}</span>${escapeHtml(entry.encodedUrl.substring(protocol.length + 3 + domain.length))}`;
-                    
-                    return `
-                        <div class="history-item">
-                            <button class="star-btn active" onclick="toggleStar('${entry.id}')">
-                                <i class="fas fa-star"></i>
-                            </button>
-                            
-                            <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${highlightedUrl}</div>
-                            
-                            <div id="nickname-section-s-${entry.id}" class="history-nickname" style="${entry.nickname ? 'display:flex' : 'display:none'}">
-                                <div id="nickname-display-s-${entry.id}" class="nickname-display">
-                                    <span id="nickname-text-s-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
-                                    <button class="nickname-edit" onclick="editNickname('s-${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
-                                </div>
-                                <div id="nickname-edit-s-${entry.id}" class="edit-mode">
-                                    <input type="text" id="nickname-input-s-${entry.id}" class="nickname-input" value="${escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
-                                    <button class="btn btn-primary" onclick="saveNickname('s-${entry.id}')">Save</button>
-                                </div>
-                            </div>
-                            
-                            <button id="add-nickname-s-${entry.id}" class="add-nickname-btn" style="${entry.nickname ? 'display:none' : 'display:inline-flex'}" onclick="addNickname('s-${entry.id}')">
-                                <i class="fas fa-tag"></i> Add Nickname
-                            </button>
-                            
-                            <div class="history-meta">
-                                <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
-                                <div class="history-actions">
-                                    <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                    <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
-                                        <i class="fas fa-external-link-alt"></i>
-                                    </button>
-                                    <button id="toggle-qr-s-${entry.id}" class="toggle-qr" onclick="toggleHistoryQR('s-${entry.id}')">
-                                        <i class="fas fa-qrcode"></i> Show QR
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <div id="qr-s-${entry.id}" class="history-qr" onclick="showHistoryQrOverlay('${entry.id}')"></div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (e) {
-                logger.error("Error rendering starred items:", e);
-                starredList.innerHTML = `<div class="empty-state">Error loading starred items</div>`;
+                logger.error("Error rendering links list:", e);
+                linksList.innerHTML = `<div class="empty-state">Error loading links</div>`;
             }
         }
         
@@ -2440,7 +2314,6 @@
         // Event listeners
         // URL processing
         inputUrl.addEventListener('input', processUrl);
-        paramNames.addEventListener('input', processUrl);
         postParams.addEventListener('input', processUrl);
         
         // Action buttons
@@ -2454,7 +2327,6 @@
         
         clearBtn.addEventListener('click', () => {
             inputUrl.value = '';
-            paramNames.value = '';
             postParams.value = '';
             processUrl();
         });
@@ -2488,7 +2360,7 @@
         // Search functionality
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim();
-            renderHistory(searchTerm);
+            renderLinksList(searchTerm);
             
             if (searchTerm) {
                 clearSearch.classList.add('visible');
@@ -2500,13 +2372,7 @@
         clearSearch.addEventListener('click', () => {
             searchInput.value = '';
             clearSearch.classList.remove('visible');
-            renderHistory();
-        });
-        
-        // Parameters collapsible toggle
-        paramsToggle.addEventListener('click', () => {
-            paramsToggle.classList.toggle('expanded');
-            paramsSection.classList.toggle('expanded');
+            renderLinksList();
         });
         
         // Introduction collapsible toggle
@@ -2540,15 +2406,14 @@
         window.runUrl = runUrl;
         window.deleteHistoryItem = deleteHistoryItem;
         window.loadUrlToEditor = loadUrlToEditor;
-        window.toggleHistoryQR = toggleHistoryQR;
-        window.showHistoryQrOverlay = showHistoryQrOverlay;
+        window.toggleListQR = toggleListQR;
+        window.showListQrOverlay = showListQrOverlay;
         window.editNickname = editNickname;
         window.saveNickname = saveNickname;
         window.addNickname = addNickname;
         
         // Initial renders
-        renderHistory();
-        renderStarred();
+        renderLinksList();
         updateCounts();
 
         // Log application initialization
