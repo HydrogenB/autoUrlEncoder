@@ -3,8 +3,6 @@
  * Includes header/footer injection, path helpers, and utility functions
  */
 
-// Add this to the logger section in common.js
-
 // Vercel-compatible logging function
 const logger = {
     log: function(msg, data) {
@@ -80,9 +78,6 @@ const logger = {
         }
     }
 };
-
-// Make sure this is added to the window.myDebugger object
-window.myDebugger.logger = logger;
 
 // Get base path depending on current location (tools/ directory or root)
 function getBasePath() {
