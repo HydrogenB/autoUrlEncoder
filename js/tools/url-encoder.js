@@ -324,7 +324,6 @@ function saveEditedParams() {
     disableParamEditing();
 }
 
-// Update QR code
 function updateQRCode(url) {
     if (!url) {
         qrContainer.style.display = 'none';
@@ -332,15 +331,11 @@ function updateQRCode(url) {
     }
     
     qrContainer.style.display = 'block';
-    qrCode.innerHTML = '';
+    qrCode.innerHTML = ''; // Clear any previous QR code
     currentQrCodeData = url;
     
     try {
-        // Clear any previous QR code
-        while (qrCode.firstChild) {
-            qrCode.removeChild(qrCode.firstChild);
-        }
-        
+        // Create new QR code
         new QRCode(qrCode, {
             text: url,
             width: 200,
@@ -352,6 +347,16 @@ function updateQRCode(url) {
     } catch (e) {
         window.myDebugger.logger.error("Error generating QR code:", e);
         qrCode.innerHTML = '<div style="color: var(--danger)">Error generating QR code</div>';
+        
+        // Try to reinitialize QR library if it failed
+        if (typeof QRCode === 'undefined') {
+            const script = document.createElement('script');
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+            script.onload = function() {
+                updateQRCode(url); // Try again after loading
+            };
+            document.head.appendChild(script);
+        }
     }
 }
 
@@ -1124,13 +1129,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load history from storage
     urlHistory = window.toolStorage.get('url-encoder', 'urlHistory', []);
     
-    // URL processing
+    // Auto-process URL on input with immediate QR code generation
     if (inputUrl) {
-        inputUrl.addEventListener('input', processUrl);
+        inputUrl.addEventListener('input', function() {
+            // Process immediately without debounce for exact behavior match
+            processUrl();
+        });
     }
     
+    // Auto-process POST params on input
     if (postParams) {
         postParams.addEventListener('input', processUrl);
+    }
+    // Call processUrl on page load if URL is present
+    if (inputUrl && inputUrl.value.trim()) {
+        processUrl();
     }
     
     // Action buttons

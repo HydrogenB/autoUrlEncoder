@@ -75,6 +75,11 @@ document.addEventListener('DOMContentLoaded', function() {
     jwtInput.addEventListener('paste', () => {
         setTimeout(decodeToken, 100);
     });
+
+    // Call decodeToken on page load if token is present
+    if (jwtInput.value.trim()) {
+        decodeToken();
+    }
     
     // Clear input
     clearBtn.addEventListener('click', () => {
@@ -148,6 +153,18 @@ document.addEventListener('DOMContentLoaded', function() {
             clearSearch.classList.add('visible');
         } else {
             clearSearch.classList.remove('visible');
+        }
+    });
+
+    // Auto-decode on input
+    jwtInput.addEventListener('input', function() {
+        // Process immediately for exact behavior match
+        const token = this.value.trim();
+        if (token) {
+            decodeToken();
+        } else {
+            // Hide results if input is empty
+            resultContainer.style.display = 'none';
         }
     });
     
