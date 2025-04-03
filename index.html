@@ -10,26 +10,25 @@
     <!-- SEO Meta Tags -->
     <meta name="description" content="Free URL Parameter Encoder tool to safely encode URL parameters for deep links, marketing campaigns, and secure data sharing. Generate QR codes and save links for future use.">
     <meta name="keywords" content="url encoder, parameter encoder, url parameter tool, encode url parameters, url deeplink generator, qr code generator, url security, utm parameter encoder">
-    <meta name="author" content="Jirad Srirattana-arporn">
     <meta name="robots" content="index, follow">
     <meta name="revisit-after" content="7 days">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://auto-url-encoder.vercel.app">
+    <link rel="canonical" href="https://encodeurl.vercel.app">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://auto-url-encoder.vercel.app">
+    <meta property="og:url" content="https://encodeurl.vercel.app">
     <meta property="og:title" content="URL Parameter Encoder Tool | Encode & Secure URL Parameters">
     <meta property="og:description" content="Free online tool to safely encode URL parameters, generate QR codes, and secure your deep links.">
-    <meta property="og:image" content="https://auto-url-encoder.vercel.app/og-image.jpg">
+    <meta property="og:image" content="https://encodeurl.vercel.app/og-image.jpg">
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://auto-url-encoder.vercel.app">
+    <meta property="twitter:url" content="https://encodeurl.vercel.app">
     <meta property="twitter:title" content="URL Parameter Encoder Tool | Encode & Secure URL Parameters">
     <meta property="twitter:description" content="Free online tool to safely encode URL parameters, generate QR codes, and secure your deep links.">
-    <meta property="twitter:image" content="https://auto-url-encoder.vercel.app/og-image.jpg">
+    <meta property="twitter:image" content="https://encodeurl.vercel.app/og-image.jpg">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png">
@@ -356,12 +355,14 @@
             text-align: center;
         }
         
+        /* FIX 4: Center align the processed URL text */
         .qr-processed-url {
             font-size: 1rem;
             font-weight: 600;
             color: var(--dark);
             margin-bottom: 8px;
             text-align: center;
+            width: 100%;
         }
 
         .qr-overlay {
@@ -726,7 +727,7 @@
             margin-top: 10px;
         }
 
-        /* FIX 3: Enhanced SEO-friendly footer */
+        /* Modified SEO-friendly footer without contact & copyright */
         footer {
             background-color: var(--light);
             border-top: 1px solid #eee;
@@ -775,10 +776,6 @@
             font-size: 0.85rem;
             border-top: 1px solid #eee;
             padding-top: 20px;
-        }
-
-        .copyright {
-            margin-top: 10px;
         }
 
         .nickname-display {
@@ -1015,7 +1012,7 @@
                     <i class="fas fa-chevron-down"></i>
                 </div>
                 <div class="intro-content">
-                    <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for secure deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
+                    <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
                 </div>
             </section>
         </div>
@@ -1161,16 +1158,16 @@
         <div class="key-instructions">Press ESC key or click anywhere to close</div>
     </div>
     
-    <!-- FIX 3: Enhanced SEO-friendly footer -->
+    <!-- Modified footer without contact info and copyright -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
                 <h3>URL Parameter Encoder Tool</h3>
-                <p>The ultimate tool for secure URL parameter encoding, deep linking, and campaign tracking</p>
+                <p>The ultimate tool for URL parameter encoding, deep linking, and campaign tracking</p>
                 <div class="footer-links">
                     <a href="/tools/url-tools">URL Tools</a> | 
                     <a href="/tools/qr-generator">QR Generator</a> | 
-                    <a href="/blog/secure-url-best-practices">URL Security Blog</a>
+                    <a href="/blog/url-best-practices">URL Best Practices</a>
                 </div>
             </div>
             
@@ -1179,15 +1176,9 @@
                 <ul>
                     <li>Marketing Campaign URL Generation</li>
                     <li>Mobile App Deep Linking</li>
-                    <li>Secure Parameter Encoding</li>
+                    <li>Parameter Encoding for Data Sharing</li>
                     <li>QR Code Generation for Offline-to-Online</li>
                 </ul>
-            </div>
-            
-            <div class="footer-section">
-                <h3>Contact & Support</h3>
-                <p>Need assistance? Contact <strong>Jirad Srirattana-arporn</strong></p>
-                <p>Email: <a href="mailto:support@auto-url-encoder.vercel.app">support@auto-url-encoder.vercel.app</a></p>
             </div>
         </div>
         
@@ -1196,11 +1187,8 @@
                 Last deployed: <span id="deployDate">April 3, 2025</span>
             </div>
             <div class="disclaimer">
-                This URL Parameter Encoder Tool is provided "as is" without warranty. All encoding occurs client-side for your privacy and security.
-                Ideal for marketing professionals, app developers, and web security specialists.
-            </div>
-            <div class="copyright">
-                © 2025 URL Parameter Encoder Tool. All rights reserved.
+                This URL Parameter Encoder Tool is provided "as is" without warranty. All encoding occurs client-side for your privacy.
+                Ideal for marketing professionals and app developers.
             </div>
         </div>
     </footer>
@@ -1483,10 +1471,16 @@
         let currentMode = 'get';
         let isEditingParams = false;
         let currentQrCodeData = '';
+        let lastParamState = ''; // Add this for parameter change detection
 
         // Update links count
         function updateCounts() {
             linksCount.textContent = urlHistory.length;
+        }
+
+        // Generate parameter state signature for comparison
+        function generateParamState(params) {
+            return params.map(p => `${p.name}=${p.encodedValue}`).sort().join('&');
         }
 
         // Process URL and update UI
@@ -1531,6 +1525,11 @@
             // Update parameter breakdown table
             updateParamTable(result.params);
             
+            // Generate parameter state signature
+            const currentParamState = generateParamState(result.params);
+            const paramsChanged = lastParamState && currentParamState !== lastParamState;
+            lastParamState = currentParamState;
+            
             // Set auto-save timer for 10 seconds of inactivity
             autoSaveTimer = setTimeout(() => {
                 if (url && result.valid) {
@@ -1539,6 +1538,13 @@
                     autosaveText.textContent = 'Auto-saved';
                 }
             }, 10000);
+            
+            // If parameters have changed, trigger save immediately
+            if (paramsChanged && url && result.valid) {
+                saveToHistory(false);
+                autosaveStatus.classList.add('autosave-active');
+                autosaveText.textContent = 'Auto-saved (parameters changed)';
+            }
             
             // Update QR code immediately
             updateQRCode(result.result);
@@ -1637,6 +1643,18 @@
                 processedUrl.textContent = newUrl;
                 lastProcessedUrl = newUrl;
                 
+                // Generate updated param state
+                const updatedParamState = updatedParams.sort().join('&');
+                const paramsChanged = lastParamState && updatedParamState !== lastParamState;
+                lastParamState = updatedParamState;
+                
+                // Save to history if parameters changed
+                if (paramsChanged) {
+                    saveToHistory(false);
+                    autosaveStatus.classList.add('autosave-active');
+                    autosaveText.textContent = 'Saved (parameters updated)';
+                }
+                
                 // Update other parameters as needed
                 updateQRCode(newUrl);
                 showStatusMessage('Parameters updated');
@@ -1702,7 +1720,7 @@
             }
         }
         
-        // FIX 2: Improved text wrapping for saved QR codes
+        // Improved text wrapping for saved QR codes
         function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
             const words = text.split('');
             let line = '';
@@ -1786,6 +1804,13 @@
                     nickname = historyItem.nickname;
                 }
                 
+                // Add nickname as a subtitle if available - FIX 5: Always include nickname if available
+                if (nickname) {
+                    ctx.font = 'italic 16px Arial';
+                    ctx.fillStyle = '#333333';
+                    ctx.fillText(`"${nickname}"`, paddedCanvas.width / 2, headerHeight - 10);
+                }
+                
                 // Add "Processed URL:" label in blue
                 ctx.font = 'bold 16px Arial';
                 ctx.fillStyle = '#4361ee';
@@ -1811,18 +1836,11 @@
                 const lineHeight = 20;
                 wrapText(ctx, url, paddedCanvas.width / 2, urlBoxY + 20, maxWidth, lineHeight);
                 
-                // Add nickname as a subtitle if available
-                if (nickname) {
-                    ctx.font = 'italic 14px Arial';
-                    ctx.fillStyle = '#333333';
-                    ctx.fillText(`"${nickname}"`, paddedCanvas.width / 2, headerHeight - 10);
-                }
-                
                 // Create download link
                 const dataUrl = paddedCanvas.toDataURL('image/png');
                 const downloadLink = document.createElement('a');
                 downloadLink.href = dataUrl;
-                downloadLink.download = filename || 'qrcode.png';
+                downloadLink.download = filename || (nickname ? `${nickname}_qrcode.png` : 'qrcode.png');
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
@@ -2013,7 +2031,11 @@
                 });
                 
                 // Generate a consistent ID based on URL content to avoid duplicates
-                const urlId = btoa(url + currentMode).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+                // FIX 6: Use paramState in ID generation to account for parameter changes
+                const paramState = lastProcessedResult.params 
+                    ? generateParamState(lastProcessedResult.params) 
+                    : '';
+                const urlId = btoa(url + currentMode + paramState).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
                 
                 // Check if URL already exists
                 const existingIndex = urlHistory.findIndex(item => item.id === urlId);
@@ -2024,7 +2046,9 @@
                         ...urlHistory[existingIndex],
                         timestamp,
                         displayDate,
-                        lastUsed: now.getTime()
+                        lastUsed: now.getTime(),
+                        encodedUrl: processedResult, // Update encoded URL in case parameters changed
+                        paramState: paramState // Save parameter state
                     };
                 } else {
                     // Add new entry
@@ -2038,7 +2062,8 @@
                         lastUsed: now.getTime(),
                         nickname: '',
                         requestMode: currentMode,
-                        postParams: currentMode === 'post' ? postParamsValue : ''
+                        postParams: currentMode === 'post' ? postParamsValue : '',
+                        paramState: paramState // Save parameter state
                     };
                     
                     urlHistory.unshift(entry);
