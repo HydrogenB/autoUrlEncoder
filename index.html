@@ -314,8 +314,6 @@
             cursor: pointer;
             width: 100%;
             text-align: center;
-            /* FIX: Added important z-index to ensure clickability */
-            z-index: 1;
         }
 
         /* FIX 1: Improve QR code alignment */
@@ -615,10 +613,16 @@
             margin-bottom: 16px;
         }
 
-        /* FIX 4: Removed search icon from CSS */
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
         .search-input {
-            padding: 12px;
-            width: 100%;
+            padding-left: 36px;
         }
 
         .clear-search {
@@ -1120,7 +1124,7 @@
                 </div>
                 <div class="card-body">
                     <div class="search-container">
-                        <!-- FIX 4: Removed search icon -->
+                        <i class="fas fa-search"></i>
                         <input type="text" id="searchInput" class="search-input" placeholder="Search links...">
                         <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
                     </div>
@@ -1189,9 +1193,8 @@
     <div id="statusMessage" class="status-message"></div>
     
     <script>
-        // Vercel-compatible logging function with improved server-side tracking
+        // Vercel-compatible logging function
         const logger = {
-            // FIX 3: Implement server-side logging to Vercel
             log: function(msg, data) {
                 if (typeof console !== 'undefined') {
                     const timestamp = new Date().toISOString();
@@ -1203,37 +1206,25 @@
                     }
                 }
                 
-                // Send logs to Vercel
-                if (typeof window !== 'undefined') {
+                // In production with Vercel, we could send logs to a monitoring service
+                if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
                     try {
+                        // Collect logs for potential serverless function reporting
                         const logEntry = {
                             timestamp: Date.now(),
                             message: msg,
                             data: data || null,
                             url: window.location.href,
-                            userAgent: navigator.userAgent,
-                            referrer: document.referrer,
-                            language: navigator.language,
-                            screenSize: `${window.screen.width}x${window.screen.height}`,
-                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                            userAgent: navigator.userAgent
                         };
                         
-                        // Send to Vercel serverless function
-                        fetch('/api/log', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(logEntry),
-                            // Use keepalive to ensure the request completes even if the page is unloading
-                            keepalive: true
-                        }).catch(err => {
-                            // Fallback to localStorage if server logging fails
-                            const logs = JSON.parse(localStorage.getItem('app_logs') || '[]');
-                            logs.push(logEntry);
-                            if (logs.length > 100) logs.splice(0, logs.length - 100);
-                            localStorage.setItem('app_logs', JSON.stringify(logs));
-                        });
+                        // Store in local storage for demo purposes
+                        // In a real app, you might send these to a serverless function
+                        const logs = JSON.parse(localStorage.getItem('app_logs') || '[]');
+                        logs.push(logEntry);
+                        // Keep only the last 100 logs
+                        if (logs.length > 100) logs.splice(0, logs.length - 100);
+                        localStorage.setItem('app_logs', JSON.stringify(logs));
                     } catch (e) {
                         console.error('Error saving log:', e);
                     }
@@ -1252,36 +1243,25 @@
                     }
                 }
                 
-                // Send errors to Vercel
-                if (typeof window !== 'undefined') {
+                // In production with Vercel, we could send errors to a monitoring service
+                if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
                     try {
+                        // Collect errors for potential serverless function reporting
                         const errorEntry = {
                             timestamp: Date.now(),
                             message: msg,
                             error: error ? (error.stack || error.toString()) : null,
                             url: window.location.href,
-                            userAgent: navigator.userAgent,
-                            referrer: document.referrer,
-                            language: navigator.language,
-                            screenSize: `${window.screen.width}x${window.screen.height}`,
-                            timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                            userAgent: navigator.userAgent
                         };
                         
-                        // Send to Vercel serverless function
-                        fetch('/api/error', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify(errorEntry),
-                            keepalive: true
-                        }).catch(err => {
-                            // Fallback to localStorage if server logging fails
-                            const errors = JSON.parse(localStorage.getItem('app_errors') || '[]');
-                            errors.push(errorEntry);
-                            if (errors.length > 50) errors.splice(0, errors.length - 50);
-                            localStorage.setItem('app_errors', JSON.stringify(errors));
-                        });
+                        // Store in local storage for demo purposes
+                        // In a real app, you might send these to a serverless function
+                        const errors = JSON.parse(localStorage.getItem('app_errors') || '[]');
+                        errors.push(errorEntry);
+                        // Keep only the last 50 errors
+                        if (errors.length > 50) errors.splice(0, errors.length - 50);
+                        localStorage.setItem('app_errors', JSON.stringify(errors));
                     } catch (e) {
                         console.error('Error saving error log:', e);
                     }
@@ -1457,6 +1437,7 @@
         const copyBtn = document.getElementById('copyBtn');
         const runBtn = document.getElementById('runBtn');
         const clearBtn = document.getElementById('clearBtn');
+        const saveQrBtn = document.getElementById('saveQrBtn');
         const qrContainer = document.getElementById('qrContainer');
         const qrCode = document.getElementById('qrCode');
         const qrOverlay = document.getElementById('qrOverlay');
@@ -2457,48 +2438,160 @@
             }
         }
         
-        // FIX 3: Improved marketing tracking function
-        function trackUserProperty(property, value) {
+        // Log visitor information
+        function logVisitorInfo() {
             try {
-                const trackingData = {
-                    property: property,
-                    value: value,
+                const visitorInfo = {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    screenWidth: window.screen.width,
+                    screenHeight: window.screen.height,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                     timestamp: new Date().toISOString(),
-                    sessionId: getSessionId(),
-                    userId: getUserId(),
-                    page: window.location.pathname,
-                    referrer: document.referrer || 'direct'
+                    referrer: document.referrer || 'direct',
+                    hostname: window.location.hostname
                 };
                 
-                // Send to Vercel serverless function
-                fetch('/api/track', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(trackingData),
-                    keepalive: true
-                }).catch(err => {
-                    console.error('Error tracking property:', err);
-                });
-                
-                return true;
+                // Store in Vercel-compatible format
+                logger.log("Visitor information", visitorInfo);
             } catch (e) {
-                console.error('Error in tracking:', e);
-                return false;
+                logger.error('Error logging visitor information:', e);
             }
         }
         
-        // FIX 3: Generate or get persistent session ID
-        function getSessionId() {
-            let sessionId = sessionStorage.getItem('encode_url_session');
-            if (!sessionId) {
-                sessionId = 'session_' + Math.random().toString(36).substring(2, 15);
-                sessionStorage.setItem('encode_url_session', sessionId);
-            }
-            return sessionId;
+        // Escape HTML to prevent XSS
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
         
-        // FIX 3: Generate or get persistent user ID for cross-session tracking
-        function getUserId() {
-            let userId = localStorage.getItem('encode_url_user');
+        // Close overlay when clicking outside content
+        function handleOverlayClick(e) {
+            if (e.target === qrOverlay) {
+                qrOverlay.classList.remove('active');
+            }
+        }
+        
+        // Close overlay with ESC key
+        function handleEscKey(e) {
+            if (e.key === 'Escape' && qrOverlay.classList.contains('active')) {
+                qrOverlay.classList.remove('active');
+            }
+        }
+        
+        // Event listeners
+        // URL processing
+        inputUrl.addEventListener('input', processUrl);
+        postParams.addEventListener('input', processUrl);
+        
+        // Action buttons
+        copyBtn.addEventListener('click', () => {
+            copyUrl(processedUrl.textContent);
+        });
+        
+        runBtn.addEventListener('click', () => {
+            runUrl(processedUrl.textContent);
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            inputUrl.value = '';
+            postParams.value = '';
+            processUrl();
+        });
+        
+        saveQrBtn.addEventListener('click', () => {
+            saveQrCode(qrCode, 'qrcode.png');
+        });
+        
+        // QR code overlay
+        qrContainer.addEventListener('click', () => {
+            showQrOverlay(lastProcessedUrl);
+        });
+        
+        qrOverlayClose.addEventListener('click', () => {
+            qrOverlay.classList.remove('active');
+        });
+        
+        qrOverlay.addEventListener('click', handleOverlayClick);
+        
+        document.addEventListener('keydown', handleEscKey);
+        
+        qrOverlaySave.addEventListener('click', () => {
+            saveQrCode(qrOverlayImage, 'qrcode.png');
+        });
+        
+        // Parameter editing
+        paramEditBtn.addEventListener('click', enableParamEditing);
+        paramSaveBtn.addEventListener('click', saveEditedParams);
+        paramCancelBtn.addEventListener('click', disableParamEditing);
+        
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            renderLinksList(searchTerm);
+            
+            if (searchTerm) {
+                clearSearch.classList.add('visible');
+            } else {
+                clearSearch.classList.remove('visible');
+            }
+        });
+        
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            clearSearch.classList.remove('visible');
+            renderLinksList();
+        });
+        
+        // Introduction collapsible toggle
+        introCollapseToggle.addEventListener('click', () => {
+            introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
+            introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
+            introContent.classList.toggle('expanded');
+        });
+        
+        // Request mode buttons
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setRequestMode(btn.dataset.mode);
+            });
+        });
+        
+        // Set current date in footer
+        const currentDate = new Date();
+        deployDate.textContent = currentDate.toLocaleDateString(undefined, { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        // Log visitor information on page load
+        logVisitorInfo();
+        
+        // Expose functions to global scope for event handlers
+        window.toggleStar = toggleStar;
+        window.copyUrl = copyUrl;
+        window.runUrl = runUrl;
+        window.deleteHistoryItem = deleteHistoryItem;
+        window.loadUrlToEditor = loadUrlToEditor;
+        window.toggleListQR = toggleListQR;
+        window.showListQrOverlay = showListQrOverlay;
+        window.editNickname = editNickname;
+        window.saveNickname = saveNickname;
+        window.addNickname = addNickname;
+        
+        // Initial renders
+        renderLinksList();
+        updateCounts();
+
+        // Log application initialization
+        logger.log("Application initialized");
+    </script>
+</body>
+</html>
