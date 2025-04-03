@@ -15,6 +15,21 @@ let isEditingParams = false;
 let currentQrCodeData = '';
 let lastParamState = ''; // For parameter change detection
 
+// Ensure QR Code library is loaded
+if (!window.QRCode) {
+    console.error("QRCode library not found - loading from CDN");
+    const script = document.createElement('script');
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js";
+    script.onload = function() {
+      console.log("QRCode library loaded successfully");
+      // Re-initialize QR code if needed
+      if (window.lastProcessedUrl) {
+        updateQRCode(window.lastProcessedUrl);
+      }
+    };
+    document.head.appendChild(script);
+  }
+
 // Main URL encoding function
 function encodeUrlParamsInUrl(url, paramNames) {
     try {
@@ -439,23 +454,6 @@ function saveQrCode(container, filename) {
             headerHeight + qrSize + 25
         );
         
-        // Get URL and try to find nickname
-        const url = container === qrOverlayImage ? qrOverlayUrl.textContent : currentQrCodeData;
-        let nickname = '';
-        
-        // Try to find nickname in history
-        const historyItem = urlHistory.find(item => item.encodedUrl === url);
-        if (historyItem && historyItem.nickname) {
-            nickname = historyItem.nickname;
-        }
-        
-        // Add nickname as a subtitle if available
-        if (nickname) {
-            ctx.font = 'italic 16px Arial';
-            ctx.fillStyle = '#333333';
-            ctx.fillText(`"${nickname}"`, paddedCanvas.width / 2, headerHeight - 10);
-        }
-        
         // Add "Processed URL:" label in blue
         ctx.font = 'bold 16px Arial';
         ctx.fillStyle = '#4361ee';
@@ -467,7 +465,7 @@ function saveQrCode(container, filename) {
         
         // Draw gray background for URL text
         const urlBoxY = headerHeight + qrSize + 60;
-        const urlBoxHeight = 80; // Increased for more rows
+        const urlBoxHeight = 80;
         ctx.fillStyle = '#f5f7fa';
         ctx.fillRect(20, urlBoxY, paddedCanvas.width - 40, urlBoxHeight);
         
@@ -476,27 +474,22 @@ function saveQrCode(container, filename) {
         ctx.fillStyle = '#333333';
         ctx.textAlign = 'center';
         
+        // Get URL to display
+        const url = container === qrOverlayImage ? qrOverlayUrl.textContent : currentQrCodeData;
+        
         // Use improved text wrapping function
-        const maxWidth = paddedCanvas.width - 80; // Increased margins
-        const lineHeight = 20;
-        wrapText(ctx, url, paddedCanvas.width / 2, urlBoxY + 20, maxWidth, lineHeight);
+        wrapText(ctx, url, paddedCanvas.width / 2, urlBoxY + 20, paddedCanvas.width - 80, 20);
         
         // Create download link
         const dataUrl = paddedCanvas.toDataURL('image/png');
         const downloadLink = document.createElement('a');
         downloadLink.href = dataUrl;
-        downloadLink.download = filename || (nickname ? `${nickname}_qrcode.png` : 'qrcode.png');
+        downloadLink.download = filename || 'qrcode.png';
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
         
         window.myDebugger.showStatusMessage('QR code saved to your device');
-        
-        // Log QR code save
-        window.myDebugger.logger.log("QR code saved", { 
-            url: url,
-            nickname: nickname || null
-        });
     } catch (e) {
         window.myDebugger.logger.error("Error saving QR code:", e);
         window.myDebugger.showStatusMessage('Error saving QR code', true);
