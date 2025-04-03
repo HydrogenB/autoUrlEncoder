@@ -100,6 +100,10 @@
             gap: 24px;
         }
 
+        .two-column-span {
+            grid-column: 1 / -1;
+        }
+
         @media (min-width: 1024px) {
             .container {
                 grid-template-columns: 3fr 2fr;
@@ -359,23 +363,34 @@
 
         .qr-overlay-content {
             background-color: white;
-            padding: 20px;
+            padding: 30px;
             border-radius: 12px;
             max-width: 90%;
-            width: 400px;
+            width: 500px;
             text-align: center;
             position: relative;
         }
 
         .qr-overlay-close {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 15px;
+            right: 15px;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 2rem;
             cursor: pointer;
-            color: var(--gray);
+            color: var(--danger);
+            z-index: 10;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .qr-overlay-close:hover {
+            background-color: rgba(247, 37, 133, 0.1);
         }
 
         .qr-overlay-image {
@@ -387,6 +402,24 @@
             justify-content: center;
             gap: 10px;
             margin-top: 15px;
+        }
+
+        .qr-overlay-url {
+            margin-top: 10px;
+            word-break: break-all;
+            font-size: 0.9rem;
+            background-color: var(--light);
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .qr-overlay-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary);
         }
 
         .history-list {
@@ -862,61 +895,6 @@
             color: var(--dark);
         }
 
-        .features-list {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .features-list {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .feature-item {
-            background-color: var(--light);
-            padding: 15px;
-            border-radius: 8px;
-            border-left: 3px solid var(--primary);
-        }
-
-        .feature-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--primary);
-        }
-
-        .feature-desc {
-            font-size: 0.9rem;
-            color: var(--dark);
-        }
-
-        .social-proof {
-            display: flex;
-            align-items: center;
-            margin-top: 15px;
-            background-color: rgba(76, 201, 240, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-        }
-
-        .rating {
-            display: flex;
-            margin-right: 10px;
-        }
-
-        .star {
-            color: #ffc107;
-            margin-right: 2px;
-        }
-
-        .rating-text {
-            font-size: 0.9rem;
-            color: var(--dark);
-        }
-
         .breadcrumbs {
             display: flex;
             align-items: center;
@@ -936,6 +914,25 @@
 
         .breadcrumb-separator {
             margin: 0 5px;
+        }
+
+        .encoder-container {
+            grid-column: 1 / -1;
+        }
+
+        .history-qr-btn {
+            cursor: pointer;
+        }
+
+        .key-instructions {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.7;
         }
 
         @media (max-width: 600px) {
@@ -964,51 +961,21 @@
 
     <!-- SEO Introduction Section - Collapsible by default -->
     <div class="container">
-        <section class="intro-section">
+        <section class="intro-section two-column-span">
             <div class="intro-collapse-toggle">
                 <h1 class="intro-title">URL Parameter Encoder Tool</h1>
                 <i class="fas fa-chevron-down"></i>
             </div>
             <div class="intro-content">
                 <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for secure deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
-                
-                <div class="social-proof">
-                    <div class="rating">
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                        <span class="star">★</span>
-                    </div>
-                    <span class="rating-text">Rated 4.8/5 based on 124 user reviews</span>
-                </div>
-                
-                <div class="features-list">
-                    <div class="feature-item">
-                        <div class="feature-title">Deep Link Generation</div>
-                        <div class="feature-desc">Create properly encoded deep links for mobile apps and web applications</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-title">QR Code Generation</div>
-                        <div class="feature-desc">Instantly create scannable QR codes for your encoded URLs</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-title">URL Parameter Safety</div>
-                        <div class="feature-desc">Prevent broken links by properly encoding special characters</div>
-                    </div>
-                    <div class="feature-item">
-                        <div class="feature-title">Marketing Campaign Links</div>
-                        <div class="feature-desc">Create reliable links for email, social media, and advertising campaigns</div>
-                    </div>
-                </div>
             </div>
         </section>
     </div>
 
     <!-- Main Application -->
     <div class="container">
-        <!-- Encoder Section -->
-        <div>
+        <!-- Encoder Section - Spanning 2 columns -->
+        <div class="encoder-container">
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title"><i class="fas fa-link"></i> URL Parameter Encoder</h2>
@@ -1088,7 +1055,8 @@
                                 <thead>
                                     <tr>
                                         <th>Parameter</th>
-                                        <th>Value</th>
+                                        <th>Original Value</th>
+                                        <th>Encoded Value</th>
                                         <th>Notes</th>
                                     </tr>
                                 </thead>
@@ -1110,9 +1078,8 @@
             </div>
         </div>
         
-        <!-- History & Starred Section -->
+        <!-- Recent Links -->
         <div>
-            <!-- Recent History -->
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">
@@ -1130,8 +1097,10 @@
                     <div id="historyList" class="history-list"></div>
                 </div>
             </div>
-            
-            <!-- Starred Links -->
+        </div>
+        
+        <!-- Starred Links -->
+        <div>
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">
@@ -1150,15 +1119,18 @@
     <div id="qrOverlay" class="qr-overlay">
         <div class="qr-overlay-content">
             <button id="qrOverlayClose" class="qr-overlay-close">&times;</button>
-            <h3>QR Code</h3>
+            <div class="qr-overlay-title">QR Code</div>
             <div id="qrOverlayImage" class="qr-overlay-image"></div>
             <p class="qr-caption">Scan with your phone to open this link directly</p>
+            <div class="qr-overlay-title">Processed URL:</div>
+            <div id="qrOverlayUrl" class="qr-overlay-url"></div>
             <div class="qr-overlay-buttons">
                 <button id="qrOverlaySave" class="btn btn-primary">
                     <i class="fas fa-download"></i> Save QR Code
                 </button>
             </div>
         </div>
+        <div class="key-instructions">Press ESC key or click anywhere to close</div>
     </div>
     
     <footer>
@@ -1177,6 +1149,82 @@
     <div id="statusMessage" class="status-message"></div>
     
     <script>
+        // Vercel-compatible logging function
+        const logger = {
+            log: function(msg, data) {
+                if (typeof console !== 'undefined') {
+                    const timestamp = new Date().toISOString();
+                    const formattedMsg = `[${timestamp}] ${msg}`;
+                    if (data) {
+                        console.log(formattedMsg, data);
+                    } else {
+                        console.log(formattedMsg);
+                    }
+                }
+                
+                // In production with Vercel, we could send logs to a monitoring service
+                if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+                    try {
+                        // Collect logs for potential serverless function reporting
+                        const logEntry = {
+                            timestamp: Date.now(),
+                            message: msg,
+                            data: data || null,
+                            url: window.location.href,
+                            userAgent: navigator.userAgent
+                        };
+                        
+                        // Store in local storage for demo purposes
+                        // In a real app, you might send these to a serverless function
+                        const logs = JSON.parse(localStorage.getItem('app_logs') || '[]');
+                        logs.push(logEntry);
+                        // Keep only the last 100 logs
+                        if (logs.length > 100) logs.splice(0, logs.length - 100);
+                        localStorage.setItem('app_logs', JSON.stringify(logs));
+                    } catch (e) {
+                        console.error('Error saving log:', e);
+                    }
+                }
+            },
+            error: function(msg, error) {
+                if (typeof console !== 'undefined') {
+                    const timestamp = new Date().toISOString();
+                    const formattedMsg = `[${timestamp}] ERROR: ${msg}`;
+                    if (error && error.stack) {
+                        console.error(formattedMsg, error.stack);
+                    } else if (error) {
+                        console.error(formattedMsg, error);
+                    } else {
+                        console.error(formattedMsg);
+                    }
+                }
+                
+                // In production with Vercel, we could send errors to a monitoring service
+                if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+                    try {
+                        // Collect errors for potential serverless function reporting
+                        const errorEntry = {
+                            timestamp: Date.now(),
+                            message: msg,
+                            error: error ? (error.stack || error.toString()) : null,
+                            url: window.location.href,
+                            userAgent: navigator.userAgent
+                        };
+                        
+                        // Store in local storage for demo purposes
+                        // In a real app, you might send these to a serverless function
+                        const errors = JSON.parse(localStorage.getItem('app_errors') || '[]');
+                        errors.push(errorEntry);
+                        // Keep only the last 50 errors
+                        if (errors.length > 50) errors.splice(0, errors.length - 50);
+                        localStorage.setItem('app_errors', JSON.stringify(errors));
+                    } catch (e) {
+                        console.error('Error saving error log:', e);
+                    }
+                }
+            }
+        };
+
         // Main URL encoding function from the provided code
         function encodeUrlParamsInUrl(url, paramNames) {
             try {
@@ -1275,7 +1323,7 @@
                     baseUrl
                 };
             } catch (error) {
-                console.error("Error encoding URL:", error);
+                logger.error("Error encoding URL:", error);
                 return { result: url, valid: false, message: `Error: ${error.message}`, params: [] };
             }
         }
@@ -1310,7 +1358,7 @@
                             return inMemoryData[key] || defaultValue;
                         }
                     } catch (e) {
-                        console.error("Error getting data from storage:", e);
+                        logger.error("Error getting data from storage:", e);
                         return defaultValue;
                     }
                 },
@@ -1323,7 +1371,7 @@
                         }
                         return true;
                     } catch (e) {
-                        console.error("Error saving data to storage:", e);
+                        logger.error("Error saving data to storage:", e);
                         return false;
                     }
                 }
@@ -1352,6 +1400,7 @@
         const qrOverlay = document.getElementById('qrOverlay');
         const qrOverlayClose = document.getElementById('qrOverlayClose');
         const qrOverlayImage = document.getElementById('qrOverlayImage');
+        const qrOverlayUrl = document.getElementById('qrOverlayUrl');
         const qrOverlaySave = document.getElementById('qrOverlaySave');
         const historyList = document.getElementById('historyList');
         const starredList = document.getElementById('starredList');
@@ -1379,6 +1428,7 @@
         let qrDebounceTimer = null;
         let currentMode = 'get';
         let isEditingParams = false;
+        let currentQrCodeData = '';
 
         // Update history counts
         function updateCounts() {
@@ -1440,6 +1490,14 @@
             
             // Update QR code immediately
             updateQRCode(result.result);
+            
+            // Log the processed URL
+            logger.log("URL processed", { 
+                originalUrl: url,
+                params: params,
+                encoded: result.valid,
+                paramCount: result.params.length
+            });
         }
         
         // Update parameter breakdown table
@@ -1449,7 +1507,7 @@
             
             if (params.length === 0) {
                 const row = document.createElement('tr');
-                row.innerHTML = '<td colspan="3" style="text-align: center;">No parameters found</td>';
+                row.innerHTML = '<td colspan="4" style="text-align: center;">No parameters found</td>';
                 tbody.appendChild(row);
                 return;
             }
@@ -1460,6 +1518,7 @@
                 if (isEditingParams) {
                     row.innerHTML = `
                         <td class="param-name">${escapeHtml(param.name)}</td>
+                        <td>${escapeHtml(param.originalValue)}</td>
                         <td>
                             <div class="param-editable editing" contenteditable="true" data-param="${escapeHtml(param.name)}">${escapeHtml(param.encodedValue)}</div>
                         </td>
@@ -1471,6 +1530,7 @@
                 } else {
                     row.innerHTML = `
                         <td class="param-name">${escapeHtml(param.name)}</td>
+                        <td>${escapeHtml(param.originalValue)}</td>
                         <td class="param-value">${escapeHtml(param.encodedValue)}</td>
                         <td>
                             ${param.wasEncoded ? '<span class="param-warning">Encoded</span><br>' : ''}
@@ -1529,6 +1589,12 @@
                 // Update other parameters as needed
                 updateQRCode(newUrl);
                 showStatusMessage('Parameters updated');
+                
+                // Log parameter updates
+                logger.log("Parameters edited", { 
+                    updates: paramUpdates,
+                    newUrl: newUrl
+                });
             }
             
             disableParamEditing();
@@ -1543,6 +1609,7 @@
             
             qrContainer.style.display = 'block';
             qrCode.innerHTML = '';
+            currentQrCodeData = url;
             
             try {
                 new QRCode(qrCode, {
@@ -1554,7 +1621,7 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
             } catch (e) {
-                console.error("Error generating QR code:", e);
+                logger.error("Error generating QR code:", e);
                 qrCode.innerHTML = '<div style="color: var(--danger)">Error generating QR code</div>';
             }
         }
@@ -1562,6 +1629,7 @@
         // Show QR code in overlay
         function showQrOverlay(url) {
             qrOverlayImage.innerHTML = '';
+            qrOverlayUrl.textContent = url;
             
             try {
                 new QRCode(qrOverlayImage, {
@@ -1574,8 +1642,11 @@
                 });
                 
                 qrOverlay.classList.add('active');
+                
+                // Log QR code view
+                logger.log("QR code overlay opened", { url: url });
             } catch (e) {
-                console.error("Error generating overlay QR code:", e);
+                logger.error("Error generating overlay QR code:", e);
                 showStatusMessage('Error generating QR code', true);
             }
         }
@@ -1594,7 +1665,7 @@
                 const paddedCanvas = document.createElement('canvas');
                 const ctx = paddedCanvas.getContext('2d');
                 const padding = 40;
-                const textHeight = 40;
+                const textHeight = 70; // Increased height for URL text
                 
                 paddedCanvas.width = canvas.width + (padding * 2);
                 paddedCanvas.height = canvas.height + (padding * 2) + textHeight;
@@ -1606,14 +1677,26 @@
                 // Draw the QR code
                 ctx.drawImage(canvas, padding, padding);
                 
-                // Add text below QR code
-                ctx.font = 'bold 16px Arial';
+                // Add title text
+                ctx.font = 'bold 18px Arial';
                 ctx.fillStyle = '#333333';
                 ctx.textAlign = 'center';
-                ctx.fillText('URL Parameter Encoder', paddedCanvas.width / 2, canvas.height + padding + 20);
+                ctx.fillText('Processed URL:', paddedCanvas.width / 2, canvas.height + padding + 25);
                 
-                ctx.font = '12px Arial';
-                ctx.fillText('Scan with your phone to open this link', paddedCanvas.width / 2, canvas.height + padding + 40);
+                // Add URL text (wrapped if needed)
+                const url = container === qrOverlayImage ? qrOverlayUrl.textContent : currentQrCodeData;
+                ctx.font = '14px Arial';
+                const maxWidth = paddedCanvas.width - (padding * 2);
+                
+                // Simple text wrapping for URL
+                if (url.length > 50) {
+                    const firstPart = url.substring(0, 50);
+                    const secondPart = url.substring(50);
+                    ctx.fillText(firstPart, paddedCanvas.width / 2, canvas.height + padding + 50);
+                    ctx.fillText(secondPart, paddedCanvas.width / 2, canvas.height + padding + 70);
+                } else {
+                    ctx.fillText(url, paddedCanvas.width / 2, canvas.height + padding + 50);
+                }
                 
                 // Create download link
                 const dataUrl = paddedCanvas.toDataURL('image/png');
@@ -1625,8 +1708,13 @@
                 document.body.removeChild(downloadLink);
                 
                 showStatusMessage('QR code saved to your device');
+                
+                // Log QR code save
+                logger.log("QR code saved", { 
+                    url: url
+                });
             } catch (e) {
-                console.error("Error saving QR code:", e);
+                logger.error("Error saving QR code:", e);
                 showStatusMessage('Error saving QR code', true);
             }
         }
@@ -1645,7 +1733,7 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
             } catch (e) {
-                console.error("Error generating QR code:", e);
+                logger.error("Error generating QR code:", e);
                 container.innerHTML = '<div style="color: var(--danger)">Error generating QR code</div>';
             }
         }
@@ -1672,6 +1760,14 @@
             }
         }
         
+        // Show QR code overlay from history item
+        function showHistoryQrOverlay(id) {
+            const item = urlHistory.find(entry => entry.id === id);
+            if (item) {
+                showQrOverlay(item.encodedUrl);
+            }
+        }
+        
         // Extract domain from URL
         function extractDomain(url) {
             try {
@@ -1685,7 +1781,7 @@
                 
                 return domain;
             } catch (e) {
-                console.error("Error extracting domain:", e);
+                logger.error("Error extracting domain:", e);
                 return url;
             }
         }
@@ -1733,6 +1829,12 @@
                 nameEdit.style.display = 'none';
                 
                 showStatusMessage('Nickname updated');
+                
+                // Log nickname update
+                logger.log("Nickname updated", { 
+                    id: id,
+                    nickname: newNickname
+                });
             }
         }
         
@@ -1823,9 +1925,16 @@
                     showStatusMessage('URL saved to history');
                 }
                 
+                // Log history save
+                logger.log("URL saved to history", { 
+                    id: urlId,
+                    mode: currentMode,
+                    hasPostParams: currentMode === 'post' && postParamsValue.length > 0
+                });
+                
                 return true;
             } catch (e) {
-                console.error("Error saving to history:", e);
+                logger.error("Error saving to history:", e);
                 if (showNotification) {
                     showStatusMessage('Error saving URL', true);
                 }
@@ -1851,9 +1960,15 @@
                             ? 'Added to starred links' 
                             : 'Removed from starred links'
                     );
+                    
+                    // Log star toggle
+                    logger.log("Star toggled", { 
+                        id: id,
+                        starred: urlHistory[itemIndex].starred
+                    });
                 }
             } catch (e) {
-                console.error("Error toggling star:", e);
+                logger.error("Error toggling star:", e);
                 showStatusMessage('Error updating star status', true);
             }
         }
@@ -1892,9 +2007,14 @@
                     }
                     
                     showStatusMessage('URL loaded to editor');
+                    
+                    // Log URL load
+                    logger.log("URL loaded to editor", { 
+                        id: id
+                    });
                 }
             } catch (e) {
-                console.error("Error loading URL to editor:", e);
+                logger.error("Error loading URL to editor:", e);
                 showStatusMessage('Error loading URL', true);
             }
         }
@@ -1905,13 +2025,16 @@
                 navigator.clipboard.writeText(text)
                     .then(() => {
                         showStatusMessage('Copied to clipboard');
+                        
+                        // Log copy action
+                        logger.log("URL copied to clipboard");
                     })
                     .catch(err => {
-                        console.error('Failed to copy text: ', err);
+                        logger.error('Failed to copy text:', err);
                         showStatusMessage('Failed to copy', true);
                     });
             } catch (e) {
-                console.error("Error copying URL:", e);
+                logger.error("Error copying URL:", e);
                 showStatusMessage('Error copying URL', true);
             }
         }
@@ -1921,6 +2044,11 @@
             try {
                 if (currentMode === 'get') {
                     window.open(url, '_blank');
+                    
+                    // Log GET URL run
+                    logger.log("URL opened (GET)", { 
+                        url: url
+                    });
                 } else if (currentMode === 'post') {
                     // Create a form to submit POST request
                     const form = document.createElement('form');
@@ -1966,9 +2094,15 @@
                     document.body.appendChild(form);
                     form.submit();
                     document.body.removeChild(form);
+                    
+                    // Log POST URL run
+                    logger.log("URL opened (POST)", { 
+                        url: url,
+                        postParamsCount: Object.keys(postData).length
+                    });
                 }
             } catch (e) {
-                console.error("Error opening URL:", e);
+                logger.error("Error opening URL:", e);
                 showStatusMessage('Error opening URL', true);
             }
         }
@@ -1984,8 +2118,13 @@
                 updateCounts();
                 
                 showStatusMessage('Item deleted');
+                
+                // Log delete
+                logger.log("History item deleted", { 
+                    id: id
+                });
             } catch (e) {
-                console.error("Error deleting history item:", e);
+                logger.error("Error deleting history item:", e);
                 showStatusMessage('Error deleting item', true);
             }
         }
@@ -2009,6 +2148,11 @@
             } else {
                 postParamsContent.style.display = 'none';
             }
+            
+            // Log mode change
+            logger.log("Request mode changed", { 
+                mode: mode
+            });
         }
         
         // Show status message
@@ -2107,12 +2251,12 @@
                                 </div>
                             </div>
                             
-                            <div id="qr-${entry.id}" class="history-qr"></div>
+                            <div id="qr-${entry.id}" class="history-qr" onclick="showHistoryQrOverlay('${entry.id}')"></div>
                         </div>
                     `;
                 }).join('');
             } catch (e) {
-                console.error("Error rendering history:", e);
+                logger.error("Error rendering history:", e);
                 historyList.innerHTML = `<div class="empty-state">Error loading history</div>`;
             }
         }
@@ -2181,12 +2325,12 @@
                                 </div>
                             </div>
                             
-                            <div id="qr-s-${entry.id}" class="history-qr"></div>
+                            <div id="qr-s-${entry.id}" class="history-qr" onclick="showHistoryQrOverlay('${entry.id}')"></div>
                         </div>
                     `;
                 }).join('');
             } catch (e) {
-                console.error("Error rendering starred items:", e);
+                logger.error("Error rendering starred items:", e);
                 starredList.innerHTML = `<div class="empty-state">Error loading starred items</div>`;
             }
         }
@@ -2202,18 +2346,14 @@
                     screenHeight: window.screen.height,
                     timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                     timestamp: new Date().toISOString(),
-                    referrer: document.referrer || 'direct'
+                    referrer: document.referrer || 'direct',
+                    hostname: window.location.hostname
                 };
                 
-                // Store in local storage for demo purposes
-                // In a real application, you would send this to your analytics server
-                let visitors = StorageManager.get('visitors', []);
-                visitors.push(visitorInfo);
-                StorageManager.set('visitors', visitors);
-                
-                console.log('Visitor information logged:', visitorInfo);
+                // Store in Vercel-compatible format
+                logger.log("Visitor information", visitorInfo);
             } catch (e) {
-                console.error('Error logging visitor information:', e);
+                logger.error('Error logging visitor information:', e);
             }
         }
         
@@ -2226,6 +2366,20 @@
                 .replace(/>/g, "&gt;")
                 .replace(/"/g, "&quot;")
                 .replace(/'/g, "&#039;");
+        }
+        
+        // Close overlay when clicking outside content
+        function handleOverlayClick(e) {
+            if (e.target === qrOverlay) {
+                qrOverlay.classList.remove('active');
+            }
+        }
+        
+        // Close overlay with ESC key
+        function handleEscKey(e) {
+            if (e.key === 'Escape' && qrOverlay.classList.contains('active')) {
+                qrOverlay.classList.remove('active');
+            }
         }
         
         // Event listeners
@@ -2262,6 +2416,10 @@
         qrOverlayClose.addEventListener('click', () => {
             qrOverlay.classList.remove('active');
         });
+        
+        qrOverlay.addEventListener('click', handleOverlayClick);
+        
+        document.addEventListener('keydown', handleEscKey);
         
         qrOverlaySave.addEventListener('click', () => {
             saveQrCode(qrOverlayImage, 'qrcode.png');
@@ -2328,6 +2486,7 @@
         window.deleteHistoryItem = deleteHistoryItem;
         window.loadUrlToEditor = loadUrlToEditor;
         window.toggleHistoryQR = toggleHistoryQR;
+        window.showHistoryQrOverlay = showHistoryQrOverlay;
         window.editNickname = editNickname;
         window.saveNickname = saveNickname;
         window.addNickname = addNickname;
@@ -2336,6 +2495,9 @@
         renderHistory();
         renderStarred();
         updateCounts();
+
+        // Log application initialization
+        logger.log("Application initialized");
     </script>
 </body>
 </html>
