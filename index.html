@@ -229,6 +229,7 @@
             display: flex;
             gap: 8px;
             margin-top: 12px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
 
@@ -306,6 +307,25 @@
             padding: 16px;
             background-color: var(--light);
             border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .qr-container::after {
+            content: 'Click to enlarge';
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--gray);
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .qr-container:hover::after {
+            opacity: 1;
         }
 
         .qr-caption {
@@ -313,6 +333,60 @@
             color: var(--gray);
             margin-top: 12px;
             text-align: center;
+        }
+
+        .qr-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .qr-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .qr-overlay-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            position: relative;
+        }
+
+        .qr-overlay-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .qr-overlay-image {
+            margin: 20px auto;
+        }
+
+        .qr-overlay-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
         }
 
         .history-list {
@@ -356,6 +430,11 @@
             margin-bottom: 4px;
             padding-right: 30px;
             cursor: pointer;
+        }
+
+        .highlighted-domain {
+            color: var(--primary);
+            font-weight: 500;
         }
 
         .history-meta {
@@ -621,7 +700,7 @@
         }
 
         .history-nickname {
-            display: flex;
+            display: none;
             align-items: center;
             margin-top: 5px;
         }
@@ -680,7 +759,72 @@
             display: block;
         }
 
-        /* SEO Improvements - New Sections */
+        .param-edit-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary);
+            transition: var(--transition);
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .param-edit-btn:hover {
+            color: var(--secondary);
+        }
+
+        .param-editable {
+            padding: 4px;
+            border: 1px dashed transparent;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .param-editable:hover {
+            border-color: var(--gray);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .param-editable.editing {
+            border-color: var(--primary);
+            background-color: white;
+        }
+
+        .param-edit-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .param-edit-save {
+            color: var(--success);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .param-edit-cancel {
+            color: var(--danger);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .add-nickname-btn {
+            color: var(--primary);
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
         .intro-section {
             margin-bottom: 30px;
             padding: 20px;
@@ -689,10 +833,28 @@
             box-shadow: var(--shadow);
         }
 
+        .intro-collapse-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            width: 100%;
+        }
+
         .intro-title {
             font-size: 1.8rem;
             color: var(--primary);
             margin-bottom: 15px;
+        }
+
+        .intro-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .intro-content.expanded {
+            max-height: 800px;
         }
 
         .intro-text {
@@ -729,66 +891,6 @@
         .feature-desc {
             font-size: 0.9rem;
             color: var(--dark);
-        }
-
-        .faq-section {
-            margin-top: 30px;
-            margin-bottom: 30px;
-            padding: 20px;
-            background-color: var(--white);
-            border-radius: var(--border-radius);
-            box-shadow: var(--shadow);
-        }
-
-        .faq-title {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 20px;
-        }
-
-        .faq-item {
-            margin-bottom: 15px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 15px;
-        }
-
-        .faq-question {
-            font-weight: 600;
-            margin-bottom: 8px;
-            color: var(--dark);
-        }
-
-        .faq-answer {
-            font-size: 0.95rem;
-            color: var(--gray);
-        }
-
-        .related-tools {
-            margin-top: 30px;
-        }
-
-        .related-tools-title {
-            font-size: 1.2rem;
-            margin-bottom: 15px;
-        }
-
-        .related-tools-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .related-tool-link {
-            color: var(--primary);
-            text-decoration: none;
-            padding: 5px 10px;
-            background-color: rgba(67, 97, 238, 0.1);
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-
-        .related-tool-link:hover {
-            background-color: rgba(67, 97, 238, 0.2);
         }
 
         .social-proof {
@@ -860,39 +962,44 @@
         </nav>
     </div>
 
-    <!-- SEO Introduction Section -->
+    <!-- SEO Introduction Section - Collapsible by default -->
     <div class="container">
         <section class="intro-section">
-            <h1 class="intro-title">URL Parameter Encoder Tool</h1>
-            <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for secure deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
-            
-            <div class="social-proof">
-                <div class="rating">
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                    <span class="star">★</span>
-                </div>
-                <span class="rating-text">Rated 4.8/5 based on 124 user reviews</span>
+            <div class="intro-collapse-toggle">
+                <h1 class="intro-title">URL Parameter Encoder Tool</h1>
+                <i class="fas fa-chevron-down"></i>
             </div>
-            
-            <div class="features-list">
-                <div class="feature-item">
-                    <div class="feature-title">Deep Link Generation</div>
-                    <div class="feature-desc">Create properly encoded deep links for mobile apps and web applications</div>
+            <div class="intro-content">
+                <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for secure deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
+                
+                <div class="social-proof">
+                    <div class="rating">
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                        <span class="star">★</span>
+                    </div>
+                    <span class="rating-text">Rated 4.8/5 based on 124 user reviews</span>
                 </div>
-                <div class="feature-item">
-                    <div class="feature-title">QR Code Generation</div>
-                    <div class="feature-desc">Instantly create scannable QR codes for your encoded URLs</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-title">URL Parameter Safety</div>
-                    <div class="feature-desc">Prevent broken links by properly encoding special characters</div>
-                </div>
-                <div class="feature-item">
-                    <div class="feature-title">Marketing Campaign Links</div>
-                    <div class="feature-desc">Create reliable links for email, social media, and advertising campaigns</div>
+                
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-title">Deep Link Generation</div>
+                        <div class="feature-desc">Create properly encoded deep links for mobile apps and web applications</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-title">QR Code Generation</div>
+                        <div class="feature-desc">Instantly create scannable QR codes for your encoded URLs</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-title">URL Parameter Safety</div>
+                        <div class="feature-desc">Prevent broken links by properly encoding special characters</div>
+                    </div>
+                    <div class="feature-item">
+                        <div class="feature-title">Marketing Campaign Links</div>
+                        <div class="feature-desc">Create reliable links for email, social media, and advertising campaigns</div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -953,9 +1060,30 @@
                         <label>Processed URL: <span id="autosaveStatus" class="autosave-indicator"></span> <span id="autosaveText" style="font-size: 0.8rem; color: var(--gray);"></span></label>
                         <div id="processedUrl" class="result"></div>
                         
-                        <!-- Parameter Breakdown -->
+                        <!-- Action Buttons Moved Before Parameter Breakdown -->
+                        <div class="action-bar">
+                            <button id="copyBtn" class="btn tooltip" data-tooltip="Copy to clipboard">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button id="runBtn" class="btn btn-primary tooltip" data-tooltip="Open in new tab">
+                                <i class="fas fa-external-link-alt"></i> Run
+                            </button>
+                            <button id="clearBtn" class="btn tooltip" data-tooltip="Clear all fields">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                            <button id="saveQrBtn" class="btn tooltip" data-tooltip="Save QR code as image">
+                                <i class="fas fa-download"></i> Save QR
+                            </button>
+                        </div>
+                        
+                        <!-- Parameter Breakdown with Edit Feature -->
                         <div id="paramBreakdown">
-                            <h3 style="margin: 15px 0 10px;">Parameter Breakdown:</h3>
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px;">
+                                <h3>Parameter Breakdown:</h3>
+                                <button id="paramEditBtn" class="param-edit-btn tooltip" data-tooltip="Edit parameters">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </div>
                             <table class="param-table" id="paramTable">
                                 <thead>
                                     <tr>
@@ -968,18 +1096,14 @@
                                     <!-- Parameters will be inserted here -->
                                 </tbody>
                             </table>
-                        </div>
-                        
-                        <div class="action-bar">
-                            <button id="copyBtn" class="btn tooltip" data-tooltip="Copy to clipboard">
-                                <i class="fas fa-copy"></i> Copy
-                            </button>
-                            <button id="runBtn" class="btn btn-primary tooltip" data-tooltip="Open in new tab">
-                                <i class="fas fa-external-link-alt"></i> Run
-                            </button>
-                            <button id="clearBtn" class="btn tooltip" data-tooltip="Clear all fields">
-                                <i class="fas fa-trash"></i> Clear
-                            </button>
+                            <div id="paramEditActions" class="param-edit-actions" style="display: none;">
+                                <button id="paramSaveBtn" class="param-edit-save tooltip" data-tooltip="Save changes">
+                                    <i class="fas fa-check"></i> Save Changes
+                                </button>
+                                <button id="paramCancelBtn" class="param-edit-cancel tooltip" data-tooltip="Cancel editing">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1022,49 +1146,19 @@
         </div>
     </div>
     
-    <!-- SEO FAQ Section -->
-    <div class="container">
-        <section class="faq-section" id="faq">
-            <h2 class="faq-title">Frequently Asked Questions</h2>
-            
-            <div class="faq-item">
-                <h3 class="faq-question">Why do I need to encode URL parameters?</h3>
-                <p class="faq-answer">URL parameters often contain special characters that can break your links if not properly encoded. This is especially important when nesting URLs within parameters or creating deep links for mobile apps. Our tool automatically detects and encodes these special characters, ensuring your links work reliably across all platforms.</p>
+    <!-- QR Code Overlay -->
+    <div id="qrOverlay" class="qr-overlay">
+        <div class="qr-overlay-content">
+            <button id="qrOverlayClose" class="qr-overlay-close">&times;</button>
+            <h3>QR Code</h3>
+            <div id="qrOverlayImage" class="qr-overlay-image"></div>
+            <p class="qr-caption">Scan with your phone to open this link directly</p>
+            <div class="qr-overlay-buttons">
+                <button id="qrOverlaySave" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Save QR Code
+                </button>
             </div>
-            
-            <div class="faq-item">
-                <h3 class="faq-question">What's the difference between GET and POST modes?</h3>
-                <p class="faq-answer">GET requests send parameters in the URL itself, making them visible in the address bar and suitable for sharing. POST requests send data in the request body, making them better for sending larger amounts of data or when you need more privacy. Our tool supports both methods to give you flexibility in how you structure your requests.</p>
-            </div>
-            
-            <div class="faq-item">
-                <h3 class="faq-question">How do QR codes work with encoded URLs?</h3>
-                <p class="faq-answer">Our tool generates QR codes that contain your fully encoded URL. When someone scans the QR code with their mobile device, it will open the encoded URL directly in their browser or app. This is perfect for mobile app deep links, event tickets, product information, and marketing materials.</p>
-            </div>
-            
-            <div class="faq-item">
-                <h3 class="faq-question">Are my URLs and data secure when using this tool?</h3>
-                <p class="faq-answer">Yes, all processing happens locally in your browser. We don't send your URLs to any server for processing, and your history is stored only in your browser's local storage. This makes our tool completely private and secure for handling sensitive URLs.</p>
-            </div>
-            
-            <div class="faq-item">
-                <h3 class="faq-question">What are UTM parameters and why are they important?</h3>
-                <p class="faq-answer">UTM parameters (Urchin Tracking Module) are special URL parameters used by analytics tools like Google Analytics to track the effectiveness of online marketing campaigns. Our parameter breakdown feature automatically identifies UTM parameters in your URLs and provides guidance on their proper use for tracking campaigns.</p>
-            </div>
-        </section>
-        
-        <!-- Related Tools Section for Internal Linking -->
-        <section class="related-tools">
-            <h3 class="related-tools-title">Related Tools You Might Find Useful:</h3>
-            <div class="related-tools-list">
-                <a href="/tools/url-decoder" class="related-tool-link">URL Decoder</a>
-                <a href="/tools/json-formatter" class="related-tool-link">JSON Formatter</a>
-                <a href="/tools/base64-encoder" class="related-tool-link">Base64 Encoder/Decoder</a>
-                <a href="/tools/html-encoder" class="related-tool-link">HTML Encoder</a>
-                <a href="/tools/utm-builder" class="related-tool-link">UTM Builder</a>
-                <a href="/tools/qr-generator" class="related-tool-link">QR Code Generator</a>
-            </div>
-        </section>
+        </div>
     </div>
     
     <footer>
@@ -1177,7 +1271,8 @@
                     message: encodedCount > 0 ? 
                         `${encodedCount} parameter${encodedCount > 1 ? 's' : ''} encoded` : 
                         "No parameters needed encoding",
-                    params: paramDetails
+                    params: paramDetails,
+                    baseUrl
                 };
             } catch (error) {
                 console.error("Error encoding URL:", error);
@@ -1244,11 +1339,20 @@
         const resultContainer = document.getElementById('resultContainer');
         const processedUrl = document.getElementById('processedUrl');
         const paramTable = document.getElementById('paramTable');
+        const paramEditBtn = document.getElementById('paramEditBtn');
+        const paramEditActions = document.getElementById('paramEditActions');
+        const paramSaveBtn = document.getElementById('paramSaveBtn');
+        const paramCancelBtn = document.getElementById('paramCancelBtn');
         const copyBtn = document.getElementById('copyBtn');
         const runBtn = document.getElementById('runBtn');
         const clearBtn = document.getElementById('clearBtn');
+        const saveQrBtn = document.getElementById('saveQrBtn');
         const qrContainer = document.getElementById('qrContainer');
         const qrCode = document.getElementById('qrCode');
+        const qrOverlay = document.getElementById('qrOverlay');
+        const qrOverlayClose = document.getElementById('qrOverlayClose');
+        const qrOverlayImage = document.getElementById('qrOverlayImage');
+        const qrOverlaySave = document.getElementById('qrOverlaySave');
         const historyList = document.getElementById('historyList');
         const starredList = document.getElementById('starredList');
         const searchInput = document.getElementById('searchInput');
@@ -1263,14 +1367,18 @@
         const modeBtns = document.querySelectorAll('.mode-btn');
         const postParamsContent = document.getElementById('postParamsContent');
         const deployDate = document.getElementById('deployDate');
+        const introCollapseToggle = document.querySelector('.intro-collapse-toggle');
+        const introContent = document.querySelector('.intro-content');
 
         // URL history array and state variables
         let urlHistory = StorageManager.get('urlHistory', []);
         let lastProcessedUrl = '';
+        let lastProcessedResult = null;
         let autoSaveTimer = null;
         let lastInputTime = 0;
         let qrDebounceTimer = null;
         let currentMode = 'get';
+        let isEditingParams = false;
 
         // Update history counts
         function updateCounts() {
@@ -1303,6 +1411,7 @@
             
             const result = encodeUrlParamsInUrl(url, params);
             lastProcessedUrl = result.result;
+            lastProcessedResult = result;
             
             // Update validation UI
             if (result.valid) {
@@ -1348,17 +1457,81 @@
             params.forEach(param => {
                 const row = document.createElement('tr');
                 
-                row.innerHTML = `
-                    <td class="param-name">${escapeHtml(param.name)}</td>
-                    <td class="param-value">${escapeHtml(param.encodedValue)}</td>
-                    <td>
-                        ${param.wasEncoded ? '<span class="param-warning">Encoded</span><br>' : ''}
-                        ${param.note ? `<span class="param-warning">${escapeHtml(param.note)}</span>` : ''}
-                    </td>
-                `;
+                if (isEditingParams) {
+                    row.innerHTML = `
+                        <td class="param-name">${escapeHtml(param.name)}</td>
+                        <td>
+                            <div class="param-editable editing" contenteditable="true" data-param="${escapeHtml(param.name)}">${escapeHtml(param.encodedValue)}</div>
+                        </td>
+                        <td>
+                            ${param.wasEncoded ? '<span class="param-warning">Encoded</span><br>' : ''}
+                            ${param.note ? `<span class="param-warning">${escapeHtml(param.note)}</span>` : ''}
+                        </td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td class="param-name">${escapeHtml(param.name)}</td>
+                        <td class="param-value">${escapeHtml(param.encodedValue)}</td>
+                        <td>
+                            ${param.wasEncoded ? '<span class="param-warning">Encoded</span><br>' : ''}
+                            ${param.note ? `<span class="param-warning">${escapeHtml(param.note)}</span>` : ''}
+                        </td>
+                    `;
+                }
                 
                 tbody.appendChild(row);
             });
+        }
+        
+        // Enable parameter editing mode
+        function enableParamEditing() {
+            isEditingParams = true;
+            updateParamTable(lastProcessedResult.params);
+            paramEditActions.style.display = 'flex';
+            paramEditBtn.style.display = 'none';
+        }
+        
+        // Disable parameter editing mode
+        function disableParamEditing() {
+            isEditingParams = false;
+            updateParamTable(lastProcessedResult.params);
+            paramEditActions.style.display = 'none';
+            paramEditBtn.style.display = 'inline-block';
+        }
+        
+        // Save edited parameters
+        function saveEditedParams() {
+            const editableFields = document.querySelectorAll('.param-editable.editing');
+            let paramUpdates = {};
+            
+            editableFields.forEach(field => {
+                const paramName = field.dataset.param;
+                const paramValue = field.textContent;
+                paramUpdates[paramName] = paramValue;
+            });
+            
+            // Reconstruct URL with updated parameters
+            if (Object.keys(paramUpdates).length > 0 && lastProcessedResult) {
+                const baseUrl = lastProcessedResult.baseUrl;
+                const updatedParams = [];
+                
+                lastProcessedResult.params.forEach(param => {
+                    const updatedValue = paramUpdates[param.name] !== undefined ? 
+                        paramUpdates[param.name] : param.encodedValue;
+                    
+                    updatedParams.push(`${param.name}=${updatedValue}`);
+                });
+                
+                const newUrl = baseUrl + '?' + updatedParams.join('&');
+                processedUrl.textContent = newUrl;
+                lastProcessedUrl = newUrl;
+                
+                // Update other parameters as needed
+                updateQRCode(newUrl);
+                showStatusMessage('Parameters updated');
+            }
+            
+            disableParamEditing();
         }
         
         // Update QR code
@@ -1383,6 +1556,78 @@
             } catch (e) {
                 console.error("Error generating QR code:", e);
                 qrCode.innerHTML = '<div style="color: var(--danger)">Error generating QR code</div>';
+            }
+        }
+        
+        // Show QR code in overlay
+        function showQrOverlay(url) {
+            qrOverlayImage.innerHTML = '';
+            
+            try {
+                new QRCode(qrOverlayImage, {
+                    text: url,
+                    width: 300,
+                    height: 300,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                qrOverlay.classList.add('active');
+            } catch (e) {
+                console.error("Error generating overlay QR code:", e);
+                showStatusMessage('Error generating QR code', true);
+            }
+        }
+        
+        // Save QR code as image
+        function saveQrCode(container, filename) {
+            try {
+                const canvas = container.querySelector('canvas');
+                
+                if (!canvas) {
+                    showStatusMessage('No QR code available to save', true);
+                    return;
+                }
+                
+                // Create a new canvas with padding and text
+                const paddedCanvas = document.createElement('canvas');
+                const ctx = paddedCanvas.getContext('2d');
+                const padding = 40;
+                const textHeight = 40;
+                
+                paddedCanvas.width = canvas.width + (padding * 2);
+                paddedCanvas.height = canvas.height + (padding * 2) + textHeight;
+                
+                // Fill with white background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
+                
+                // Draw the QR code
+                ctx.drawImage(canvas, padding, padding);
+                
+                // Add text below QR code
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = '#333333';
+                ctx.textAlign = 'center';
+                ctx.fillText('URL Parameter Encoder', paddedCanvas.width / 2, canvas.height + padding + 20);
+                
+                ctx.font = '12px Arial';
+                ctx.fillText('Scan with your phone to open this link', paddedCanvas.width / 2, canvas.height + padding + 40);
+                
+                // Create download link
+                const dataUrl = paddedCanvas.toDataURL('image/png');
+                const downloadLink = document.createElement('a');
+                downloadLink.href = dataUrl;
+                downloadLink.download = filename || 'qrcode.png';
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                showStatusMessage('QR code saved to your device');
+            } catch (e) {
+                console.error("Error saving QR code:", e);
+                showStatusMessage('Error saving QR code', true);
             }
         }
         
@@ -1427,6 +1672,24 @@
             }
         }
         
+        // Extract domain from URL
+        function extractDomain(url) {
+            try {
+                if (!url) return '';
+                
+                // Remove protocol and get domain
+                let domain = url.split('//')[1] || url;
+                
+                // Get domain and subdomain
+                domain = domain.split('/')[0];
+                
+                return domain;
+            } catch (e) {
+                console.error("Error extracting domain:", e);
+                return url;
+            }
+        }
+        
         // Edit nickname for history item
         function editNickname(id) {
             const nameDisplay = document.getElementById(`nickname-display-${id}`);
@@ -1458,11 +1721,31 @@
                 const displayElement = document.getElementById(`nickname-text-${id}`);
                 displayElement.textContent = newNickname || 'No nickname';
                 
+                // Show or hide nickname section based on presence of nickname
+                const nicknameSection = document.getElementById(`nickname-section-${id}`);
+                if (newNickname) {
+                    nicknameSection.style.display = 'flex';
+                } else {
+                    nicknameSection.style.display = 'none';
+                }
+                
                 nameDisplay.style.display = 'flex';
                 nameEdit.style.display = 'none';
                 
                 showStatusMessage('Nickname updated');
             }
+        }
+        
+        // Add nickname to history item
+        function addNickname(id) {
+            const nicknameSection = document.getElementById(`nickname-section-${id}`);
+            const addButton = document.getElementById(`add-nickname-${id}`);
+            
+            nicknameSection.style.display = 'flex';
+            addButton.style.display = 'none';
+            
+            // Trigger edit mode
+            editNickname(id);
         }
         
         // Save URL to history
@@ -1775,45 +2058,59 @@
                 // Sort by last used time, most recent first
                 const sortedHistory = [...filteredHistory].sort((a, b) => b.lastUsed - a.lastUsed);
                 
-                historyList.innerHTML = sortedHistory.map(entry => `
-                    <div class="history-item">
-                        <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="toggleStar('${entry.id}')">
-                            <i class="fas fa-star"></i>
-                        </button>
-                        <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${escapeHtml(entry.encodedUrl)}</div>
-                        
-                        <div class="history-nickname">
-                            <div id="nickname-display-${entry.id}" class="nickname-display">
-                                <span id="nickname-text-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
-                                <button class="nickname-edit" onclick="editNickname('${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
+                historyList.innerHTML = sortedHistory.map(entry => {
+                    // Highlight domain if no nickname
+                    const domain = extractDomain(entry.originalUrl);
+                    const protocol = entry.originalUrl.split('://')[0] || '';
+                    const highlightedUrl = entry.nickname ? 
+                        escapeHtml(entry.encodedUrl) : 
+                        `<span class="highlighted-domain">${protocol}://${domain}</span>${escapeHtml(entry.encodedUrl.substring(protocol.length + 3 + domain.length))}`;
+                    
+                    return `
+                        <div class="history-item">
+                            <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="toggleStar('${entry.id}')">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            
+                            <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${highlightedUrl}</div>
+                            
+                            <div id="nickname-section-${entry.id}" class="history-nickname" style="${entry.nickname ? 'display:flex' : 'display:none'}">
+                                <div id="nickname-display-${entry.id}" class="nickname-display">
+                                    <span id="nickname-text-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
+                                    <button class="nickname-edit" onclick="editNickname('${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                                <div id="nickname-edit-${entry.id}" class="edit-mode">
+                                    <input type="text" id="nickname-input-${entry.id}" class="nickname-input" value="${escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
+                                    <button class="btn btn-primary" onclick="saveNickname('${entry.id}')">Save</button>
+                                </div>
                             </div>
-                            <div id="nickname-edit-${entry.id}" class="edit-mode">
-                                <input type="text" id="nickname-input-${entry.id}" class="nickname-input" value="${escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
-                                <button class="btn btn-primary" onclick="saveNickname('${entry.id}')">Save</button>
+                            
+                            <button id="add-nickname-${entry.id}" class="add-nickname-btn" style="${entry.nickname ? 'display:none' : 'display:inline-flex'}" onclick="addNickname('${entry.id}')">
+                                <i class="fas fa-tag"></i> Add Nickname
+                            </button>
+                            
+                            <div class="history-meta">
+                                <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
+                                <div class="history-actions">
+                                    <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button id="toggle-qr-${entry.id}" class="toggle-qr" onclick="toggleHistoryQR('${entry.id}')">
+                                        <i class="fas fa-qrcode"></i> Show QR
+                                    </button>
+                                    <button class="action-icon tooltip" data-tooltip="Delete" onclick="deleteHistoryItem('${entry.id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
+                            
+                            <div id="qr-${entry.id}" class="history-qr"></div>
                         </div>
-                        
-                        <div class="history-meta">
-                            <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
-                            <div class="history-actions">
-                                <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                                <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
-                                    <i class="fas fa-external-link-alt"></i>
-                                </button>
-                                <button id="toggle-qr-${entry.id}" class="toggle-qr" onclick="toggleHistoryQR('${entry.id}')">
-                                    <i class="fas fa-qrcode"></i> Show QR
-                                </button>
-                                <button class="action-icon tooltip" data-tooltip="Delete" onclick="deleteHistoryItem('${entry.id}')">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="qr-${entry.id}" class="history-qr"></div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch (e) {
                 console.error("Error rendering history:", e);
                 historyList.innerHTML = `<div class="empty-state">Error loading history</div>`;
@@ -1838,42 +2135,56 @@
                 // Sort by last used time
                 const sortedStarred = [...starredItems].sort((a, b) => b.lastUsed - a.lastUsed);
                 
-                starredList.innerHTML = sortedStarred.map(entry => `
-                    <div class="history-item">
-                        <button class="star-btn active" onclick="toggleStar('${entry.id}')">
-                            <i class="fas fa-star"></i>
-                        </button>
-                        <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${escapeHtml(entry.encodedUrl)}</div>
-                        
-                        <div class="history-nickname">
-                            <div id="nickname-display-s-${entry.id}" class="nickname-display">
-                                <span id="nickname-text-s-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
-                                <button class="nickname-edit" onclick="editNickname('s-${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
+                starredList.innerHTML = sortedStarred.map(entry => {
+                    // Highlight domain if no nickname
+                    const domain = extractDomain(entry.originalUrl);
+                    const protocol = entry.originalUrl.split('://')[0] || '';
+                    const highlightedUrl = entry.nickname ? 
+                        escapeHtml(entry.encodedUrl) : 
+                        `<span class="highlighted-domain">${protocol}://${domain}</span>${escapeHtml(entry.encodedUrl.substring(protocol.length + 3 + domain.length))}`;
+                    
+                    return `
+                        <div class="history-item">
+                            <button class="star-btn active" onclick="toggleStar('${entry.id}')">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            
+                            <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${highlightedUrl}</div>
+                            
+                            <div id="nickname-section-s-${entry.id}" class="history-nickname" style="${entry.nickname ? 'display:flex' : 'display:none'}">
+                                <div id="nickname-display-s-${entry.id}" class="nickname-display">
+                                    <span id="nickname-text-s-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
+                                    <button class="nickname-edit" onclick="editNickname('s-${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                                <div id="nickname-edit-s-${entry.id}" class="edit-mode">
+                                    <input type="text" id="nickname-input-s-${entry.id}" class="nickname-input" value="${escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
+                                    <button class="btn btn-primary" onclick="saveNickname('s-${entry.id}')">Save</button>
+                                </div>
                             </div>
-                            <div id="nickname-edit-s-${entry.id}" class="edit-mode">
-                                <input type="text" id="nickname-input-s-${entry.id}" class="nickname-input" value="${escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
-                                <button class="btn btn-primary" onclick="saveNickname('s-${entry.id}')">Save</button>
+                            
+                            <button id="add-nickname-s-${entry.id}" class="add-nickname-btn" style="${entry.nickname ? 'display:none' : 'display:inline-flex'}" onclick="addNickname('s-${entry.id}')">
+                                <i class="fas fa-tag"></i> Add Nickname
+                            </button>
+                            
+                            <div class="history-meta">
+                                <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
+                                <div class="history-actions">
+                                    <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button id="toggle-qr-s-${entry.id}" class="toggle-qr" onclick="toggleHistoryQR('s-${entry.id}')">
+                                        <i class="fas fa-qrcode"></i> Show QR
+                                    </button>
+                                </div>
                             </div>
+                            
+                            <div id="qr-s-${entry.id}" class="history-qr"></div>
                         </div>
-                        
-                        <div class="history-meta">
-                            <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
-                            <div class="history-actions">
-                                <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
-                                    <i class="fas fa-copy"></i>
-                                </button>
-                                <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
-                                    <i class="fas fa-external-link-alt"></i>
-                                </button>
-                                <button id="toggle-qr-s-${entry.id}" class="toggle-qr" onclick="toggleHistoryQR('s-${entry.id}')">
-                                    <i class="fas fa-qrcode"></i> Show QR
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <div id="qr-s-${entry.id}" class="history-qr"></div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             } catch (e) {
                 console.error("Error rendering starred items:", e);
                 starredList.innerHTML = `<div class="empty-state">Error loading starred items</div>`;
@@ -1939,6 +2250,28 @@
             processUrl();
         });
         
+        saveQrBtn.addEventListener('click', () => {
+            saveQrCode(qrCode, 'qrcode.png');
+        });
+        
+        // QR code overlay
+        qrContainer.addEventListener('click', () => {
+            showQrOverlay(lastProcessedUrl);
+        });
+        
+        qrOverlayClose.addEventListener('click', () => {
+            qrOverlay.classList.remove('active');
+        });
+        
+        qrOverlaySave.addEventListener('click', () => {
+            saveQrCode(qrOverlayImage, 'qrcode.png');
+        });
+        
+        // Parameter editing
+        paramEditBtn.addEventListener('click', enableParamEditing);
+        paramSaveBtn.addEventListener('click', saveEditedParams);
+        paramCancelBtn.addEventListener('click', disableParamEditing);
+        
         // Search functionality
         searchInput.addEventListener('input', (e) => {
             const searchTerm = e.target.value.trim();
@@ -1961,6 +2294,13 @@
         paramsToggle.addEventListener('click', () => {
             paramsToggle.classList.toggle('expanded');
             paramsSection.classList.toggle('expanded');
+        });
+        
+        // Introduction collapsible toggle
+        introCollapseToggle.addEventListener('click', () => {
+            introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
+            introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
+            introContent.classList.toggle('expanded');
         });
         
         // Request mode buttons
@@ -1990,6 +2330,7 @@
         window.toggleHistoryQR = toggleHistoryQR;
         window.editNickname = editNickname;
         window.saveNickname = saveNickname;
+        window.addNickname = addNickname;
         
         // Initial renders
         renderHistory();
