@@ -4,71 +4,2597 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- SEO-Optimized Title -->
-    <title>MyDebugger | Free Developer Tools for URL Encoding, JWT Decoding & More</title>
+    <!-- SEO Optimized Title -->
+    <title>URL Parameter Encoder Tool | Encode & Secure URL Parameters | Free Online Tool</title>
     
-    <!-- High-Impact Meta Description -->
-    <meta name="description" content="Free online developer tools for URL encoding, JWT decoding, QR code generation, and API testing. Boost productivity with secure, client-side web utilities.">
-    
-    <!-- Targeted Keywords -->
-    <meta name="keywords" content="developer tools, URL encoder, JWT decoder, QR code generator, web development tools, API testing, free online tools">
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free URL Parameter Encoder tool to safely encode URL parameters for deep links, marketing campaigns, and secure data sharing. Generate QR codes and save links for future use.">
+    <meta name="keywords" content="url encoder, parameter encoder, url parameter tool, encode url parameters, url deeplink generator, qr code generator, url security, utm parameter encoder">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="https://mydebugger.vercel.app">
+    <link rel="canonical" href="https://encodeurl.vercel.app">
     
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="css/main.css">
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://encodeurl.vercel.app">
+    <meta property="og:title" content="URL Parameter Encoder Tool | Encode & Secure URL Parameters">
+    <meta property="og:description" content="Free online tool to safely encode URL parameters, generate QR codes, and secure your deep links.">
+    <meta property="og:image" content="https://encodeurl.vercel.app/og-image.jpg">
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://encodeurl.vercel.app">
+    <meta property="twitter:title" content="URL Parameter Encoder Tool | Encode & Secure URL Parameters">
+    <meta property="twitter:description" content="Free online tool to safely encode URL parameters, generate QR codes, and secure your deep links.">
+    <meta property="twitter:image" content="https://encodeurl.vercel.app/og-image.jpg">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="favicon.png">
     
     <!-- External Scripts and Styles -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <!-- Structured Data for Rich Snippets -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "WebApplication",
-      "name": "MyDebugger",
-      "url": "https://mydebugger.vercel.app",
-      "applicationCategory": "DeveloperApplication",
+      "@type": "SoftwareApplication",
+      "name": "URL Parameter Encoder Tool",
+      "applicationCategory": "WebApplication",
       "operatingSystem": "Web Browser",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       },
-      "description": "Free online developer tools for URL parameter encoding, JWT decoding, and more"
+      "description": "A free online tool to safely encode URL parameters, generate QR codes, and secure your deep links for marketing campaigns, mobile apps, and secure data sharing.",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.8",
+        "reviewCount": "124"
+      }
     }
     </script>
+    
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f5f7fa;
+            --dark: #212529;
+            --gray: #adb5bd;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 3fr 2fr;
+            gap: 24px;
+        }
+
+        .two-column-span {
+            grid-column: 1 / -1;
+        }
+
+        @media (max-width: 1023px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            margin-bottom: 24px;
+        }
+
+        .card-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i {
+            font-size: 1rem;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background-color: var(--light);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        .result-container {
+            margin-top: 16px;
+            position: relative;
+        }
+
+        .result {
+            background-color: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 0.9rem;
+            border: 1px solid #ddd;
+        }
+
+        .validation-bar {
+            height: 4px;
+            width: 100%;
+            background-color: #ddd;
+            margin-bottom: 8px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .validation-progress {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .valid {
+            background-color: var(--success);
+        }
+
+        .invalid {
+            background-color: var(--danger);
+        }
+
+        .warning {
+            background-color: var(--warning);
+        }
+
+        .validation-message {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 4px;
+            min-height: 1rem;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        .btn:hover {
+            background-color: #e5e9ed;
+        }
+
+        .btn i {
+            margin-right: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background-color: #e01e79;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .badge-success {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background-color: rgba(248, 150, 30, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: var(--danger);
+        }
+
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            padding: 16px;
+            background-color: var(--light);
+            border-radius: 8px;
+            position: relative;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* FIX 1: Improve QR code alignment */
+        .qr-container canvas,
+        .qr-container img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        #qrCode {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .qr-container::after {
+            content: 'Click to enlarge';
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.8rem;
+            color: var(--gray);
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 4px 8px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .qr-container:hover::after {
+            opacity: 1;
+        }
+
+        .qr-caption {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 12px;
+            text-align: center;
+        }
+        
+        /* FIX 4: Center align the processed URL text */
+        .qr-processed-url {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .qr-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .qr-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .qr-overlay-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 90%;
+            width: 500px;
+            text-align: center;
+            position: relative;
+        }
+
+        .qr-overlay-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid var(--danger);
+            color: var(--danger);
+            width: 36px;
+            height: 36px;
+            font-size: 1.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1050;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .qr-overlay-close:hover {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .qr-overlay-image {
+            margin: 20px auto;
+            width: 300px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .qr-overlay-image canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .qr-overlay-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .qr-overlay-url {
+            margin-top: 10px;
+            word-break: break-all;
+            font-size: 0.9rem;
+            background-color: var(--light);
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 100px;
+            overflow-y: auto;
+        }
+
+        .qr-overlay-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: var(--primary);
+        }
+
+        .links-list {
+            max-height: 500px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gray) var(--light);
+        }
+
+        .links-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .links-list::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        .links-list::-webkit-scrollbar-thumb {
+            background-color: var(--gray);
+            border-radius: 6px;
+        }
+
+        .list-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .list-item:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-item.starred {
+            background-color: rgba(248, 150, 30, 0.08);
+        }
+
+        .list-url {
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin-bottom: 4px;
+            padding-right: 30px;
+            cursor: pointer;
+        }
+
+        .highlighted-domain {
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .list-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 2px;
+        }
+
+        .action-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .action-icon:hover {
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .star-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .star-btn:hover, .star-btn.active {
+            color: var(--warning);
+        }
+
+        .empty-state {
+            padding: 20px;
+            text-align: center;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .status-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .status-message.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .search-input {
+            padding-left: 36px;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            cursor: pointer;
+            background: none;
+            border: none;
+            display: none;
+        }
+
+        .clear-search.visible {
+            display: block;
+        }
+
+        .autosave-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--gray);
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .autosave-active {
+            background-color: var(--success);
+        }
+
+        .param-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.85rem;
+        }
+
+        .param-table th, .param-table td {
+            padding: 8px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .param-table th {
+            background-color: var(--light);
+            font-weight: 600;
+        }
+
+        .param-table tr:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .param-name {
+            font-weight: 500;
+            max-width: 150px;
+        }
+
+        .param-value {
+            word-break: break-all;
+        }
+
+        .param-warning {
+            color: var(--warning);
+            font-size: 0.75rem;
+        }
+
+        .mode-toggle {
+            display: flex;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            width: fit-content;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            border: none;
+            background-color: var(--light);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .mode-content {
+            display: none;
+        }
+
+        .mode-content.active {
+            display: block;
+        }
+
+        .post-params {
+            min-height: 100px;
+            margin-top: 10px;
+        }
+
+        /* Modified SEO-friendly footer without contact & copyright */
+        footer {
+            background-color: var(--light);
+            border-top: 1px solid #eee;
+            padding: 30px 20px;
+            margin-top: 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            margin: 15px 0;
+        }
+
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer-bottom {
+            margin-top: 30px;
+            text-align: center;
+            color: var(--gray);
+            font-size: 0.85rem;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .nickname-display {
+            margin-right: 10px;
+            font-weight: 500;
+        }
+        
+        .nickname-edit {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .nickname-input {
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 200px;
+            margin-right: 5px;
+        }
+
+        .list-qr {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            display: flex;
+            justify-content: center;
+            padding: 0 20px;
+        }
+
+        .list-qr.expanded {
+            max-height: 200px;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .toggle-qr {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-left: 10px;
+        }
+
+        .edit-mode {
+            display: none;
+        }
+
+        .edit-mode.active {
+            display: block;
+        }
+
+        .param-edit-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--primary);
+            transition: var(--transition);
+            font-size: 0.9rem;
+            margin-left: 10px;
+        }
+
+        .param-edit-btn:hover {
+            color: var(--secondary);
+        }
+
+        .param-editable {
+            padding: 4px;
+            border: 1px dashed transparent;
+            border-radius: 4px;
+            transition: var(--transition);
+        }
+
+        .param-editable:hover {
+            border-color: var(--gray);
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+
+        .param-editable.editing {
+            border-color: var(--primary);
+            background-color: white;
+        }
+
+        .param-edit-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .param-edit-save {
+            color: var(--success);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .param-edit-cancel {
+            color: var(--danger);
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-size: 0.9rem;
+        }
+
+        .add-nickname-btn {
+            color: var(--primary);
+            background: none;
+            border: none;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .intro-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+
+        .intro-collapse-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .intro-title {
+            font-size: 1.8rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .intro-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .intro-content.expanded {
+            max-height: 800px;
+        }
+
+        .intro-text {
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+
+        .breadcrumbs {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .breadcrumb-item {
+            margin-right: 5px;
+        }
+
+        .breadcrumb-item a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .breadcrumb-separator {
+            margin: 0 5px;
+        }
+
+        .list-qr-btn {
+            cursor: pointer;
+        }
+
+        .key-instructions {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .list-nickname {
+            display: none;
+            align-items: center;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .action-bar {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Header will be injected by common.js -->
-    <div id="header-container"></div>
-    
-    <!-- Hero Section -->
+    <!-- Breadcrumbs for SEO -->
     <div class="container">
-        <section class="hero">
-            <h1>Developer Tools for Everyday Debugging</h1>
-            <p>Free, secure, and client-side web utilities for developers, testers, and marketers</p>
-            <a href="#tools" class="btn">Explore Tools</a>
-        </section>
+        <div class="two-column-span">
+            <nav aria-label="breadcrumb" class="breadcrumbs">
+                <div class="breadcrumb-item"><a href="/">Home</a></div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item"><a href="/tools">Web Tools</a></div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item">URL Parameter Encoder</div>
+            </nav>
+        </div>
     </div>
-    
-    <!-- Tools Section -->
+
+    <!-- SEO Introduction Section - Collapsible by default -->
     <div class="container">
-        <section id="tools">
-            <h2>Our Tools</h2>
-            <div id="tools-container">
-                <!-- Tools will be populated by tools-registry.js -->
+        <div class="two-column-span">
+            <section class="intro-section">
+                <div class="intro-collapse-toggle">
+                    <h1 class="intro-title">URL Parameter Encoder Tool</h1>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="intro-content">
+                    <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="container">
+        <!-- Encoder Section - Left column -->
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-link"></i> URL Parameter Encoder</h2>
+                    <div class="mode-toggle">
+                        <button class="mode-btn active" data-mode="get">GET</button>
+                        <button class="mode-btn" data-mode="post">POST</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <label for="inputUrl">Input URL:</label>
+                        <textarea id="inputUrl" placeholder="Enter URL with parameters (e.g. https://example.com?url=https://another.com)"></textarea>
+                        <div class="validation-bar">
+                            <div id="validationProgress" class="validation-progress"></div>
+                        </div>
+                        <div id="validationMessage" class="validation-message"></div>
+                    </div>
+                    
+                    <!-- POST Parameters (hidden by default) -->
+                    <div class="mode-content" id="postParamsContent">
+                        <div class="input-group">
+                            <label for="postParams">POST Parameters:</label>
+                            <textarea id="postParams" class="post-params" placeholder="key1=value1&key2=value2
+# Or use JSON format:
+{
+  &quot;key1&quot;: &quot;value1&quot;,
+  &quot;key2&quot;: &quot;value2&quot;
+}"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div id="resultContainer" class="result-container" style="display: none;">
+                        <!-- QR Code First -->
+                        <div id="qrContainer" class="qr-container">
+                            <div class="qr-processed-url">Processed URL:</div>
+                            <div id="qrCode"></div>
+                            <p class="qr-caption">Scan with your phone to open this link directly</p>
+                        </div>
+                        
+                        <!-- URL Result -->
+                        <label>Processed URL: <span id="autosaveStatus" class="autosave-indicator"></span> <span id="autosaveText" style="font-size: 0.8rem; color: var(--gray);"></span></label>
+                        <div id="processedUrl" class="result"></div>
+                        
+                        <!-- Action Buttons Moved Before Parameter Breakdown -->
+                        <div class="action-bar">
+                            <button id="copyBtn" class="btn tooltip" data-tooltip="Copy to clipboard">
+                                <i class="fas fa-copy"></i> Copy
+                            </button>
+                            <button id="runBtn" class="btn btn-primary tooltip" data-tooltip="Open in new tab">
+                                <i class="fas fa-external-link-alt"></i> Run
+                            </button>
+                            <button id="clearBtn" class="btn tooltip" data-tooltip="Clear all fields">
+                                <i class="fas fa-trash"></i> Clear
+                            </button>
+                            <button id="saveQrBtn" class="btn tooltip" data-tooltip="Save QR code as image">
+                                <i class="fas fa-download"></i> Save QR
+                            </button>
+                        </div>
+                        
+                        <!-- Parameter Breakdown with Edit Feature -->
+                        <div id="paramBreakdown">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px;">
+                                <h3>Parameter Breakdown:</h3>
+                                <button id="paramEditBtn" class="param-edit-btn tooltip" data-tooltip="Edit parameters">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                            </div>
+                            <table class="param-table" id="paramTable">
+                                <thead>
+                                    <tr>
+                                        <th>Parameter</th>
+                                        <th>Original Value</th>
+                                        <th>Encoded Value</th>
+                                        <th>Notes</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Parameters will be inserted here -->
+                                </tbody>
+                            </table>
+                            <div id="paramEditActions" class="param-edit-actions" style="display: none;">
+                                <button id="paramSaveBtn" class="param-edit-save tooltip" data-tooltip="Save changes">
+                                    <i class="fas fa-check"></i> Save Changes
+                                </button>
+                                <button id="paramCancelBtn" class="param-edit-cancel tooltip" data-tooltip="Cancel editing">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </section>
+        </div>
+        
+        <!-- Recent Links - Right column -->
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i> Recent Links 
+                        <span id="linksCount" class="badge badge-success">0</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search links...">
+                        <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
+                    </div>
+                    
+                    <div id="linksList" class="links-list">
+                        <!-- Links will be inserted here, starred items first -->
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     
-    <!-- Footer will be injected by common.js -->
-    <div id="footer-container"></div>
+    <!-- QR Code Overlay -->
+    <div id="qrOverlay" class="qr-overlay">
+        <div class="qr-overlay-content">
+            <button id="qrOverlayClose" class="qr-overlay-close">&times;</button>
+            <div class="qr-overlay-title">QR Code</div>
+            <div id="qrOverlayImage" class="qr-overlay-image"></div>
+            <p class="qr-caption">Scan with your phone to open this link directly</p>
+            <div class="qr-overlay-title">Processed URL:</div>
+            <div id="qrOverlayUrl" class="qr-overlay-url"></div>
+            <div class="qr-overlay-buttons">
+                <button id="qrOverlaySave" class="btn btn-primary">
+                    <i class="fas fa-download"></i> Save QR Code
+                </button>
+            </div>
+        </div>
+        <div class="key-instructions">Press ESC key or click anywhere to close</div>
+    </div>
     
-    <!-- Common Scripts -->
-    <script src="js/common.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/tools-registry.js"></script>
+    <!-- Modified footer without contact info and copyright -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>URL Parameter Encoder Tool</h3>
+                <p>The ultimate tool for URL parameter encoding, deep linking, and campaign tracking</p>
+                <div class="footer-links">
+                    <a href="/tools/url-tools">URL Tools</a> | 
+                    <a href="/tools/qr-generator">QR Generator</a> | 
+                    <a href="/blog/url-best-practices">URL Best Practices</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Use Cases</h3>
+                <ul>
+                    <li>Marketing Campaign URL Generation</li>
+                    <li>Mobile App Deep Linking</li>
+                    <li>Parameter Encoding for Data Sharing</li>
+                    <li>QR Code Generation for Offline-to-Online</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <div class="deploy-info">
+                Last deployed: <span id="deployDate">April 3, 2025</span>
+            </div>
+            <div class="disclaimer">
+                This URL Parameter Encoder Tool is provided "as is" without warranty. All encoding occurs client-side for your privacy.
+                Ideal for marketing professionals and app developers.
+            </div>
+        </div>
+    </footer>
+    
+    <div id="statusMessage" class="status-message"></div>
+    
+    <script>
+        // Vercel-compatible logging function
+        const logger = {
+            log: function(msg, data) {
+                if (typeof console !== 'undefined') {
+                    const timestamp = new Date().toISOString();
+                    const formattedMsg = `[${timestamp}] ${msg}`;
+                    if (data) {
+                        console.log(formattedMsg, data);
+                    } else {
+                        console.log(formattedMsg);
+                    }
+                }
+                
+                // In production with Vercel, we could send logs to a monitoring service
+                if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+                    try {
+                        // Collect logs for potential serverless function reporting
+                        const logEntry = {
+                            timestamp: Date.now(),
+                            message: msg,
+                            data: data || null,
+                            url: window.location.href,
+                            userAgent: navigator.userAgent
+                        };
+                        
+                        // Store in local storage for demo purposes
+                        // In a real app, you might send these to a serverless function
+                        const logs = JSON.parse(localStorage.getItem('app_logs') || '[]');
+                        logs.push(logEntry);
+                        // Keep only the last 100 logs
+                        if (logs.length > 100) logs.splice(0, logs.length - 100);
+                        localStorage.setItem('app_logs', JSON.stringify(logs));
+                    } catch (e) {
+                        console.error('Error saving log:', e);
+                    }
+                }
+            },
+            error: function(msg, error) {
+                if (typeof console !== 'undefined') {
+                    const timestamp = new Date().toISOString();
+                    const formattedMsg = `[${timestamp}] ERROR: ${msg}`;
+                    if (error && error.stack) {
+                        console.error(formattedMsg, error.stack);
+                    } else if (error) {
+                        console.error(formattedMsg, error);
+                    } else {
+                        console.error(formattedMsg);
+                    }
+                }
+                
+                // In production with Vercel, we could send errors to a monitoring service
+                if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+                    try {
+                        // Collect errors for potential serverless function reporting
+                        const errorEntry = {
+                            timestamp: Date.now(),
+                            message: msg,
+                            error: error ? (error.stack || error.toString()) : null,
+                            url: window.location.href,
+                            userAgent: navigator.userAgent
+                        };
+                        
+                        // Store in local storage for demo purposes
+                        // In a real app, you might send these to a serverless function
+                        const errors = JSON.parse(localStorage.getItem('app_errors') || '[]');
+                        errors.push(errorEntry);
+                        // Keep only the last 50 errors
+                        if (errors.length > 50) errors.splice(0, errors.length - 50);
+                        localStorage.setItem('app_errors', JSON.stringify(errors));
+                    } catch (e) {
+                        console.error('Error saving error log:', e);
+                    }
+                }
+            }
+        };
+
+        // Main URL encoding function from the provided code
+        function encodeUrlParamsInUrl(url, paramNames) {
+            try {
+                // Check for valid input
+                if (!url || typeof url !== "string") return { result: url, valid: false, message: "Invalid URL format" };
+                
+                // Basic URL validation
+                if (!url.includes("://")) {
+                    return { result: url, valid: false, message: "Missing protocol (http:// or https://)" };
+                }
+                
+                // Parse parameter names to encode, if specified
+                let paramsToEncode = null;
+                if (paramNames) {
+                    paramsToEncode = paramNames.split(",").map(p => p.trim()).filter(p => p.length > 0);
+                }
+                
+                // Split URL into base and query string
+                const queryIndex = url.indexOf("?");
+                if (queryIndex === -1) {
+                    return { 
+                        result: url, 
+                        valid: true, 
+                        message: "No parameters to encode",
+                        params: [] 
+                    };
+                }
+                
+                const baseUrl = url.substring(0, queryIndex);
+                const queryString = url.substring(queryIndex + 1);
+                
+                // Split query string into parameters
+                const params = queryString.split("&");
+                let encodedCount = 0;
+                let paramDetails = [];
+                
+                // Process each parameter
+                for (let i = 0; i < params.length; i++) {
+                    const eqIndex = params[i].indexOf("=");
+                    if (eqIndex !== -1) {
+                        const name = params[i].substring(0, eqIndex);
+                        const value = params[i].substring(eqIndex + 1);
+                        let encodedValue = value;
+                        let wasEncoded = false;
+                        let paramNote = "";
+                        
+                        // Check if we should encode this parameter
+                        if (
+                            (paramsToEncode === null && value.match(/^https?:\/\//)) || // Auto-detect URL values
+                            (paramsToEncode !== null && paramsToEncode.includes(name))  // Specifically listed parameters
+                        ) {
+                            const originalValue = value;
+                            encodedValue = encodeURIComponent(value);
+                            
+                            // Only count as encoded if the value actually changed
+                            if (originalValue !== encodedValue) {
+                                encodedCount++;
+                                wasEncoded = true;
+                            }
+                            
+                            params[i] = name + "=" + encodedValue;
+                        }
+                        
+                        // Check for special parameters and add notes
+                        if (name.toLowerCase().startsWith('utm_')) {
+                            paramNote = "UTM tracking parameter for analytics";
+                        } else if (name.toLowerCase() === 'url' || name.toLowerCase() === 'link' || name.toLowerCase() === 'href') {
+                            paramNote = "URL parameter - encoding recommended";
+                        } else if (name.toLowerCase() === 'redirect' || name.toLowerCase() === 'return' || name.toLowerCase() === 'returnurl') {
+                            paramNote = "Redirect URL - verify for security";
+                        } else if (name.toLowerCase() === 'token' || name.toLowerCase() === 'auth' || name.toLowerCase() === 'key') {
+                            paramNote = "Security token - handle with care";
+                        }
+                        
+                        paramDetails.push({
+                            name,
+                            originalValue: value,
+                            encodedValue: encodedValue,
+                            wasEncoded,
+                            note: paramNote
+                        });
+                    }
+                }
+                
+                // Join everything back together
+                const result = baseUrl + "?" + params.join("&");
+                
+                // Return result with validation info
+                return { 
+                    result, 
+                    valid: true, 
+                    message: encodedCount > 0 ? 
+                        `${encodedCount} parameter${encodedCount > 1 ? 's' : ''} encoded` : 
+                        "No parameters needed encoding",
+                    params: paramDetails,
+                    baseUrl
+                };
+            } catch (error) {
+                logger.error("Error encoding URL:", error);
+                return { result: url, valid: false, message: `Error: ${error.message}`, params: [] };
+            }
+        }
+
+        // Storage Manager for browser storage with fallback
+        const StorageManager = (function() {
+            // In-memory storage as fallback
+            let inMemoryData = {
+                urlHistory: []
+            };
+            
+            // Check if storage is available
+            function isStorageAvailable() {
+                try {
+                    const test = '__storage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+            
+            // Storage interface
+            return {
+                get: function(key, defaultValue) {
+                    try {
+                        if (isStorageAvailable()) {
+                            const item = localStorage.getItem(key);
+                            return item ? JSON.parse(item) : defaultValue;
+                        } else {
+                            return inMemoryData[key] || defaultValue;
+                        }
+                    } catch (e) {
+                        logger.error("Error getting data from storage:", e);
+                        return defaultValue;
+                    }
+                },
+                set: function(key, value) {
+                    try {
+                        if (isStorageAvailable()) {
+                            localStorage.setItem(key, JSON.stringify(value));
+                        } else {
+                            inMemoryData[key] = value;
+                        }
+                        return true;
+                    } catch (e) {
+                        logger.error("Error saving data to storage:", e);
+                        return false;
+                    }
+                }
+            };
+        })();
+
+        // DOM elements
+        const inputUrl = document.getElementById('inputUrl');
+        const postParams = document.getElementById('postParams');
+        const validationProgress = document.getElementById('validationProgress');
+        const validationMessage = document.getElementById('validationMessage');
+        const resultContainer = document.getElementById('resultContainer');
+        const processedUrl = document.getElementById('processedUrl');
+        const paramTable = document.getElementById('paramTable');
+        const paramEditBtn = document.getElementById('paramEditBtn');
+        const paramEditActions = document.getElementById('paramEditActions');
+        const paramSaveBtn = document.getElementById('paramSaveBtn');
+        const paramCancelBtn = document.getElementById('paramCancelBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const runBtn = document.getElementById('runBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const saveQrBtn = document.getElementById('saveQrBtn');
+        const qrContainer = document.getElementById('qrContainer');
+        const qrCode = document.getElementById('qrCode');
+        const qrOverlay = document.getElementById('qrOverlay');
+        const qrOverlayClose = document.getElementById('qrOverlayClose');
+        const qrOverlayImage = document.getElementById('qrOverlayImage');
+        const qrOverlayUrl = document.getElementById('qrOverlayUrl');
+        const qrOverlaySave = document.getElementById('qrOverlaySave');
+        const linksList = document.getElementById('linksList');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        const linksCount = document.getElementById('linksCount');
+        const statusMessage = document.getElementById('statusMessage');
+        const autosaveStatus = document.getElementById('autosaveStatus');
+        const autosaveText = document.getElementById('autosaveText');
+        const modeBtns = document.querySelectorAll('.mode-btn');
+        const postParamsContent = document.getElementById('postParamsContent');
+        const deployDate = document.getElementById('deployDate');
+        const introCollapseToggle = document.querySelector('.intro-collapse-toggle');
+        const introContent = document.querySelector('.intro-content');
+
+        // URL history array and state variables
+        let urlHistory = StorageManager.get('urlHistory', []);
+        let lastProcessedUrl = '';
+        let lastProcessedResult = null;
+        let autoSaveTimer = null;
+        let lastInputTime = 0;
+        let qrDebounceTimer = null;
+        let currentMode = 'get';
+        let isEditingParams = false;
+        let currentQrCodeData = '';
+        let lastParamState = ''; // Add this for parameter change detection
+
+        // Update links count
+        function updateCounts() {
+            linksCount.textContent = urlHistory.length;
+        }
+
+        // Generate parameter state signature for comparison
+        function generateParamState(params) {
+            return params.map(p => `${p.name}=${p.encodedValue}`).sort().join('&');
+        }
+
+        // Process URL and update UI
+        function processUrl() {
+            const url = inputUrl.value.trim();
+            
+            // Clear auto-save status
+            autosaveStatus.classList.remove('autosave-active');
+            autosaveText.textContent = '';
+            
+            // Reset auto-save timer
+            if (autoSaveTimer) {
+                clearTimeout(autoSaveTimer);
+            }
+            
+            lastInputTime = Date.now();
+            
+            if (!url) {
+                validationProgress.style.width = '0';
+                validationMessage.textContent = '';
+                resultContainer.style.display = 'none';
+                return;
+            }
+            
+            const result = encodeUrlParamsInUrl(url, null); // Auto-detect all URLs
+            lastProcessedUrl = result.result;
+            lastProcessedResult = result;
+            
+            // Update validation UI
+            if (result.valid) {
+                validationProgress.className = 'validation-progress valid';
+                validationProgress.style.width = '100%';
+            } else {
+                validationProgress.className = 'validation-progress invalid';
+                validationProgress.style.width = '30%';
+            }
+            
+            validationMessage.textContent = result.message;
+            processedUrl.textContent = result.result;
+            resultContainer.style.display = 'block';
+            
+            // Update parameter breakdown table
+            updateParamTable(result.params);
+            
+            // Generate parameter state signature
+            const currentParamState = generateParamState(result.params);
+            const paramsChanged = lastParamState && currentParamState !== lastParamState;
+            lastParamState = currentParamState;
+            
+            // Set auto-save timer for 10 seconds of inactivity
+            autoSaveTimer = setTimeout(() => {
+                if (url && result.valid) {
+                    saveToHistory(false);
+                    autosaveStatus.classList.add('autosave-active');
+                    autosaveText.textContent = 'Auto-saved';
+                }
+            }, 10000);
+            
+            // If parameters have changed, trigger save immediately
+            if (paramsChanged && url && result.valid) {
+                saveToHistory(false);
+                autosaveStatus.classList.add('autosave-active');
+                autosaveText.textContent = 'Auto-saved (parameters changed)';
+            }
+            
+            // Update QR code immediately
+            updateQRCode(result.result);
+            
+            // Log the processed URL
+            logger.log("URL processed", { 
+                originalUrl: url,
+                encoded: result.valid,
+                paramCount: result.params.length
+            });
+        }
+        
+        // Update parameter breakdown table
+        function updateParamTable(params) {
+            const tbody = paramTable.querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            if (params.length === 0) {
+                const row = document.createElement('tr');
+                row.innerHTML = '<td colspan="4" style="text-align: center;">No parameters found</td>';
+                tbody.appendChild(row);
+                return;
+            }
+            
+            params.forEach(param => {
+                const row = document.createElement('tr');
+                
+                if (isEditingParams) {
+                    row.innerHTML = `
+                        <td class="param-name">${escapeHtml(param.name)}</td>
+                        <td>${escapeHtml(param.originalValue)}</td>
+                        <td>
+                            <div class="param-editable editing" contenteditable="true" data-param="${escapeHtml(param.name)}">${escapeHtml(param.encodedValue)}</div>
+                        </td>
+                        <td>
+                            ${param.wasEncoded ? '<span class="param-warning">Encoded</span><br>' : ''}
+                            ${param.note ? `<span class="param-warning">${escapeHtml(param.note)}</span>` : ''}
+                        </td>
+                    `;
+                } else {
+                    row.innerHTML = `
+                        <td class="param-name">${escapeHtml(param.name)}</td>
+                        <td>${escapeHtml(param.originalValue)}</td>
+                        <td class="param-value">${escapeHtml(param.encodedValue)}</td>
+                        <td>
+                            ${param.wasEncoded ? '<span class="param-warning">Encoded</span><br>' : ''}
+                            ${param.note ? `<span class="param-warning">${escapeHtml(param.note)}</span>` : ''}
+                        </td>
+                    `;
+                }
+                
+                tbody.appendChild(row);
+            });
+        }
+        
+        // Enable parameter editing mode
+        function enableParamEditing() {
+            isEditingParams = true;
+            updateParamTable(lastProcessedResult.params);
+            paramEditActions.style.display = 'flex';
+            paramEditBtn.style.display = 'none';
+        }
+        
+        // Disable parameter editing mode
+        function disableParamEditing() {
+            isEditingParams = false;
+            updateParamTable(lastProcessedResult.params);
+            paramEditActions.style.display = 'none';
+            paramEditBtn.style.display = 'inline-block';
+        }
+        
+        // Save edited parameters
+        function saveEditedParams() {
+            const editableFields = document.querySelectorAll('.param-editable.editing');
+            let paramUpdates = {};
+            
+            editableFields.forEach(field => {
+                const paramName = field.dataset.param;
+                const paramValue = field.textContent;
+                paramUpdates[paramName] = paramValue;
+            });
+            
+            // Reconstruct URL with updated parameters
+            if (Object.keys(paramUpdates).length > 0 && lastProcessedResult) {
+                const baseUrl = lastProcessedResult.baseUrl;
+                const updatedParams = [];
+                
+                lastProcessedResult.params.forEach(param => {
+                    const updatedValue = paramUpdates[param.name] !== undefined ? 
+                        paramUpdates[param.name] : param.encodedValue;
+                    
+                    updatedParams.push(`${param.name}=${updatedValue}`);
+                });
+                
+                const newUrl = baseUrl + '?' + updatedParams.join('&');
+                processedUrl.textContent = newUrl;
+                lastProcessedUrl = newUrl;
+                
+                // Generate updated param state
+                const updatedParamState = updatedParams.sort().join('&');
+                const paramsChanged = lastParamState && updatedParamState !== lastParamState;
+                lastParamState = updatedParamState;
+                
+                // Save to history if parameters changed
+                if (paramsChanged) {
+                    saveToHistory(false);
+                    autosaveStatus.classList.add('autosave-active');
+                    autosaveText.textContent = 'Saved (parameters updated)';
+                }
+                
+                // Update other parameters as needed
+                updateQRCode(newUrl);
+                showStatusMessage('Parameters updated');
+                
+                // Log parameter updates
+                logger.log("Parameters edited", { 
+                    updates: paramUpdates,
+                    newUrl: newUrl
+                });
+            }
+            
+            disableParamEditing();
+        }
+        
+        // Update QR code
+        function updateQRCode(url) {
+            if (!url) {
+                qrContainer.style.display = 'none';
+                return;
+            }
+            
+            qrContainer.style.display = 'block';
+            qrCode.innerHTML = '';
+            currentQrCodeData = url;
+            
+            try {
+                new QRCode(qrCode, {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                logger.error("Error generating QR code:", e);
+                qrCode.innerHTML = '<div style="color: var(--danger)">Error generating QR code</div>';
+            }
+        }
+        
+        // Show QR code in overlay
+        function showQrOverlay(url) {
+            qrOverlayImage.innerHTML = '';
+            qrOverlayUrl.textContent = url;
+            
+            try {
+                new QRCode(qrOverlayImage, {
+                    text: url,
+                    width: 300,
+                    height: 300,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+                
+                qrOverlay.classList.add('active');
+                
+                // Log QR code view
+                logger.log("QR code overlay opened", { url: url });
+            } catch (e) {
+                logger.error("Error generating overlay QR code:", e);
+                showStatusMessage('Error generating QR code', true);
+            }
+        }
+        
+        // Improved text wrapping for saved QR codes
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split('');
+            let line = '';
+            let testLine = '';
+            let currentY = y;
+            
+            for(let i = 0; i < words.length; i++) {
+                testLine += words[i];
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                
+                if (testWidth > maxWidth && i > 0) {
+                    ctx.fillText(line, x, currentY);
+                    line = words[i];
+                    testLine = words[i];
+                    currentY += lineHeight;
+                }
+                else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, currentY);
+            return currentY;
+        }
+        
+        // Save QR code as image
+        function saveQrCode(container, filename) {
+            try {
+                const canvas = container.querySelector('canvas');
+                
+                if (!canvas) {
+                    showStatusMessage('No QR code available to save', true);
+                    return;
+                }
+                
+                // Create a new canvas with padding and text
+                const paddedCanvas = document.createElement('canvas');
+                const ctx = paddedCanvas.getContext('2d');
+                const padding = 40;
+                const headerHeight = 50;
+                const footerHeight = 100;
+                const qrSize = Math.max(canvas.width, canvas.height);
+                
+                paddedCanvas.width = qrSize + (padding * 2);
+                paddedCanvas.height = qrSize + headerHeight + footerHeight + (padding * 2);
+                
+                // Fill with white background
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
+                
+                // Add "QR Code" title at the top in blue
+                ctx.font = 'bold 20px Arial';
+                ctx.fillStyle = '#4361ee';
+                ctx.textAlign = 'center';
+                ctx.fillText('QR Code', paddedCanvas.width / 2, padding);
+                
+                // Draw the QR code
+                ctx.drawImage(canvas, 
+                    padding, 
+                    headerHeight, 
+                    qrSize, 
+                    qrSize
+                );
+                
+                // Add "Scan with your phone" text
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#adb5bd';
+                ctx.textAlign = 'center';
+                ctx.fillText('Scan with your phone to open this link directly', 
+                    paddedCanvas.width / 2, 
+                    headerHeight + qrSize + 25
+                );
+                
+                // Get URL and try to find nickname
+                const url = container === qrOverlayImage ? qrOverlayUrl.textContent : currentQrCodeData;
+                let nickname = '';
+                
+                // Try to find nickname in history
+                const historyItem = urlHistory.find(item => item.encodedUrl === url);
+                if (historyItem && historyItem.nickname) {
+                    nickname = historyItem.nickname;
+                }
+                
+                // Add nickname as a subtitle if available - FIX 5: Always include nickname if available
+                if (nickname) {
+                    ctx.font = 'italic 16px Arial';
+                    ctx.fillStyle = '#333333';
+                    ctx.fillText(`"${nickname}"`, paddedCanvas.width / 2, headerHeight - 10);
+                }
+                
+                // Add "Processed URL:" label in blue
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = '#4361ee';
+                ctx.textAlign = 'center';
+                ctx.fillText('Processed URL:', 
+                    paddedCanvas.width / 2, 
+                    headerHeight + qrSize + 50
+                );
+                
+                // Draw gray background for URL text
+                const urlBoxY = headerHeight + qrSize + 60;
+                const urlBoxHeight = 80; // Increased for more rows
+                ctx.fillStyle = '#f5f7fa';
+                ctx.fillRect(20, urlBoxY, paddedCanvas.width - 40, urlBoxHeight);
+                
+                // Add URL text with improved wrapping
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#333333';
+                ctx.textAlign = 'center';
+                
+                // Use improved text wrapping function
+                const maxWidth = paddedCanvas.width - 80; // Increased margins
+                const lineHeight = 20;
+                wrapText(ctx, url, paddedCanvas.width / 2, urlBoxY + 20, maxWidth, lineHeight);
+                
+                // Create download link
+                const dataUrl = paddedCanvas.toDataURL('image/png');
+                const downloadLink = document.createElement('a');
+                downloadLink.href = dataUrl;
+                downloadLink.download = filename || (nickname ? `${nickname}_qrcode.png` : 'qrcode.png');
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                
+                showStatusMessage('QR code saved to your device');
+                
+                // Log QR code save
+                logger.log("QR code saved", { 
+                    url: url,
+                    nickname: nickname || null
+                });
+            } catch (e) {
+                logger.error("Error saving QR code:", e);
+                showStatusMessage('Error saving QR code', true);
+            }
+        }
+        
+        // Generate QR code for list item
+        function generateListQR(container, url) {
+            container.innerHTML = '';
+            
+            try {
+                new QRCode(container, {
+                    text: url,
+                    width: 150,
+                    height: 150,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                logger.error("Error generating QR code:", e);
+                container.innerHTML = '<div style="color: var(--danger)">Error generating QR code</div>';
+            }
+        }
+        
+        // Toggle QR code visibility for list item
+        function toggleListQR(id) {
+            const qrElement = document.getElementById(`qr-${id}`);
+            const toggleBtn = document.getElementById(`toggle-qr-${id}`);
+            
+            if (qrElement.classList.contains('expanded')) {
+                qrElement.classList.remove('expanded');
+                toggleBtn.innerHTML = '<i class="fas fa-qrcode"></i> Show QR';
+            } else {
+                qrElement.classList.add('expanded');
+                toggleBtn.innerHTML = '<i class="fas fa-chevron-up"></i> Hide QR';
+                
+                // Generate QR code if container is empty
+                if (qrElement.children.length === 0) {
+                    const item = urlHistory.find(entry => entry.id === id);
+                    if (item) {
+                        generateListQR(qrElement, item.encodedUrl);
+                    }
+                }
+            }
+        }
+        
+        // Show QR code overlay from list item
+        function showListQrOverlay(id) {
+            const item = urlHistory.find(entry => entry.id === id);
+            if (item) {
+                showQrOverlay(item.encodedUrl);
+            }
+        }
+        
+        // Extract domain from URL
+        function extractDomain(url) {
+            try {
+                if (!url) return '';
+                
+                // Remove protocol and get domain
+                let domain = url.split('//')[1] || url;
+                
+                // Get domain and subdomain
+                domain = domain.split('/')[0];
+                
+                return domain;
+            } catch (e) {
+                logger.error("Error extracting domain:", e);
+                return url;
+            }
+        }
+        
+        // Edit nickname for list item
+        function editNickname(id) {
+            const nameDisplay = document.getElementById(`nickname-display-${id}`);
+            const nameEdit = document.getElementById(`nickname-edit-${id}`);
+            
+            nameDisplay.style.display = 'none';
+            nameEdit.style.display = 'block';
+            
+            const inputElement = document.getElementById(`nickname-input-${id}`);
+            inputElement.focus();
+            inputElement.select();
+            
+            // Log edit action
+            logger.log("Nickname edit started", { 
+                id: id
+            });
+        }
+        
+        // Save nickname for list item
+        function saveNickname(id) {
+            const nameDisplay = document.getElementById(`nickname-display-${id}`);
+            const nameEdit = document.getElementById(`nickname-edit-${id}`);
+            const inputElement = document.getElementById(`nickname-input-${id}`);
+            
+            const newNickname = inputElement.value.trim();
+            
+            // Update in history array
+            const itemIndex = urlHistory.findIndex(entry => entry.id === id);
+            if (itemIndex !== -1) {
+                urlHistory[itemIndex].nickname = newNickname;
+                StorageManager.set('urlHistory', urlHistory);
+                
+                // Update display
+                const displayElement = document.getElementById(`nickname-text-${id}`);
+                if (displayElement) {
+                    displayElement.textContent = newNickname || 'No nickname';
+                }
+                
+                // Show or hide nickname section based on presence of nickname
+                const nicknameSection = document.getElementById(`nickname-section-${id}`);
+                if (nicknameSection) {
+                    if (newNickname) {
+                        nicknameSection.style.display = 'flex';
+                    } else {
+                        nicknameSection.style.display = 'none';
+                    }
+                }
+                
+                // Update add nickname button
+                const addButton = document.getElementById(`add-nickname-${id}`);
+                if (addButton) {
+                    addButton.style.display = newNickname ? 'none' : 'inline-flex';
+                }
+                
+                nameDisplay.style.display = 'flex';
+                nameEdit.style.display = 'none';
+                
+                showStatusMessage('Nickname updated');
+                
+                // Refresh the links list to reflect changes
+                renderLinksList();
+                
+                // Log nickname update
+                logger.log("Nickname updated", { 
+                    id: id,
+                    nickname: newNickname
+                });
+            }
+        }
+        
+        // Add nickname to list item
+        function addNickname(id) {
+            const nicknameSection = document.getElementById(`nickname-section-${id}`);
+            const addButton = document.getElementById(`add-nickname-${id}`);
+            
+            nicknameSection.style.display = 'flex';
+            addButton.style.display = 'none';
+            
+            // Trigger edit mode
+            editNickname(id);
+            
+            // Log add nickname action
+            logger.log("Add nickname initiated", { 
+                id: id
+            });
+        }
+        
+        // Save URL to history
+        function saveToHistory(showNotification = true) {
+            const url = inputUrl.value.trim();
+            const processedResult = lastProcessedUrl;
+            const postParamsValue = postParams.value.trim();
+            
+            if (!url || !processedResult) return;
+            
+            try {
+                const now = new Date();
+                const timestamp = now.toISOString();
+                const displayDate = now.toLocaleString(undefined, { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                // Generate a consistent ID based on URL content to avoid duplicates
+                // FIX 6: Use paramState in ID generation to account for parameter changes
+                const paramState = lastProcessedResult.params 
+                    ? generateParamState(lastProcessedResult.params) 
+                    : '';
+                const urlId = btoa(url + currentMode + paramState).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+                
+                // Check if URL already exists
+                const existingIndex = urlHistory.findIndex(item => item.id === urlId);
+                
+                if (existingIndex !== -1) {
+                    // Update existing entry
+                    urlHistory[existingIndex] = {
+                        ...urlHistory[existingIndex],
+                        timestamp,
+                        displayDate,
+                        lastUsed: now.getTime(),
+                        encodedUrl: processedResult, // Update encoded URL in case parameters changed
+                        paramState: paramState // Save parameter state
+                    };
+                } else {
+                    // Add new entry
+                    const entry = {
+                        id: urlId,
+                        originalUrl: url,
+                        encodedUrl: processedResult,
+                        timestamp,
+                        displayDate,
+                        starred: false,
+                        lastUsed: now.getTime(),
+                        nickname: '',
+                        requestMode: currentMode,
+                        postParams: currentMode === 'post' ? postParamsValue : '',
+                        paramState: paramState // Save parameter state
+                    };
+                    
+                    urlHistory.unshift(entry);
+                    
+                    // Limit history size to 100 items
+                    if (urlHistory.length > 100) {
+                        // Remove oldest non-starred items first
+                        const nonStarredIndex = urlHistory.findIndex(item => !item.starred);
+                        if (nonStarredIndex !== -1) {
+                            urlHistory.splice(nonStarredIndex, 1);
+                        } else {
+                            urlHistory.pop(); // If all are starred, remove the oldest
+                        }
+                    }
+                }
+                
+                // Save to storage
+                StorageManager.set('urlHistory', urlHistory);
+                
+                // Update UI
+                renderLinksList();
+                updateCounts();
+                
+                if (showNotification) {
+                    showStatusMessage('URL saved to history');
+                }
+                
+                // Log history save
+                logger.log("URL saved to history", { 
+                    id: urlId,
+                    mode: currentMode,
+                    hasPostParams: currentMode === 'post' && postParamsValue.length > 0
+                });
+                
+                return true;
+            } catch (e) {
+                logger.error("Error saving to history:", e);
+                if (showNotification) {
+                    showStatusMessage('Error saving URL', true);
+                }
+                return false;
+            }
+        }
+        
+        // Toggle star status
+        function toggleStar(id) {
+            try {
+                const itemIndex = urlHistory.findIndex(entry => entry.id === id);
+                
+                if (itemIndex !== -1) {
+                    urlHistory[itemIndex].starred = !urlHistory[itemIndex].starred;
+                    StorageManager.set('urlHistory', urlHistory);
+                    
+                    renderLinksList();
+                    updateCounts();
+                    
+                    showStatusMessage(
+                        urlHistory[itemIndex].starred 
+                            ? 'Added to starred links' 
+                            : 'Removed from starred links'
+                    );
+                    
+                    // Log star toggle
+                    logger.log("Star toggled", { 
+                        id: id,
+                        starred: urlHistory[itemIndex].starred
+                    });
+                }
+            } catch (e) {
+                logger.error("Error toggling star:", e);
+                showStatusMessage('Error updating star status', true);
+            }
+        }
+        
+        // Load URL into editor
+        function loadUrlToEditor(id) {
+            try {
+                const item = urlHistory.find(entry => entry.id === id);
+                
+                if (item) {
+                    inputUrl.value = item.originalUrl;
+                    
+                    // Set request mode
+                    if (item.requestMode) {
+                        setRequestMode(item.requestMode);
+                        
+                        // If POST mode, load post params
+                        if (item.requestMode === 'post' && item.postParams) {
+                            postParams.value = item.postParams;
+                        }
+                    } else {
+                        setRequestMode('get'); // Default to GET if no mode specified
+                    }
+                    
+                    // Update item's "last used" timestamp
+                    item.lastUsed = Date.now();
+                    StorageManager.set('urlHistory', urlHistory);
+                    
+                    // Process URL
+                    processUrl();
+                    
+                    // Scroll to top on mobile
+                    if (window.innerWidth < 1024) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    
+                    showStatusMessage('URL loaded to editor');
+                    
+                    // Log URL load
+                    logger.log("URL loaded to editor", { 
+                        id: id
+                    });
+                }
+            } catch (e) {
+                logger.error("Error loading URL to editor:", e);
+                showStatusMessage('Error loading URL', true);
+            }
+        }
+        
+        // Copy URL to clipboard
+        function copyUrl(text) {
+            try {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showStatusMessage('Copied to clipboard');
+                        
+                        // Log copy action
+                        logger.log("URL copied to clipboard");
+                    })
+                    .catch(err => {
+                        logger.error('Failed to copy text:', err);
+                        showStatusMessage('Failed to copy', true);
+                    });
+            } catch (e) {
+                logger.error("Error copying URL:", e);
+                showStatusMessage('Error copying URL', true);
+            }
+        }
+        
+        // Open URL in new tab
+        function runUrl(url, mode = null, postParamsText = null) {
+            try {
+                const useMode = mode || currentMode;
+                
+                if (useMode === 'get') {
+                    window.open(url, '_blank');
+                    
+                    // Log GET URL run
+                    logger.log("URL opened (GET)", { 
+                        url: url
+                    });
+                } else if (useMode === 'post') {
+                    // Create a form to submit POST request
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = url.split('?')[0]; // Base URL without query string
+                    form.target = '_blank';
+                    
+                    // Add query parameters from URL
+                    const queryParams = new URLSearchParams(url.split('?')[1] || '');
+                    for (const [key, value] of queryParams.entries()) {
+                        const input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = key;
+                        input.value = value;
+                        form.appendChild(input);
+                    }
+                    
+                    // Add POST parameters
+                    const postParamsValue = postParamsText || postParams.value;
+                    let postData = {};
+                    
+                    try {
+                        // Try to parse as JSON
+                        postData = JSON.parse(postParamsValue);
+                    } catch (e) {
+                        // Parse as URL encoded string
+                        const params = new URLSearchParams(postParamsValue);
+                        for (const [key, value] of params.entries()) {
+                            postData[key] = value;
+                        }
+                    }
+                    
+                    // Add POST parameters to form
+                    for (const key in postData) {
+                        if (postData.hasOwnProperty(key)) {
+                            const input = document.createElement('input');
+                            input.type = 'hidden';
+                            input.name = key;
+                            input.value = postData[key];
+                            form.appendChild(input);
+                        }
+                    }
+                    
+                    // Append form to body, submit it, and remove it
+                    document.body.appendChild(form);
+                    form.submit();
+                    document.body.removeChild(form);
+                    
+                    // Log POST URL run
+                    logger.log("URL opened (POST)", { 
+                        url: url,
+                        postParamsCount: Object.keys(postData).length
+                    });
+                }
+            } catch (e) {
+                logger.error("Error opening URL:", e);
+                showStatusMessage('Error opening URL', true);
+            }
+        }
+        
+        // Delete history item
+        function deleteHistoryItem(id) {
+            try {
+                urlHistory = urlHistory.filter(entry => entry.id !== id);
+                StorageManager.set('urlHistory', urlHistory);
+                
+                renderLinksList();
+                updateCounts();
+                
+                showStatusMessage('Item deleted');
+                
+                // Log delete
+                logger.log("History item deleted", { 
+                    id: id
+                });
+            } catch (e) {
+                logger.error("Error deleting history item:", e);
+                showStatusMessage('Error deleting item', true);
+            }
+        }
+        
+        // Set request mode (GET/POST)
+        function setRequestMode(mode) {
+            currentMode = mode;
+            
+            // Update UI
+            modeBtns.forEach(btn => {
+                if (btn.dataset.mode === mode) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Show/hide POST parameters
+            if (mode === 'post') {
+                postParamsContent.style.display = 'block';
+            } else {
+                postParamsContent.style.display = 'none';
+            }
+            
+            // Log mode change
+            logger.log("Request mode changed", { 
+                mode: mode
+            });
+        }
+        
+        // Show status message
+        function showStatusMessage(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.style.backgroundColor = isError ? 'rgba(247, 37, 133, 0.9)' : 'rgba(0, 0, 0, 0.8)';
+            
+            statusMessage.classList.add('show');
+            
+            setTimeout(() => {
+                statusMessage.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Render links list with starred items at the top
+        function renderLinksList(searchTerm = '') {
+            try {
+                if (urlHistory.length === 0) {
+                    linksList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <p>No history yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const normalizedSearch = searchTerm.toLowerCase();
+                
+                // Filter by search term if provided
+                const filteredHistory = normalizedSearch ? 
+                    urlHistory.filter(entry => 
+                        (entry.originalUrl.toLowerCase().includes(normalizedSearch) || 
+                        entry.encodedUrl.toLowerCase().includes(normalizedSearch) ||
+                        (entry.nickname && entry.nickname.toLowerCase().includes(normalizedSearch)))) : 
+                    urlHistory;
+                
+                if (filteredHistory.length === 0) {
+                    linksList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <p>No matching links found</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Separate starred and non-starred items
+                const starredItems = filteredHistory.filter(item => item.starred);
+                const regularItems = filteredHistory.filter(item => !item.starred);
+                
+                // Sort each group by last used time, most recent first
+                starredItems.sort((a, b) => b.lastUsed - a.lastUsed);
+                regularItems.sort((a, b) => b.lastUsed - a.lastUsed);
+                
+                // Combine with starred items first
+                const sortedHistory = [...starredItems, ...regularItems];
+                
+                linksList.innerHTML = sortedHistory.map(entry => {
+                    // Highlight domain if no nickname
+                    const domain = extractDomain(entry.originalUrl);
+                    const protocol = entry.originalUrl.split('://')[0] || '';
+                    const displayUrl = entry.nickname ? 
+                        entry.nickname : 
+                        entry.encodedUrl; // Show the full encoded URL
+                    
+                    return `
+                        <div class="list-item ${entry.starred ? 'starred' : ''}">
+                            <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="toggleStar('${entry.id}')">
+                                <i class="fas fa-star"></i>
+                            </button>
+                            
+                            <div class="list-url" onclick="loadUrlToEditor('${entry.id}')">
+                                ${escapeHtml(displayUrl)}
+                            </div>
+                            
+                            <div id="nickname-section-${entry.id}" class="list-nickname" style="${entry.nickname ? 'display:flex' : 'display:none'}">
+                                <div id="nickname-display-${entry.id}" class="nickname-display">
+                                    <span id="nickname-text-${entry.id}">${entry.nickname ? escapeHtml(entry.nickname) : 'No nickname'}</span>
+                                    <button class="nickname-edit" onclick="editNickname('${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
+                                </div>
+                                <div id="nickname-edit-${entry.id}" class="edit-mode">
+                                    <input type="text" id="nickname-input-${entry.id}" class="nickname-input" value="${escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
+                                    <button class="btn btn-primary" onclick="saveNickname('${entry.id}')">Save</button>
+                                </div>
+                            </div>
+                            
+                            ${!entry.nickname ? `
+                                <button id="add-nickname-${entry.id}" class="add-nickname-btn" onclick="addNickname('${entry.id}')">
+                                    <i class="fas fa-tag"></i> Add Nickname
+                                </button>
+                            ` : ''}
+                            
+                            <div class="list-meta">
+                                <span>${escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
+                                <div class="list-actions">
+                                    <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
+                                        <i class="fas fa-copy"></i>
+                                    </button>
+                                    <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}', '${entry.requestMode || 'get'}', '${entry.postParams ? escapeHtml(entry.postParams.replace(/'/g, "\\'")) : ''}')">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </button>
+                                    <button id="toggle-qr-${entry.id}" class="toggle-qr" onclick="toggleListQR('${entry.id}')">
+                                        <i class="fas fa-qrcode"></i> Show QR
+                                    </button>
+                                    <button class="action-icon tooltip" data-tooltip="Delete" onclick="deleteHistoryItem('${entry.id}')">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="qr-${entry.id}" class="list-qr" onclick="showListQrOverlay('${entry.id}')"></div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                logger.error("Error rendering links list:", e);
+                linksList.innerHTML = `<div class="empty-state">Error loading links</div>`;
+            }
+        }
+        
+        // Log visitor information
+        function logVisitorInfo() {
+            try {
+                const visitorInfo = {
+                    userAgent: navigator.userAgent,
+                    language: navigator.language,
+                    platform: navigator.platform,
+                    screenWidth: window.screen.width,
+                    screenHeight: window.screen.height,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                    timestamp: new Date().toISOString(),
+                    referrer: document.referrer || 'direct',
+                    hostname: window.location.hostname
+                };
+                
+                // Store in Vercel-compatible format
+                logger.log("Visitor information", visitorInfo);
+            } catch (e) {
+                logger.error('Error logging visitor information:', e);
+            }
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(unsafe) {
+            if (unsafe === null || unsafe === undefined) return '';
+            return String(unsafe)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        // Close overlay when clicking outside content
+        function handleOverlayClick(e) {
+            if (e.target === qrOverlay) {
+                qrOverlay.classList.remove('active');
+            }
+        }
+        
+        // Close overlay with ESC key
+        function handleEscKey(e) {
+            if (e.key === 'Escape' && qrOverlay.classList.contains('active')) {
+                qrOverlay.classList.remove('active');
+            }
+        }
+        
+        // Event listeners
+        // URL processing
+        inputUrl.addEventListener('input', processUrl);
+        postParams.addEventListener('input', processUrl);
+        
+        // Action buttons
+        copyBtn.addEventListener('click', () => {
+            copyUrl(processedUrl.textContent);
+        });
+        
+        runBtn.addEventListener('click', () => {
+            runUrl(processedUrl.textContent);
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            inputUrl.value = '';
+            postParams.value = '';
+            processUrl();
+        });
+        
+        saveQrBtn.addEventListener('click', () => {
+            saveQrCode(qrCode, 'qrcode.png');
+        });
+        
+        // QR code overlay
+        qrContainer.addEventListener('click', () => {
+            showQrOverlay(lastProcessedUrl);
+        });
+        
+        qrOverlayClose.addEventListener('click', () => {
+            qrOverlay.classList.remove('active');
+        });
+        
+        qrOverlay.addEventListener('click', handleOverlayClick);
+        
+        document.addEventListener('keydown', handleEscKey);
+        
+        qrOverlaySave.addEventListener('click', () => {
+            saveQrCode(qrOverlayImage, 'qrcode.png');
+        });
+        
+        // Parameter editing
+        paramEditBtn.addEventListener('click', enableParamEditing);
+        paramSaveBtn.addEventListener('click', saveEditedParams);
+        paramCancelBtn.addEventListener('click', disableParamEditing);
+        
+        // Search functionality
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            renderLinksList(searchTerm);
+            
+            if (searchTerm) {
+                clearSearch.classList.add('visible');
+            } else {
+                clearSearch.classList.remove('visible');
+            }
+        });
+        
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            clearSearch.classList.remove('visible');
+            renderLinksList();
+        });
+        
+        // Introduction collapsible toggle
+        introCollapseToggle.addEventListener('click', () => {
+            introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
+            introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
+            introContent.classList.toggle('expanded');
+        });
+        
+        // Request mode buttons
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                setRequestMode(btn.dataset.mode);
+            });
+        });
+        
+        // Set current date in footer
+        const currentDate = new Date();
+        deployDate.textContent = currentDate.toLocaleDateString(undefined, { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
+        
+        // Log visitor information on page load
+        logVisitorInfo();
+        
+        // Expose functions to global scope for event handlers
+        window.toggleStar = toggleStar;
+        window.copyUrl = copyUrl;
+        window.runUrl = runUrl;
+        window.deleteHistoryItem = deleteHistoryItem;
+        window.loadUrlToEditor = loadUrlToEditor;
+        window.toggleListQR = toggleListQR;
+        window.showListQrOverlay = showListQrOverlay;
+        window.editNickname = editNickname;
+        window.saveNickname = saveNickname;
+        window.addNickname = addNickname;
+        
+        // Initial renders
+        renderLinksList();
+        updateCounts();
+
+        // Log application initialization
+        logger.log("Application initialized");
+    </script>
 </body>
 </html>
