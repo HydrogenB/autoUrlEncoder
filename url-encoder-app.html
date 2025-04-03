@@ -1,0 +1,1138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Parameter Encoder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f5f7fa;
+            --dark: #212529;
+            --gray: #adb5bd;
+            --white: #ffffff;
+            --border-radius: 12px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        @media (min-width: 1024px) {
+            .container {
+                grid-template-columns: 3fr 2fr;
+            }
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .card-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 16px 20px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-title i {
+            font-size: 1rem;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        textarea, input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            background-color: var(--light);
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        .result-container {
+            margin-top: 16px;
+            position: relative;
+        }
+
+        .result {
+            background-color: var(--light);
+            padding: 12px;
+            border-radius: 8px;
+            word-break: break-all;
+            font-size: 0.9rem;
+            border: 1px solid #ddd;
+        }
+
+        .validation-bar {
+            height: 4px;
+            width: 100%;
+            background-color: #ddd;
+            margin-bottom: 8px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .validation-progress {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease;
+        }
+
+        .valid {
+            background-color: var(--success);
+        }
+
+        .invalid {
+            background-color: var(--danger);
+        }
+
+        .warning {
+            background-color: var(--warning);
+        }
+
+        .validation-message {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 4px;
+            min-height: 1rem;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.9rem;
+            background-color: var(--light);
+            color: var(--dark);
+        }
+
+        .btn:hover {
+            background-color: #e5e9ed;
+        }
+
+        .btn i {
+            margin-right: 6px;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background-color: #e01e79;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+
+        .badge-success {
+            background-color: rgba(76, 201, 240, 0.15);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background-color: rgba(248, 150, 30, 0.15);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background-color: rgba(247, 37, 133, 0.15);
+            color: var(--danger);
+        }
+
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 20px;
+            padding: 16px;
+            background-color: var(--light);
+            border-radius: 8px;
+        }
+
+        .qr-caption {
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 12px;
+            text-align: center;
+        }
+
+        .history-list {
+            max-height: 500px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gray) var(--light);
+        }
+
+        .history-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .history-list::-webkit-scrollbar-track {
+            background: var(--light);
+        }
+
+        .history-list::-webkit-scrollbar-thumb {
+            background-color: var(--gray);
+            border-radius: 6px;
+        }
+
+        .history-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .history-item:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-url {
+            font-size: 0.9rem;
+            word-break: break-all;
+            margin-bottom: 4px;
+            padding-right: 30px;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 2px;
+        }
+
+        .action-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--gray);
+            padding: 4px;
+            border-radius: 4px;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+
+        .action-icon:hover {
+            color: var(--primary);
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .star-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .star-btn:hover, .star-btn.active {
+            color: var(--warning);
+        }
+
+        .empty-state {
+            padding: 20px;
+            text-align: center;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 4px 8px;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .status-message {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 16px;
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+
+        .status-message.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .search-input {
+            padding-left: 36px;
+        }
+
+        .clear-search {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            cursor: pointer;
+            background: none;
+            border: none;
+            display: none;
+        }
+
+        .clear-search.visible {
+            display: block;
+        }
+
+        .autosave-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--gray);
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+
+        .autosave-active {
+            background-color: var(--success);
+        }
+
+        @media (max-width: 600px) {
+            .action-bar {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Encoder Section -->
+        <div class="card">
+            <div class="card-header">
+                <h2 class="card-title"><i class="fas fa-link"></i> URL Parameter Encoder</h2>
+            </div>
+            <div class="card-body">
+                <div class="input-group">
+                    <label for="inputUrl">Input URL:</label>
+                    <textarea id="inputUrl" placeholder="Enter URL with parameters (e.g. https://example.com?url=https://another.com)"></textarea>
+                    <div class="validation-bar">
+                        <div id="validationProgress" class="validation-progress"></div>
+                    </div>
+                    <div id="validationMessage" class="validation-message"></div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="paramNames">Parameters to Encode (Optional):</label>
+                    <input type="text" id="paramNames" placeholder="Comma-separated names (e.g. url,link,source)">
+                    <div class="validation-message">Leave empty to auto-detect URL parameters</div>
+                </div>
+                
+                <div id="resultContainer" class="result-container" style="display: none;">
+                    <label>Processed URL: <span id="autosaveStatus" class="autosave-indicator"></span> <span id="autosaveText" style="font-size: 0.8rem; color: var(--gray);"></span></label>
+                    <div id="processedUrl" class="result"></div>
+                    
+                    <div class="action-bar">
+                        <button id="copyBtn" class="btn tooltip" data-tooltip="Copy to clipboard">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                        <button id="runBtn" class="btn btn-primary tooltip" data-tooltip="Open in new tab">
+                            <i class="fas fa-external-link-alt"></i> Run
+                        </button>
+                        <button id="clearBtn" class="btn tooltip" data-tooltip="Clear all fields">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="qrContainer" class="qr-container" style="display: none;">
+                    <div id="qrCode"></div>
+                    <p class="qr-caption">Scan with your phone to open this link directly</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- History & Starred Section -->
+        <div>
+            <!-- Recent History -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i> Recent Links 
+                        <span id="historyCount" class="badge badge-success">0</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search links...">
+                        <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
+                    </div>
+                    
+                    <div id="historyList" class="history-list"></div>
+                </div>
+            </div>
+            
+            <!-- Starred Links -->
+            <div class="card" style="margin-top: 24px;">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-star"></i> Starred Links
+                        <span id="starredCount" class="badge badge-warning">0</span>
+                    </h2>
+                </div>
+                <div class="card-body">
+                    <div id="starredList" class="history-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="statusMessage" class="status-message"></div>
+    
+    <script>
+        // Main URL encoding function from the provided code
+        function encodeUrlParamsInUrl(url, paramNames) {
+            try {
+                // Check for valid input
+                if (!url || typeof url !== "string") return { result: url, valid: false, message: "Invalid URL format" };
+                
+                // Basic URL validation
+                if (!url.includes("://")) {
+                    return { result: url, valid: false, message: "Missing protocol (http:// or https://)" };
+                }
+                
+                // Parse parameter names to encode, if specified
+                let paramsToEncode = null;
+                if (paramNames) {
+                    paramsToEncode = paramNames.split(",").map(p => p.trim()).filter(p => p.length > 0);
+                }
+                
+                // Split URL into base and query string
+                const queryIndex = url.indexOf("?");
+                if (queryIndex === -1) {
+                    return { result: url, valid: true, message: "No parameters to encode" };
+                }
+                
+                const baseUrl = url.substring(0, queryIndex);
+                const queryString = url.substring(queryIndex + 1);
+                
+                // Split query string into parameters
+                const params = queryString.split("&");
+                let encodedCount = 0;
+                
+                // Process each parameter
+                for (let i = 0; i < params.length; i++) {
+                    const eqIndex = params[i].indexOf("=");
+                    if (eqIndex !== -1) {
+                        const name = params[i].substring(0, eqIndex);
+                        const value = params[i].substring(eqIndex + 1);
+                        
+                        // Check if we should encode this parameter
+                        if (
+                            (paramsToEncode === null && value.match(/^https?:\/\//)) || // Auto-detect URL values
+                            (paramsToEncode !== null && paramsToEncode.includes(name))  // Specifically listed parameters
+                        ) {
+                            const originalValue = value;
+                            const encodedValue = encodeURIComponent(value);
+                            
+                            // Only count as encoded if the value actually changed
+                            if (originalValue !== encodedValue) {
+                                encodedCount++;
+                            }
+                            
+                            params[i] = name + "=" + encodedValue;
+                        }
+                    }
+                }
+                
+                // Join everything back together
+                const result = baseUrl + "?" + params.join("&");
+                
+                // Return result with validation info
+                return { 
+                    result, 
+                    valid: true, 
+                    message: encodedCount > 0 ? 
+                        `${encodedCount} parameter${encodedCount > 1 ? 's' : ''} encoded` : 
+                        "No parameters needed encoding"
+                };
+            } catch (error) {
+                console.error("Error encoding URL:", error);
+                return { result: url, valid: false, message: `Error: ${error.message}` };
+            }
+        }
+
+        // Storage Manager for browser storage with fallback
+        const StorageManager = (function() {
+            // In-memory storage as fallback
+            let inMemoryData = {
+                urlHistory: []
+            };
+            
+            // Check if storage is available
+            function isStorageAvailable() {
+                try {
+                    const test = '__storage_test__';
+                    localStorage.setItem(test, test);
+                    localStorage.removeItem(test);
+                    return true;
+                } catch (e) {
+                    return false;
+                }
+            }
+            
+            // Storage interface
+            return {
+                get: function(key, defaultValue) {
+                    try {
+                        if (isStorageAvailable()) {
+                            const item = localStorage.getItem(key);
+                            return item ? JSON.parse(item) : defaultValue;
+                        } else {
+                            return inMemoryData[key] || defaultValue;
+                        }
+                    } catch (e) {
+                        console.error("Error getting data from storage:", e);
+                        return defaultValue;
+                    }
+                },
+                set: function(key, value) {
+                    try {
+                        if (isStorageAvailable()) {
+                            localStorage.setItem(key, JSON.stringify(value));
+                        } else {
+                            inMemoryData[key] = value;
+                        }
+                        return true;
+                    } catch (e) {
+                        console.error("Error saving data to storage:", e);
+                        return false;
+                    }
+                }
+            };
+        })();
+
+        // DOM elements
+        const inputUrl = document.getElementById('inputUrl');
+        const paramNames = document.getElementById('paramNames');
+        const validationProgress = document.getElementById('validationProgress');
+        const validationMessage = document.getElementById('validationMessage');
+        const resultContainer = document.getElementById('resultContainer');
+        const processedUrl = document.getElementById('processedUrl');
+        const copyBtn = document.getElementById('copyBtn');
+        const runBtn = document.getElementById('runBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const qrContainer = document.getElementById('qrContainer');
+        const qrCode = document.getElementById('qrCode');
+        const historyList = document.getElementById('historyList');
+        const starredList = document.getElementById('starredList');
+        const searchInput = document.getElementById('searchInput');
+        const clearSearch = document.getElementById('clearSearch');
+        const historyCount = document.getElementById('historyCount');
+        const starredCount = document.getElementById('starredCount');
+        const statusMessage = document.getElementById('statusMessage');
+        const autosaveStatus = document.getElementById('autosaveStatus');
+        const autosaveText = document.getElementById('autosaveText');
+
+        // URL history array and state variables
+        let urlHistory = StorageManager.get('urlHistory', []);
+        let lastProcessedUrl = '';
+        let autoSaveTimer = null;
+        let lastInputTime = 0;
+        let qrDebounceTimer = null;
+
+        // Update history counts
+        function updateCounts() {
+            historyCount.textContent = urlHistory.length;
+            starredCount.textContent = urlHistory.filter(item => item.starred).length;
+        }
+
+        // Process URL and update UI
+        function processUrl() {
+            const url = inputUrl.value.trim();
+            const params = paramNames.value.trim();
+            
+            // Clear auto-save status
+            autosaveStatus.classList.remove('autosave-active');
+            autosaveText.textContent = '';
+            
+            // Reset auto-save timer
+            if (autoSaveTimer) {
+                clearTimeout(autoSaveTimer);
+            }
+            
+            lastInputTime = Date.now();
+            
+            if (!url) {
+                validationProgress.style.width = '0';
+                validationMessage.textContent = '';
+                resultContainer.style.display = 'none';
+                qrContainer.style.display = 'none';
+                return;
+            }
+            
+            const result = encodeUrlParamsInUrl(url, params);
+            lastProcessedUrl = result.result;
+            
+            // Update validation UI
+            if (result.valid) {
+                validationProgress.className = 'validation-progress valid';
+                validationProgress.style.width = '100%';
+            } else {
+                validationProgress.className = 'validation-progress invalid';
+                validationProgress.style.width = '30%';
+            }
+            
+            validationMessage.textContent = result.message;
+            processedUrl.textContent = result.result;
+            resultContainer.style.display = 'block';
+            
+            // Set auto-save timer for 10 seconds of inactivity
+            autoSaveTimer = setTimeout(() => {
+                if (url && result.valid) {
+                    saveToHistory(false);
+                    autosaveStatus.classList.add('autosave-active');
+                    autosaveText.textContent = 'Auto-saved';
+                }
+            }, 10000);
+            
+            // Update QR code with debounce
+            if (qrDebounceTimer) {
+                clearTimeout(qrDebounceTimer);
+            }
+            
+            qrDebounceTimer = setTimeout(() => {
+                updateQRCode(result.result);
+            }, 500);
+        }
+        
+        // Update QR code
+        function updateQRCode(url) {
+            if (!url) {
+                qrContainer.style.display = 'none';
+                return;
+            }
+            
+            qrContainer.style.display = 'block';
+            qrCode.innerHTML = '';
+            
+            try {
+                new QRCode(qrCode, {
+                    text: url,
+                    width: 160,
+                    height: 160,
+                    colorDark: "#4361ee",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (e) {
+                console.error("Error generating QR code:", e);
+                qrCode.innerHTML = '<div style="color: var(--danger)">Error generating QR code</div>';
+            }
+        }
+        
+        // Save URL to history
+        function saveToHistory(showNotification = true) {
+            const url = inputUrl.value.trim();
+            const params = paramNames.value.trim();
+            const processedResult = lastProcessedUrl;
+            
+            if (!url || !processedResult) return;
+            
+            try {
+                const now = new Date();
+                const timestamp = now.toISOString();
+                const displayDate = now.toLocaleString(undefined, { 
+                    month: 'short', 
+                    day: 'numeric', 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                // Generate a consistent ID based on URL content to avoid duplicates
+                const urlId = btoa(url + params).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+                
+                // Check if URL already exists
+                const existingIndex = urlHistory.findIndex(item => item.id === urlId);
+                
+                if (existingIndex !== -1) {
+                    // Update existing entry
+                    urlHistory[existingIndex] = {
+                        ...urlHistory[existingIndex],
+                        timestamp,
+                        displayDate,
+                        lastUsed: now.getTime()
+                    };
+                } else {
+                    // Add new entry
+                    const entry = {
+                        id: urlId,
+                        originalUrl: url,
+                        params: params,
+                        encodedUrl: processedResult,
+                        timestamp,
+                        displayDate,
+                        starred: false,
+                        lastUsed: now.getTime()
+                    };
+                    
+                    urlHistory.unshift(entry);
+                    
+                    // Limit history size to 100 items
+                    if (urlHistory.length > 100) {
+                        // Remove oldest non-starred items first
+                        const nonStarredIndex = urlHistory.findIndex(item => !item.starred);
+                        if (nonStarredIndex !== -1) {
+                            urlHistory.splice(nonStarredIndex, 1);
+                        } else {
+                            urlHistory.pop(); // If all are starred, remove the oldest
+                        }
+                    }
+                }
+                
+                // Save to storage
+                StorageManager.set('urlHistory', urlHistory);
+                
+                // Update UI
+                renderHistory();
+                renderStarred();
+                updateCounts();
+                
+                if (showNotification) {
+                    showStatusMessage('URL saved to history');
+                }
+                
+                return true;
+            } catch (e) {
+                console.error("Error saving to history:", e);
+                if (showNotification) {
+                    showStatusMessage('Error saving URL', true);
+                }
+                return false;
+            }
+        }
+        
+        // Toggle star status
+        function toggleStar(id) {
+            try {
+                const itemIndex = urlHistory.findIndex(entry => entry.id === id);
+                
+                if (itemIndex !== -1) {
+                    urlHistory[itemIndex].starred = !urlHistory[itemIndex].starred;
+                    StorageManager.set('urlHistory', urlHistory);
+                    
+                    renderHistory();
+                    renderStarred();
+                    updateCounts();
+                    
+                    showStatusMessage(
+                        urlHistory[itemIndex].starred 
+                            ? 'Added to starred links' 
+                            : 'Removed from starred links'
+                    );
+                }
+            } catch (e) {
+                console.error("Error toggling star:", e);
+                showStatusMessage('Error updating star status', true);
+            }
+        }
+        
+        // Load URL into editor
+        function loadUrlToEditor(id) {
+            try {
+                const item = urlHistory.find(entry => entry.id === id);
+                
+                if (item) {
+                    inputUrl.value = item.originalUrl;
+                    paramNames.value = item.params;
+                    
+                    // Update item's "last used" timestamp
+                    item.lastUsed = Date.now();
+                    StorageManager.set('urlHistory', urlHistory);
+                    
+                    // Process URL
+                    processUrl();
+                    
+                    // Scroll to top on mobile
+                    if (window.innerWidth < 1024) {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                    
+                    showStatusMessage('URL loaded to editor');
+                }
+            } catch (e) {
+                console.error("Error loading URL to editor:", e);
+                showStatusMessage('Error loading URL', true);
+            }
+        }
+        
+        // Copy URL to clipboard
+        function copyUrl(text) {
+            try {
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        showStatusMessage('Copied to clipboard');
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy text: ', err);
+                        showStatusMessage('Failed to copy', true);
+                    });
+            } catch (e) {
+                console.error("Error copying URL:", e);
+                showStatusMessage('Error copying URL', true);
+            }
+        }
+        
+        // Open URL in new tab
+        function runUrl(url) {
+            try {
+                window.open(url, '_blank');
+            } catch (e) {
+                console.error("Error opening URL:", e);
+                showStatusMessage('Error opening URL', true);
+            }
+        }
+        
+        // Delete history item
+        function deleteHistoryItem(id) {
+            try {
+                urlHistory = urlHistory.filter(entry => entry.id !== id);
+                StorageManager.set('urlHistory', urlHistory);
+                
+                renderHistory();
+                renderStarred();
+                updateCounts();
+                
+                showStatusMessage('Item deleted');
+            } catch (e) {
+                console.error("Error deleting history item:", e);
+                showStatusMessage('Error deleting item', true);
+            }
+        }
+        
+        // Show status message
+        function showStatusMessage(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.style.backgroundColor = isError ? 'rgba(247, 37, 133, 0.9)' : 'rgba(0, 0, 0, 0.8)';
+            
+            statusMessage.classList.add('show');
+            
+            setTimeout(() => {
+                statusMessage.classList.remove('show');
+            }, 2000);
+        }
+        
+        // Render history list
+        function renderHistory(searchTerm = '') {
+            try {
+                if (urlHistory.length === 0) {
+                    historyList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-history"></i>
+                            <p>No history yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const normalizedSearch = searchTerm.toLowerCase();
+                
+                const filteredHistory = normalizedSearch ? 
+                    urlHistory.filter(entry => 
+                        entry.originalUrl.toLowerCase().includes(normalizedSearch) || 
+                        entry.encodedUrl.toLowerCase().includes(normalizedSearch)) : 
+                    urlHistory;
+                
+                if (filteredHistory.length === 0) {
+                    historyList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-search"></i>
+                            <p>No matching links found</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Sort by last used time, most recent first
+                const sortedHistory = [...filteredHistory].sort((a, b) => b.lastUsed - a.lastUsed);
+                
+                historyList.innerHTML = sortedHistory.map(entry => `
+                    <div class="history-item">
+                        <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="toggleStar('${entry.id}')">
+                            <i class="fas fa-star"></i>
+                        </button>
+                        <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${escapeHtml(entry.encodedUrl)}</div>
+                        <div class="history-meta">
+                            <span>${escapeHtml(entry.displayDate)}</span>
+                            <div class="history-actions">
+                                <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                                <button class="action-icon tooltip" data-tooltip="Delete" onclick="deleteHistoryItem('${entry.id}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Error rendering history:", e);
+                historyList.innerHTML = `<div class="empty-state">Error loading history</div>`;
+            }
+        }
+        
+        // Render starred list
+        function renderStarred() {
+            try {
+                const starredItems = urlHistory.filter(entry => entry.starred);
+                
+                if (starredItems.length === 0) {
+                    starredList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-star"></i>
+                            <p>No starred links yet</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Sort by last used time
+                const sortedStarred = [...starredItems].sort((a, b) => b.lastUsed - a.lastUsed);
+                
+                starredList.innerHTML = sortedStarred.map(entry => `
+                    <div class="history-item">
+                        <button class="star-btn active" onclick="toggleStar('${entry.id}')">
+                            <i class="fas fa-star"></i>
+                        </button>
+                        <div class="history-url" onclick="loadUrlToEditor('${entry.id}')">${escapeHtml(entry.encodedUrl)}</div>
+                        <div class="history-meta">
+                            <span>${escapeHtml(entry.displayDate)}</span>
+                            <div class="history-actions">
+                                <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${escapeHtml(entry.encodedUrl)}')">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                                <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${escapeHtml(entry.encodedUrl)}')">
+                                    <i class="fas fa-external-link-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                console.error("Error rendering starred items:", e);
+                starredList.innerHTML = `<div class="empty-state">Error loading starred items</div>`;
+            }
+        }
+        
+        // Escape HTML to prevent XSS
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+        
+        // Event listeners
+        inputUrl.addEventListener('input', processUrl);
+        paramNames.addEventListener('input', processUrl);
+        
+        copyBtn.addEventListener('click', () => {
+            copyUrl(processedUrl.textContent);
+        });
+        
+        runBtn.addEventListener('click', () => {
+            runUrl(processedUrl.textContent);
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            inputUrl.value = '';
+            paramNames.value = '';
+            processUrl();
+        });
+        
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            renderHistory(searchTerm);
+            
+            if (searchTerm) {
+                clearSearch.classList.add('visible');
+            } else {
+                clearSearch.classList.remove('visible');
+            }
+        });
+        
+        clearSearch.addEventListener('click', () => {
+            searchInput.value = '';
+            clearSearch.classList.remove('visible');
+            renderHistory();
+        });
+        
+        // Expose functions to global scope for event handlers
+        window.toggleStar = toggleStar;
+        window.copyUrl = copyUrl;
+        window.runUrl = runUrl;
+        window.deleteHistoryItem = deleteHistoryItem;
+        window.loadUrlToEditor = loadUrlToEditor;
+        
+        // Initial renders
+        renderHistory();
+        renderStarred();
+        updateCounts();
+    </script>
+</body>
+</html>
