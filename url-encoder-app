@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Parameter Encoder</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3f37c9;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --info: #4895ef;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #adb5bd;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #f5f7fa;
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 24px;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .app-description {
+            font-size: 1rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+
+        .content {
+            padding: 24px;
+        }
+
+        .card {
+            background-color: var(--white);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 24px;
+            padding: 20px;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-group {
+            margin-bottom: 16px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(67, 97, 238, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary);
+        }
+
+        .btn-success {
+            background-color: var(--success);
+            color: var(--white);
+        }
+
+        .btn-success:hover {
+            background-color: #3ab7da;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--white);
+        }
+
+        .btn-danger:hover {
+            background-color: #e01e79;
+        }
+
+        .btn-warning {
+            background-color: var(--warning);
+            color: var(--white);
+        }
+
+        .btn-warning:hover {
+            background-color: #e58311;
+        }
+
+        .btn-icon {
+            margin-right: 8px;
+            font-size: 1rem;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #eee;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: var(--gray);
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-color: var(--primary);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .result {
+            background-color: #f8f9fa;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 16px;
+            margin-bottom: 16px;
+            word-break: break-all;
+        }
+
+        #qrCode {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .history-item {
+            display: flex;
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-url {
+            flex: 1;
+            margin-right: 10px;
+            word-break: break-all;
+        }
+
+        .history-info {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.8rem;
+            color: var(--gray);
+            width: 120px;
+        }
+
+        .history-date {
+            margin-bottom: 4px;
+        }
+
+        .history-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            color: var(--gray);
+            transition: all 0.3s ease;
+        }
+
+        .star-btn.active {
+            color: var(--warning);
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            color: var(--primary);
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(67, 97, 238, 0.1);
+        }
+
+        .no-items-message {
+            padding: 20px;
+            text-align: center;
+            color: var(--gray);
+            font-style: italic;
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 120px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8rem;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .btn-group {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>URL Parameter Encoder</h1>
+            <p class="app-description">Encode URL parameters, save history, generate QR codes, and more</p>
+        </header>
+
+        <div class="content">
+            <div class="tabs">
+                <div class="tab active" data-tab="encoder">Encoder</div>
+                <div class="tab" data-tab="history">History</div>
+                <div class="tab" data-tab="starred">Starred</div>
+            </div>
+
+            <div class="tab-content active" id="encoder-tab">
+                <div class="card">
+                    <h2 class="card-title">URL Encoder</h2>
+                    <div class="input-group">
+                        <label for="inputUrl">Input URL:</label>
+                        <textarea id="inputUrl" placeholder="Enter URL with parameters (e.g., https://example.com?url=https://another.com)"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label for="paramNames">Parameter Names to Encode (Optional):</label>
+                        <input type="text" id="paramNames" placeholder="Comma-separated names (e.g., url,link,source)">
+                    </div>
+                    <div class="btn-group">
+                        <button id="encodeBtn" class="btn btn-primary">
+                            <span class="btn-icon">✓</span> Encode URL
+                        </button>
+                        <button id="clearBtn" class="btn btn-danger">
+                            <span class="btn-icon">✕</span> Clear
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card" id="resultCard" style="display: none;">
+                    <h2 class="card-title">Result</h2>
+                    <div class="result" id="resultText"></div>
+                    <div class="btn-group">
+                        <button id="copyBtn" class="btn btn-primary">
+                            <span class="btn-icon">📋</span> Copy URL
+                        </button>
+                        <button id="runBtn" class="btn btn-success">
+                            <span class="btn-icon">▶️</span> Run URL
+                        </button>
+                        <button id="qrBtn" class="btn btn-warning">
+                            <span class="btn-icon">📱</span> Generate QR
+                        </button>
+                        <button id="saveBtn" class="btn btn-primary">
+                            <span class="btn-icon">💾</span> Save to History
+                        </button>
+                    </div>
+                    <div id="qrCode"></div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="history-tab">
+                <div class="card">
+                    <h2 class="card-title">URL History</h2>
+                    <div id="historyList"></div>
+                    <div class="btn-group">
+                        <button id="exportCsvBtn" class="btn btn-primary">
+                            <span class="btn-icon">📤</span> Export as CSV
+                        </button>
+                        <button id="clearHistoryBtn" class="btn btn-danger">
+                            <span class="btn-icon">🗑️</span> Clear History
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="tab-content" id="starred-tab">
+                <div class="card">
+                    <h2 class="card-title">Starred URLs</h2>
+                    <div id="starredList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Main URL encoding function from the provided code
+        function encodeUrlParamsInUrl(url, paramNames) {
+            // Check for valid input
+            if (!url || typeof url !== "string") return url;
+            
+            // Parse parameter names to encode, if specified
+            let paramsToEncode = null;
+            if (paramNames) {
+                paramsToEncode = paramNames.split(",").map(p => p.trim());
+            }
+            
+            // Split URL into base and query string
+            const queryIndex = url.indexOf("?");
+            if (queryIndex === -1) return url; // No query string
+            
+            const baseUrl = url.substring(0, queryIndex);
+            const queryString = url.substring(queryIndex + 1);
+            
+            // Split query string into parameters
+            const params = queryString.split("&");
+            
+            // Process each parameter
+            for (let i = 0; i < params.length; i++) {
+                const eqIndex = params[i].indexOf("=");
+                if (eqIndex !== -1) {
+                    const name = params[i].substring(0, eqIndex);
+                    const value = params[i].substring(eqIndex + 1);
+                    
+                    // Check if we should encode this parameter
+                    if (
+                        (paramsToEncode === null && value.match(/^https?:\/\//)) || // Auto-detect URL values
+                        (paramsToEncode !== null && paramsToEncode.includes(name))  // Specifically listed parameters
+                    ) {
+                        params[i] = name + "=" + encodeURIComponent(value);
+                    }
+                }
+            }
+            
+            // Join everything back together
+            return baseUrl + "?" + params.join("&");
+        }
+
+        // DOM elements
+        const inputUrl = document.getElementById('inputUrl');
+        const paramNames = document.getElementById('paramNames');
+        const encodeBtn = document.getElementById('encodeBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const resultCard = document.getElementById('resultCard');
+        const resultText = document.getElementById('resultText');
+        const copyBtn = document.getElementById('copyBtn');
+        const runBtn = document.getElementById('runBtn');
+        const qrBtn = document.getElementById('qrBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const qrCode = document.getElementById('qrCode');
+        const historyList = document.getElementById('historyList');
+        const starredList = document.getElementById('starredList');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        // URL history array
+        let urlHistory = JSON.parse(localStorage.getItem('urlHistory')) || [];
+        
+        // Encode URL
+        encodeBtn.addEventListener('click', () => {
+            const url = inputUrl.value.trim();
+            const params = paramNames.value.trim();
+            
+            if (!url) {
+                alert('Please enter a URL');
+                return;
+            }
+            
+            const encodedUrl = encodeUrlParamsInUrl(url, params);
+            resultText.textContent = encodedUrl;
+            resultCard.style.display = 'block';
+            qrCode.innerHTML = ''; // Clear previous QR code
+        });
+        
+        // Clear inputs
+        clearBtn.addEventListener('click', () => {
+            inputUrl.value = '';
+            paramNames.value = '';
+            resultCard.style.display = 'none';
+            qrCode.innerHTML = '';
+        });
+        
+        // Copy result
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(resultText.textContent)
+                .then(() => {
+                    const original = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<span class="btn-icon">✓</span> Copied!';
+                    setTimeout(() => {
+                        copyBtn.innerHTML = original;
+                    }, 1500);
+                })
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+        });
+        
+        // Run URL in new tab
+        runBtn.addEventListener('click', () => {
+            const url = resultText.textContent;
+            window.open(url, '_blank');
+        });
+        
+        // Generate QR code
+        qrBtn.addEventListener('click', () => {
+            qrCode.innerHTML = '';
+            
+            new QRCode(qrCode, {
+                text: resultText.textContent,
+                width: 200,
+                height: 200,
+                colorDark: "#4361ee",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        });
+        
+        // Save to history
+        saveBtn.addEventListener('click', () => {
+            const url = resultText.textContent;
+            const inputValue = inputUrl.value.trim();
+            const paramsValue = paramNames.value.trim();
+            
+            const now = new Date();
+            const timestamp = now.toISOString();
+            const displayDate = now.toLocaleString();
+            
+            const entry = {
+                id: Date.now(),
+                originalUrl: inputValue,
+                params: paramsValue,
+                encodedUrl: url,
+                timestamp,
+                displayDate,
+                starred: false
+            };
+            
+            urlHistory.unshift(entry);
+            localStorage.setItem('urlHistory', JSON.stringify(urlHistory));
+            
+            renderHistory();
+            renderStarred();
+            
+            const original = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<span class="btn-icon">✓</span> Saved!';
+            setTimeout(() => {
+                saveBtn.innerHTML = original;
+            }, 1500);
+        });
+        
+        // Export as CSV
+        exportCsvBtn.addEventListener('click', () => {
+            if (urlHistory.length === 0) {
+                alert('No history to export');
+                return;
+            }
+            
+            const headers = ['ID', 'Original URL', 'Parameters', 'Encoded URL', 'Timestamp', 'Starred'];
+            const csvContent = [
+                headers.join(','),
+                ...urlHistory.map(entry => [
+                    entry.id,
+                    `"${entry.originalUrl.replace(/"/g, '""')}"`,
+                    `"${entry.params.replace(/"/g, '""')}"`,
+                    `"${entry.encodedUrl.replace(/"/g, '""')}"`,
+                    entry.timestamp,
+                    entry.starred
+                ].join(','))
+            ].join('\n');
+            
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `url-history-${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.display = 'none';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+        
+        // Clear history
+        clearHistoryBtn.addEventListener('click', () => {
+            if (confirm('Are you sure you want to clear all history? This cannot be undone.')) {
+                urlHistory = [];
+                localStorage.setItem('urlHistory', JSON.stringify(urlHistory));
+                renderHistory();
+                renderStarred();
+            }
+        });
+        
+        // Toggle star status
+        function toggleStar(id) {
+            urlHistory = urlHistory.map(entry => {
+                if (entry.id === id) {
+                    return { ...entry, starred: !entry.starred };
+                }
+                return entry;
+            });
+            
+            localStorage.setItem('urlHistory', JSON.stringify(urlHistory));
+            renderHistory();
+            renderStarred();
+        }
+        
+        // Copy URL from history
+        function copyFromHistory(url) {
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    alert('URL copied to clipboard');
+                })
+                .catch(err => {
+                    console.error('Failed to copy text: ', err);
+                });
+        }
+        
+        // Run URL from history
+        function runFromHistory(url) {
+            window.open(url, '_blank');
+        }
+        
+        // Generate QR for history item
+        function generateQrFromHistory(url, id) {
+            // Navigate to encoder tab
+            switchTab('encoder');
+            
+            // Fill form with existing data
+            const entry = urlHistory.find(entry => entry.id === id);
+            if (entry) {
+                inputUrl.value = entry.originalUrl;
+                paramNames.value = entry.params;
+                resultText.textContent = entry.encodedUrl;
+                resultCard.style.display = 'block';
+                
+                // Generate QR code
+                qrCode.innerHTML = '';
+                new QRCode(qrCode, {
+                    text: url,
+                    width: 200,
+                    height: 200,
+                    colorDark: "#4361ee",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            }
+        }
+        
+        // Delete history item
+        function deleteHistoryItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                urlHistory = urlHistory.filter(entry => entry.id !== id);
+                localStorage.setItem('urlHistory', JSON.stringify(urlHistory));
+                renderHistory();
+                renderStarred();
+            }
+        }
+        
+        // Render history list
+        function renderHistory() {
+            if (urlHistory.length === 0) {
+                historyList.innerHTML = '<div class="no-items-message">No history items yet</div>';
+                return;
+            }
+            
+            historyList.innerHTML = urlHistory.map(entry => `
+                <div class="history-item">
+                    <div class="history-url">${entry.encodedUrl}</div>
+                    <div class="history-info">
+                        <div class="history-date">${entry.displayDate}</div>
+                    </div>
+                    <div class="history-actions">
+                        <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="toggleStar(${entry.id})">
+                            ★
+                        </button>
+                        <button class="action-btn tooltip" onclick="copyFromHistory('${entry.encodedUrl.replace(/'/g, "\\'")}')">
+                            📋
+                            <span class="tooltip-text">Copy</span>
+                        </button>
+                        <button class="action-btn tooltip" onclick="runFromHistory('${entry.encodedUrl.replace(/'/g, "\\'")}')">
+                            ▶️
+                            <span class="tooltip-text">Run</span>
+                        </button>
+                        <button class="action-btn tooltip" onclick="generateQrFromHistory('${entry.encodedUrl.replace(/'/g, "\\'")}', ${entry.id})">
+                            📱
+                            <span class="tooltip-text">QR Code</span>
+                        </button>
+                        <button class="action-btn tooltip" onclick="deleteHistoryItem(${entry.id})">
+                            🗑️
+                            <span class="tooltip-text">Delete</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Render starred list
+        function renderStarred() {
+            const starredItems = urlHistory.filter(entry => entry.starred);
+            
+            if (starredItems.length === 0) {
+                starredList.innerHTML = '<div class="no-items-message">No starred items yet</div>';
+                return;
+            }
+            
+            starredList.innerHTML = starredItems.map(entry => `
+                <div class="history-item">
+                    <div class="history-url">${entry.encodedUrl}</div>
+                    <div class="history-info">
+                        <div class="history-date">${entry.displayDate}</div>
+                    </div>
+                    <div class="history-actions">
+                        <button class="star-btn active" onclick="toggleStar(${entry.id})">
+                            ★
+                        </button>
+                        <button class="action-btn tooltip" onclick="copyFromHistory('${entry.encodedUrl.replace(/'/g, "\\'")}')">
+                            📋
+                            <span class="tooltip-text">Copy</span>
+                        </button>
+                        <button class="action-btn tooltip" onclick="runFromHistory('${entry.encodedUrl.replace(/'/g, "\\'")}')">
+                            ▶️
+                            <span class="tooltip-text">Run</span>
+                        </button>
+                        <button class="action-btn tooltip" onclick="generateQrFromHistory('${entry.encodedUrl.replace(/'/g, "\\'")}', ${entry.id})">
+                            📱
+                            <span class="tooltip-text">QR Code</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Tab switching
+        function switchTab(tabName) {
+            tabs.forEach(tab => {
+                if (tab.dataset.tab === tabName) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+            
+            tabContents.forEach(content => {
+                if (content.id === `${tabName}-tab`) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                switchTab(tab.dataset.tab);
+            });
+        });
+        
+        // Expose functions to global scope (for onclick in rendered HTML)
+        window.toggleStar = toggleStar;
+        window.copyFromHistory = copyFromHistory;
+        window.runFromHistory = runFromHistory;
+        window.generateQrFromHistory = generateQrFromHistory;
+        window.deleteHistoryItem = deleteHistoryItem;
+        window.switchTab = switchTab;
+        
+        // Initial renders
+        renderHistory();
+        renderStarred();
+    </script>
+</body>
+</html>
