@@ -311,10 +311,25 @@
             padding: 16px;
             background-color: var(--light);
             border-radius: 8px;
-            position: center;
+            position: relative;
             cursor: pointer;
             width: 100%;
             text-align: center;
+        }
+
+        /* FIX 1: Improve QR code alignment */
+        .qr-container canvas,
+        .qr-container img {
+            display: block;
+            margin: 0 auto;
+        }
+
+        #qrCode {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .qr-container::after {
@@ -711,23 +726,59 @@
             margin-top: 10px;
         }
 
+        /* FIX 3: Enhanced SEO-friendly footer */
         footer {
-            text-align: center;
-            padding: 20px;
+            background-color: var(--light);
+            border-top: 1px solid #eee;
+            padding: 30px 20px;
             margin-top: 30px;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-section h3 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-section ul li {
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+
+        .footer-links {
+            margin: 15px 0;
+        }
+
+        .footer-links a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .footer-bottom {
+            margin-top: 30px;
+            text-align: center;
             color: var(--gray);
             font-size: 0.85rem;
             border-top: 1px solid #eee;
+            padding-top: 20px;
         }
 
-        .contact-info {
-            margin-bottom: 10px;
-        }
-
-        .disclaimer {
-            font-size: 0.75rem;
-            max-width: 800px;
-            margin: 0 auto;
+        .copyright {
+            margin-top: 10px;
         }
 
         .nickname-display {
@@ -1110,16 +1161,47 @@
         <div class="key-instructions">Press ESC key or click anywhere to close</div>
     </div>
     
+    <!-- FIX 3: Enhanced SEO-friendly footer -->
     <footer>
-        <div class="contact-info">
-            For any adjustment, contact <strong>Jirad Srirattana-arporn</strong>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>URL Parameter Encoder Tool</h3>
+                <p>The ultimate tool for secure URL parameter encoding, deep linking, and campaign tracking</p>
+                <div class="footer-links">
+                    <a href="/tools/url-tools">URL Tools</a> | 
+                    <a href="/tools/qr-generator">QR Generator</a> | 
+                    <a href="/blog/secure-url-best-practices">URL Security Blog</a>
+                </div>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Use Cases</h3>
+                <ul>
+                    <li>Marketing Campaign URL Generation</li>
+                    <li>Mobile App Deep Linking</li>
+                    <li>Secure Parameter Encoding</li>
+                    <li>QR Code Generation for Offline-to-Online</li>
+                </ul>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Contact & Support</h3>
+                <p>Need assistance? Contact <strong>Jirad Srirattana-arporn</strong></p>
+                <p>Email: <a href="mailto:support@auto-url-encoder.vercel.app">support@auto-url-encoder.vercel.app</a></p>
+            </div>
         </div>
-        <div class="deploy-info">
-            Last deployed: <span id="deployDate">April 3, 2025</span>
-        </div>
-        <div class="disclaimer">
-            This URL Parameter Encoder Tool is provided "as is" without warranty of any kind. The encoded URLs are processed client-side and no data is stored on our servers. 
-            Always verify the encoded URLs for security-sensitive applications. Perfect for marketing campaigns, mobile app deep links, and secure data sharing.
+        
+        <div class="footer-bottom">
+            <div class="deploy-info">
+                Last deployed: <span id="deployDate">April 3, 2025</span>
+            </div>
+            <div class="disclaimer">
+                This URL Parameter Encoder Tool is provided "as is" without warranty. All encoding occurs client-side for your privacy and security.
+                Ideal for marketing professionals, app developers, and web security specialists.
+            </div>
+            <div class="copyright">
+                © 2025 URL Parameter Encoder Tool. All rights reserved.
+            </div>
         </div>
     </footer>
     
@@ -1620,6 +1702,32 @@
             }
         }
         
+        // FIX 2: Improved text wrapping for saved QR codes
+        function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
+            const words = text.split('');
+            let line = '';
+            let testLine = '';
+            let currentY = y;
+            
+            for(let i = 0; i < words.length; i++) {
+                testLine += words[i];
+                const metrics = ctx.measureText(testLine);
+                const testWidth = metrics.width;
+                
+                if (testWidth > maxWidth && i > 0) {
+                    ctx.fillText(line, x, currentY);
+                    line = words[i];
+                    testLine = words[i];
+                    currentY += lineHeight;
+                }
+                else {
+                    line = testLine;
+                }
+            }
+            ctx.fillText(line, x, currentY);
+            return currentY;
+        }
+        
         // Save QR code as image
         function saveQrCode(container, filename) {
             try {
@@ -1689,31 +1797,19 @@
                 
                 // Draw gray background for URL text
                 const urlBoxY = headerHeight + qrSize + 60;
-                const urlBoxHeight = 40;
+                const urlBoxHeight = 80; // Increased for more rows
                 ctx.fillStyle = '#f5f7fa';
                 ctx.fillRect(20, urlBoxY, paddedCanvas.width - 40, urlBoxHeight);
                 
-                // Add URL text with wrapping
+                // Add URL text with improved wrapping
                 ctx.font = '14px Arial';
                 ctx.fillStyle = '#333333';
                 ctx.textAlign = 'center';
                 
-                // Word wrap the URL
-                const maxWidth = paddedCanvas.width - 60;
-                const words = url.split('');
-                let line = '';
-                let y = urlBoxY + 25;
-                
-                if (url.length <= 80) {
-                    // For shorter URLs, just center in the box
-                    ctx.fillText(url, paddedCanvas.width / 2, y);
-                } else {
-                    // For longer URLs, split into multiple lines
-                    const firstPart = url.substring(0, url.length / 2);
-                    const secondPart = url.substring(url.length / 2);
-                    ctx.fillText(firstPart, paddedCanvas.width / 2, urlBoxY + 18);
-                    ctx.fillText(secondPart, paddedCanvas.width / 2, urlBoxY + 38);
-                }
+                // Use improved text wrapping function
+                const maxWidth = paddedCanvas.width - 80; // Increased margins
+                const lineHeight = 20;
+                wrapText(ctx, url, paddedCanvas.width / 2, urlBoxY + 20, maxWidth, lineHeight);
                 
                 // Add nickname as a subtitle if available
                 if (nickname) {
