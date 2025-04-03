@@ -3,83 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Optimized Title -->
     <title>URL Parameter Encoder | MyDebugger</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Free URL Parameter Encoder tool to safely encode URL parameters for deep links, marketing campaigns, and secure data sharing. Generate QR codes and save links for future use.">
-    <meta name="keywords" content="url encoder, parameter encoder, url parameter tool, encode url parameters, url deeplink generator, qr code generator, url security, utm parameter encoder">
-    <meta name="robots" content="index, follow">
-    <meta name="revisit-after" content="7 days">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://mydebugger.vercel.app/tools/url-encoder.html">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mydebugger.vercel.app/tools/url-encoder.html">
-    <meta property="og:title" content="URL Parameter Encoder | MyDebugger">
-    <meta property="og:description" content="Free online tool to safely encode URL parameters, generate QR codes, and secure your deep links.">
-    <meta property="og:image" content="https://mydebugger.vercel.app/assets/og-image.jpg">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://mydebugger.vercel.app/tools/url-encoder.html">
-    <meta property="twitter:title" content="URL Parameter Encoder | MyDebugger">
-    <meta property="twitter:description" content="Free online tool to safely encode URL parameters, generate QR codes, and secure your deep links.">
-    <meta property="twitter:image" content="https://mydebugger.vercel.app/assets/og-image.jpg">
-    
-    <!-- Favicon -->
+    <meta name="description" content="Free URL Parameter Encoder tool to safely encode URL parameters for deep links, marketing campaigns, and secure data sharing.">
     <link rel="icon" type="image/png" href="../assets/favicon.png">
-    
-    <!-- External Scripts and Styles -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Custom Styles -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/tools/url-encoder.css">
 </head>
 <body>
-    <!-- Header will be injected by common.js -->
     <div id="header-container"></div>
-    
-    <!-- Breadcrumbs for SEO -->
-    <div class="container">
-        <div class="two-column-span">
-            <nav aria-label="breadcrumb" class="breadcrumbs">
-                <div class="breadcrumb-item"><a href="../index.html">Home</a></div>
-                <div class="breadcrumb-separator">/</div>
-                <div class="breadcrumb-item"><a href="../index.html#tools">Tools</a></div>
-                <div class="breadcrumb-separator">/</div>
-                <div class="breadcrumb-item">URL Parameter Encoder</div>
-            </nav>
-        </div>
-    </div>
 
-    <!-- Tool Introduction -->
     <div class="container">
-        <div class="two-column-span">
-            <section class="intro-section">
-                <div class="intro-collapse-toggle">
-                    <h1 class="intro-title">URL Parameter Encoder Tool</h1>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="intro-content">
-                    <p class="intro-text">This professional-grade URL parameter encoder helps you safely encode URL parameters for deep links, marketing campaigns, and data sharing. Perfect for developers, marketers, and anyone working with complex URLs.</p>
-                </div>
-            </section>
-        </div>
-    </div>
+        <nav aria-label="breadcrumb" class="breadcrumbs">
+            <div class="breadcrumb-item"><a href="../index.html">Home</a></div>
+            <div class="breadcrumb-separator">/</div>
+            <div class="breadcrumb-item"><a href="../index.html#tools">Tools</a></div>
+            <div class="breadcrumb-separator">/</div>
+            <div class="breadcrumb-item">URL Parameter Encoder</div>
+        </nav>
 
-    <!-- Main Application -->
-    <div class="container tool-container">
-        <!-- Encoder Section - Left column -->
-        <div>
+        <div class="tool-container">
+            <!-- URL Encoder Section -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-link"></i> URL Parameter Encoder</h2>
+                    <div class="card-title">
+                        <i class="fas fa-link"></i> URL Parameter Encoder
+                    </div>
                     <div class="mode-toggle">
                         <button class="mode-btn active" data-mode="get">GET</button>
                         <button class="mode-btn" data-mode="post">POST</button>
@@ -89,58 +39,45 @@
                     <div class="input-group">
                         <label for="inputUrl">Input URL:</label>
                         <textarea id="inputUrl" placeholder="Enter URL with parameters (e.g. https://example.com?url=https://another.com)"></textarea>
-                        <div class="validation-bar">
-                            <div id="validationProgress" class="validation-progress"></div>
-                        </div>
-                        <div id="validationMessage" class="validation-message"></div>
                     </div>
                     
-                    <!-- POST Parameters (hidden by default) -->
                     <div class="mode-content" id="postParamsContent" style="display: none;">
                         <div class="input-group">
                             <label for="postParams">POST Parameters:</label>
-                            <textarea id="postParams" class="post-params" placeholder="key1=value1&key2=value2
-# Or use JSON format:
-{
-  &quot;key1&quot;: &quot;value1&quot;,
-  &quot;key2&quot;: &quot;value2&quot;
-}"></textarea>
+                            <textarea id="postParams" class="post-params" placeholder="key1=value1&key2=value2"></textarea>
                         </div>
                     </div>
                     
+                    <div id="validationMessage" class="validation-message"></div>
+                    
                     <div id="resultContainer" class="result-container" style="display: none;">
-                        <!-- QR Code First -->
+                        <div>Processed URL:</div>
+                        <div id="processedUrl" class="result"></div>
+                        
                         <div id="qrContainer" class="qr-container">
-                            <div class="qr-processed-url">Processed URL:</div>
                             <div id="qrCode"></div>
                             <p class="qr-caption">Scan with your phone to open this link directly</p>
                         </div>
                         
-                        <!-- URL Result -->
-                        <label>Processed URL: <span id="autosaveStatus" class="autosave-indicator"></span> <span id="autosaveText" style="font-size: 0.8rem; color: var(--gray);"></span></label>
-                        <div id="processedUrl" class="result"></div>
-                        
-                        <!-- Action Buttons -->
                         <div class="action-bar">
-                            <button id="copyBtn" class="btn tooltip" data-tooltip="Copy to clipboard">
+                            <button id="copyBtn" class="btn">
                                 <i class="fas fa-copy"></i> Copy
                             </button>
-                            <button id="runBtn" class="btn btn-primary tooltip" data-tooltip="Open in new tab">
+                            <button id="runBtn" class="btn btn-primary">
                                 <i class="fas fa-external-link-alt"></i> Run
                             </button>
-                            <button id="clearBtn" class="btn tooltip" data-tooltip="Clear all fields">
+                            <button id="clearBtn" class="btn">
                                 <i class="fas fa-trash"></i> Clear
                             </button>
-                            <button id="saveQrBtn" class="btn tooltip" data-tooltip="Save QR code as image">
+                            <button id="saveQrBtn" class="btn">
                                 <i class="fas fa-download"></i> Save QR
                             </button>
                         </div>
                         
-                        <!-- Parameter Breakdown with Edit Feature -->
                         <div id="paramBreakdown">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin: 15px 0 10px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
                                 <h3>Parameter Breakdown:</h3>
-                                <button id="paramEditBtn" class="param-edit-btn tooltip" data-tooltip="Edit parameters">
+                                <button id="paramEditBtn" class="param-edit-btn">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
                             </div>
@@ -157,38 +94,31 @@
                                     <!-- Parameters will be inserted here -->
                                 </tbody>
                             </table>
-                            <div id="paramEditActions" class="param-edit-actions" style="display: none;">
-                                <button id="paramSaveBtn" class="param-edit-save tooltip" data-tooltip="Save changes">
-                                    <i class="fas fa-check"></i> Save Changes
-                                </button>
-                                <button id="paramCancelBtn" class="param-edit-cancel tooltip" data-tooltip="Cancel editing">
-                                    <i class="fas fa-times"></i> Cancel
-                                </button>
+                            <div id="paramEditActions" style="display: none; margin-top: 10px; text-align: right;">
+                                <button id="paramSaveBtn" class="btn btn-primary">Save Changes</button>
+                                <button id="paramCancelBtn" class="btn">Cancel</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Recent Links - Right column -->
-        <div>
+            
+            <!-- Recent Links Section -->
             <div class="card">
                 <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-history"></i> Recent Links 
+                    <div class="card-title">
+                        <i class="fas fa-history"></i> Recent Links
                         <span id="linksCount" class="badge badge-success">0</span>
-                    </h2>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="search-container">
                         <i class="fas fa-search"></i>
                         <input type="text" id="searchInput" class="search-input" placeholder="Search links...">
-                        <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
                     </div>
                     
                     <div id="linksList" class="links-list">
-                        <!-- Links will be inserted here, starred items first -->
+                        <!-- Links will be inserted here -->
                     </div>
                 </div>
             </div>
@@ -196,52 +126,25 @@
     </div>
     
     <!-- QR Code Overlay -->
-    <div id="qrOverlay" class="qr-overlay">
+    <div id="qrOverlay" class="qr-overlay" style="display: none;">
         <div class="qr-overlay-content">
             <button id="qrOverlayClose" class="qr-overlay-close">&times;</button>
             <div class="qr-overlay-title">QR Code</div>
             <div id="qrOverlayImage" class="qr-overlay-image"></div>
-            <p class="qr-caption">Scan with your phone to open this link directly</p>
-            <div class="qr-overlay-title">Processed URL:</div>
-            <div id="qrOverlayUrl" class="qr-overlay-url"></div>
+            <div class="qr-overlay-url" id="qrOverlayUrl"></div>
             <div class="qr-overlay-buttons">
                 <button id="qrOverlaySave" class="btn btn-primary">
                     <i class="fas fa-download"></i> Save QR Code
                 </button>
             </div>
         </div>
-        <div class="key-instructions">Press ESC key or click anywhere to close</div>
     </div>
     
-    <!-- Status message container -->
-    <div id="statusMessage" class="status-message"></div>
-    
-    <!-- Footer will be injected by common.js -->
     <div id="footer-container"></div>
     
-    <!-- Common Scripts -->
     <script src="../js/common.js"></script>
     <script src="../js/storage.js"></script>
     <script src="../js/tools-registry.js"></script>
-    
-    <!-- Tool-specific Script -->
     <script src="../js/tools/url-encoder.js"></script>
-    
-    <!-- Initialize intro section toggle -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Introduction collapsible toggle
-            const introCollapseToggle = document.querySelector('.intro-collapse-toggle');
-            const introContent = document.querySelector('.intro-content');
-            
-            if (introCollapseToggle && introContent) {
-                introCollapseToggle.addEventListener('click', () => {
-                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
-                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
-                    introContent.classList.toggle('expanded');
-                });
-            }
-        });
-    </script>
 </body>
 </html>

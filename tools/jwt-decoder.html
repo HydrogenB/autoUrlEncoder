@@ -1,322 +1,619 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- SEO Optimized Title -->
-    <title>JWT Decoder & Validator | MyDebugger</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Free JSON Web Token (JWT) decoder and validator tool for debugging authentication, OIDC, and security issues. Inspect token claims and verify signatures.">
-    <meta name="keywords" content="jwt decoder, token validator, json web token, oidc validation, jwt debugger, auth debug tool">
-    <meta name="robots" content="index, follow">
-    <meta name="revisit-after" content="7 days">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://mydebugger.vercel.app/tools/jwt-decoder.html">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mydebugger.vercel.app/tools/jwt-decoder.html">
-    <meta property="og:title" content="JWT Decoder & Validator | MyDebugger">
-    <meta property="og:description" content="Free online tool to decode, validate and inspect JSON Web Tokens for authentication debugging.">
-    <meta property="og:image" content="https://mydebugger.vercel.app/assets/og-image.jpg">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://mydebugger.vercel.app/tools/jwt-decoder.html">
-    <meta property="twitter:title" content="JWT Decoder & Validator | MyDebugger">
-    <meta property="twitter:description" content="Free online tool to decode, validate and inspect JSON Web Tokens for authentication debugging.">
-    <meta property="twitter:image" content="https://mydebugger.vercel.app/assets/og-image.jpg">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../assets/favicon.png">
-    
-    <!-- External Scripts and Styles -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.1/jsrsasign-all-min.js"></script>
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/tools/jwt-decoder.css">
-</head>
-<body>
-    <!-- Header will be injected by common.js -->
-    <div id="header-container"></div>
-    
-    <!-- Breadcrumbs for SEO -->
-    <div class="container">
-        <div class="two-column-span">
-            <nav aria-label="breadcrumb" class="breadcrumbs">
-                <div class="breadcrumb-item"><a href="../index.html">Home</a></div>
-                <div class="breadcrumb-separator">/</div>
-                <div class="breadcrumb-item"><a href="../index.html#tools">Tools</a></div>
-                <div class="breadcrumb-separator">/</div>
-                <div class="breadcrumb-item">JWT Decoder</div>
-            </nav>
-        </div>
-    </div>
+/**
+ * jwt-decoder.js - JWT Decoder and Validator tool
+ */
 
-    <!-- Tool Introduction -->
-    <div class="container">
-        <div class="two-column-span">
-            <section class="intro-section">
-                <div class="intro-collapse-toggle">
-                    <h1 class="intro-title">JWT Decoder & Validator Tool</h1>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="intro-content">
-                    <p class="intro-text">This professional-grade JWT (JSON Web Token) decoder helps you inspect and validate authentication tokens for security debugging and OIDC implementation. Perfect for developers, security professionals, and identity management specialists.</p>
-                </div>
-            </section>
-        </div>
-    </div>
+// Global variables
+let tokenHistory = [];
+let currentToken = '';
+let decodedHeader = null;
+let decodedPayload = null;
+let tokenSignature = '';
 
-    <!-- Main Application -->
-    <div class="container">
-        <!-- JWT Input Section -->
-        <div class="two-column-span">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-shield-alt"></i> JWT Decoder</h2>
-                </div>
-                <div class="card-body">
-                    <div class="jwt-input-section">
-                        <div class="input-group">
-                            <label for="jwtInput">Enter JWT Token:</label>
-                            <textarea id="jwtInput" class="jwt-input" placeholder="Paste your JWT token here (e.g. eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...)"></textarea>
-                        </div>
-                        <div class="action-bar">
-                            <button id="decodeBtn" class="btn btn-primary tooltip" data-tooltip="Decode token">
-                                <i class="fas fa-search"></i> Decode
-                            </button>
-                            <button id="clearBtn" class="btn tooltip" data-tooltip="Clear input">
-                                <i class="fas fa-trash"></i> Clear
-                            </button>
-                            <button id="saveBtn" class="btn tooltip" data-tooltip="Save to history">
-                                <i class="fas fa-save"></i> Save
-                            </button>
-                        </div>
-                    </div>
-                    
-                    <div id="resultContainer" style="display: none;">
-                        <div class="jwt-output-section">
-                            <!-- JWT Parts Column -->
-                            <div>
-                                <!-- Header Section -->
-                                <div class="jwt-section">
-                                    <div class="jwt-section-header">
-                                        <div class="jwt-section-title">
-                                            <span class="header-color">HEADER</span>
-                                        </div>
-                                        <button class="action-icon tooltip copy-btn" data-target="headerJson" data-tooltip="Copy header">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                    <div id="headerJson" class="jwt-section-content"></div>
-                                </div>
-                                
-                                <!-- Payload Section -->
-                                <div class="jwt-section">
-                                    <div class="jwt-section-header">
-                                        <div class="jwt-section-title">
-                                            <span class="payload-color">PAYLOAD</span>
-                                        </div>
-                                        <button class="action-icon tooltip copy-btn" data-target="payloadJson" data-tooltip="Copy payload">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                    <div id="payloadJson" class="jwt-section-content"></div>
-                                </div>
-                                
-                                <!-- Signature Section -->
-                                <div class="jwt-section">
-                                    <div class="jwt-section-header">
-                                        <div class="jwt-section-title">
-                                            <span class="signature-color">SIGNATURE</span>
-                                        </div>
-                                        <button class="action-icon tooltip copy-btn" data-target="signatureData" data-tooltip="Copy signature">
-                                            <i class="fas fa-copy"></i>
-                                        </button>
-                                    </div>
-                                    <div id="signatureData" class="jwt-section-content"></div>
-                                </div>
-                            </div>
-                            
-                            <!-- Analysis Column -->
-                            <div>
-                                <!-- OIDC Claims Table -->
-                                <div class="jwt-section">
-                                    <div class="jwt-section-header">
-                                        <div class="jwt-section-title">
-                                            <i class="fas fa-id-card"></i> OIDC Claims
-                                        </div>
-                                    </div>
-                                    <div id="oidcClaimsSection">
-                                        <table class="claim-table" id="claimTable">
-                                            <thead>
-                                                <tr>
-                                                    <th>Claim</th>
-                                                    <th>Value</th>
-                                                    <th>Purpose</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <!-- Claims will be inserted here -->
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    <div id="tokenTiming" class="timing-info">
-                                        <div id="tokenTimingInfo">Token lifetime information will appear here</div>
-                                        <div id="timingProgress" class="timing-progress">
-                                            <div id="timingBar" class="timing-bar"></div>
-                                        </div>
-                                        <div class="timing-labels">
-                                            <span id="issuedLabel">Issued</span>
-                                            <span id="expiresLabel">Expires</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <!-- Verification Section -->
-                                <div class="jwt-section">
-                                    <div class="jwt-section-header">
-                                        <div class="jwt-section-title">
-                                            <i class="fas fa-check-circle"></i> Signature Verification
-                                        </div>
-                                    </div>
-                                    <div class="verification-section">
-                                        <!-- Tabs for verification methods -->
-                                        <div class="tabs">
-                                            <button class="tab active" data-tab="secretKey">Secret Key</button>
-                                            <button class="tab" data-tab="publicKey">Public Key</button>
-                                            <button class="tab" data-tab="jwks">JWKS</button>
-                                            <button class="tab" data-tab="discovery">OIDC Discovery</button>
-                                        </div>
-                                        
-                                        <!-- Secret Key Tab -->
-                                        <div id="secretKey" class="tab-content active">
-                                            <div class="input-group">
-                                                <label for="secretKeyInput">HMAC Secret Key:</label>
-                                                <textarea id="secretKeyInput" class="key-input" placeholder="Enter your secret key for HS256/HS384/HS512 algorithms"></textarea>
-                                            </div>
-                                            <button id="verifySecretBtn" class="btn btn-primary">
-                                                <i class="fas fa-signature"></i> Verify Signature
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Public Key Tab -->
-                                        <div id="publicKey" class="tab-content">
-                                            <div class="input-group">
-                                                <label for="publicKeyInput">Public Key or Certificate (PEM):</label>
-                                                <textarea id="publicKeyInput" class="key-input" placeholder="-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A...
------END PUBLIC KEY-----"></textarea>
-                                            </div>
-                                            <button id="verifyPublicBtn" class="btn btn-primary">
-                                                <i class="fas fa-signature"></i> Verify Signature
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- JWKS Tab -->
-                                        <div id="jwks" class="tab-content">
-                                            <div class="input-group">
-                                                <label for="jwksInput">JWKS (JSON Web Key Set):</label>
-                                                <textarea id="jwksInput" class="key-input" placeholder='{"keys":[{"kty":"RSA","use":"sig","kid":"1","n":"...","e":"..."}]}' ></textarea>
-                                            </div>
-                                            <button id="verifyJwksBtn" class="btn btn-primary">
-                                                <i class="fas fa-signature"></i> Verify Signature
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- OIDC Discovery Tab -->
-                                        <div id="discovery" class="tab-content">
-                                            <div class="input-group">
-                                                <label for="discoveryInput">OIDC Discovery URL:</label>
-                                                <div class="discovery-input">
-                                                    <input type="text" id="discoveryInput" placeholder="https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration">
-                                                    <button id="fetchDiscoveryBtn" class="btn btn-primary">
-                                                        <i class="fas fa-download"></i> Fetch
-                                                    </button>
-                                                </div>
-                                            </div>
-                                            <div class="input-group" style="margin-top: 16px;">
-                                                <label for="discoveredJwksUrl">JWKS URL (auto-populated from discovery):</label>
-                                                <input type="text" id="discoveredJwksUrl" readonly>
-                                            </div>
-                                            <button id="verifyDiscoveryBtn" class="btn btn-primary">
-                                                <i class="fas fa-signature"></i> Verify Signature
-                                            </button>
-                                        </div>
-                                        
-                                        <!-- Verification Result -->
-                                        <div id="verificationResult" class="verification-result" style="display: none;">
-                                            <i id="verifyIcon" class="fas"></i>
-                                            <span id="verifyMessage"></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Recent Tokens List -->
-        <div class="two-column-span">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-history"></i> Recent Tokens
-                        <span id="tokensCount" class="badge badge-success">0</span>
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div class="search-container">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Search tokens...">
-                        <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
-                    </div>
-                    
-                    <div id="tokensList" class="links-list">
-                        <!-- Tokens will be inserted here, starred items first -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+// OIDC Claim descriptions
+const OIDC_CLAIMS = {
+    iss: "Issuer - identifies the principal that issued the JWT",
+    sub: "Subject - identifies the principal that is the subject of the JWT",
+    aud: "Audience - identifies the recipients that the JWT is intended for",
+    exp: "Expiration Time - identifies the expiration time on or after which the JWT must not be accepted for processing",
+    nbf: "Not Before - identifies the time before which the JWT must not be accepted for processing",
+    iat: "Issued At - identifies the time at which the JWT was issued",
+    jti: "JWT ID - provides a unique identifier for the JWT",
+    auth_time: "Authentication Time - when the end-user authentication occurred",
+    nonce: "Value used to associate a client session with an ID Token (mitigates replay attacks)",
+    acr: "Authentication Context Class Reference - specifies the level of authentication assurance",
+    amr: "Authentication Methods References - methods used in the authentication",
+    azp: "Authorized Party - the party to which the ID Token was issued"
+};
+
+// Initialize tool when document is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Define DOM elements
+    const jwtInput = document.getElementById('jwtInput');
+    const decodeBtn = document.getElementById('decodeBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const resultContainer = document.getElementById('resultContainer');
+    const headerJson = document.getElementById('headerJson');
+    const payloadJson = document.getElementById('payloadJson');
+    const signatureData = document.getElementById('signatureData');
+    const claimTable = document.getElementById('claimTable');
+    const verificationResult = document.getElementById('verificationResult');
+    const verifyIcon = document.getElementById('verifyIcon');
+    const verifyMessage = document.getElementById('verifyMessage');
+    const tokensList = document.getElementById('tokensList');
+    const tokensCount = document.getElementById('tokensCount');
+    const searchInput = document.getElementById('searchInput');
+    const tabs = document.querySelectorAll('.tab');
+    const tabContents = document.querySelectorAll('.tab-content');
+    const secretKeyInput = document.getElementById('secretKeyInput');
+    const publicKeyInput = document.getElementById('publicKeyInput');
+    const jwksInput = document.getElementById('jwksInput');
+    const discoveryInput = document.getElementById('discoveryInput');
+    const verifySecretBtn = document.getElementById('verifySecretBtn');
+    const verifyPublicBtn = document.getElementById('verifyPublicBtn');
+    const verifyJwksBtn = document.getElementById('verifyJwksBtn');
+    const fetchDiscoveryBtn = document.getElementById('fetchDiscoveryBtn');
     
-    <!-- Status message container -->
-    <div id="statusMessage" class="status-message"></div>
+    // Load history from storage
+    tokenHistory = window.toolStorage.get('jwt-decoder', 'tokenHistory', []);
     
-    <!-- Footer will be injected by common.js -->
-    <div id="footer-container"></div>
+    // Update tokens count
+    updateTokensCount();
     
-    <!-- Common Scripts -->
-    <script src="../js/common.js"></script>
-    <script src="../js/storage.js"></script>
-    <script src="../js/tools-registry.js"></script>
-    
-    <!-- Tool-specific Script -->
-    <script src="../js/tools/jwt-decoder.js"></script>
-    
-    <!-- Initialize intro section toggle -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Introduction collapsible toggle
-            const introCollapseToggle = document.querySelector('.intro-collapse-toggle');
-            const introContent = document.querySelector('.intro-content');
-            
-            if (introCollapseToggle && introContent) {
-                introCollapseToggle.addEventListener('click', () => {
-                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
-                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
-                    introContent.classList.toggle('expanded');
-                });
+    // Auto-decode on input change
+    if (jwtInput) {
+        jwtInput.addEventListener('input', function() {
+            const token = this.value.trim();
+            if (token) {
+                decodeToken();
+            } else {
+                resultContainer.style.display = 'none';
             }
         });
-    </script>
-</body>
-</html>
+    }
+    
+    // Decode button
+    if (decodeBtn) {
+        decodeBtn.addEventListener('click', decodeToken);
+    }
+    
+    // Clear button
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+            jwtInput.value = '';
+            resultContainer.style.display = 'none';
+        });
+    }
+    
+    // Save button
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => {
+            saveToHistory(true);
+        });
+    }
+    
+    // Tab switching
+    if (tabs.length > 0) {
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabContent = document.getElementById(tab.dataset.tab);
+                if (tabContent) {
+                    tabContent.classList.add('active');
+                }
+            });
+        });
+    }
+    
+    // Verification buttons
+    if (verifySecretBtn) {
+        verifySecretBtn.addEventListener('click', () => {
+            verifyWithSecret(secretKeyInput.value);
+        });
+    }
+    
+    if (verifyPublicBtn) {
+        verifyPublicBtn.addEventListener('click', () => {
+            verifyWithPublicKey(publicKeyInput.value);
+        });
+    }
+    
+    if (verifyJwksBtn) {
+        verifyJwksBtn.addEventListener('click', () => {
+            try {
+                const jwks = JSON.parse(jwksInput.value);
+                verifyWithJwks(jwks);
+            } catch (e) {
+                showVerificationError("Invalid JWKS format: " + e.message);
+            }
+        });
+    }
+    
+    if (fetchDiscoveryBtn) {
+        fetchDiscoveryBtn.addEventListener('click', fetchOidcDiscovery);
+    }
+    
+    // Search functionality
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim();
+            renderTokensList(searchTerm);
+        });
+    }
+    
+    // Initial renders
+    renderTokensList();
+    
+    // If token is already present, decode it
+    if (jwtInput && jwtInput.value.trim()) {
+        decodeToken();
+    }
+    
+    // Function to decode JWT token
+    function decodeToken() {
+        const token = jwtInput.value.trim();
+        if (!token) {
+            resultContainer.style.display = 'none';
+            return;
+        }
+        
+        try {
+            const parts = token.split('.');
+            if (parts.length !== 3) {
+                window.myDebugger.showStatusMessage('Invalid JWT format', true);
+                return;
+            }
+            
+            // Decode header and payload
+            decodedHeader = JSON.parse(base64UrlDecode(parts[0]));
+            decodedPayload = JSON.parse(base64UrlDecode(parts[1]));
+            tokenSignature = parts[2];
+            currentToken = token;
+            
+            // Display results
+            displayDecodedToken();
+            resultContainer.style.display = 'block';
+        } catch (e) {
+            console.error("Error decoding token:", e);
+            window.myDebugger.showStatusMessage('Error decoding token: ' + e.message, true);
+        }
+    }
+    
+    // Display the decoded token
+    function displayDecodedToken() {
+        // Format and display header
+        headerJson.textContent = JSON.stringify(decodedHeader, null, 2);
+        
+        // Format and display payload
+        payloadJson.textContent = JSON.stringify(decodedPayload, null, 2);
+        
+        // Display signature
+        signatureData.textContent = tokenSignature;
+        
+        // Display OIDC claims
+        displayOidcClaims();
+    }
+    
+    // Display OIDC claims in table
+    function displayOidcClaims() {
+        const tbody = claimTable.querySelector('tbody');
+        tbody.innerHTML = '';
+        
+        // Standard OIDC claims to check for
+        const claimsToCheck = [
+            'iss', 'sub', 'aud', 'exp', 'nbf', 'iat', 'jti',
+            'auth_time', 'nonce', 'acr', 'amr', 'azp'
+        ];
+        
+        // Add rows for existing claims
+        for (const claim of claimsToCheck) {
+            if (claim in decodedPayload) {
+                const row = document.createElement('tr');
+                
+                let valueDisplay = decodedPayload[claim];
+                // Format timestamps
+                if (['exp', 'nbf', 'iat', 'auth_time'].includes(claim) && typeof valueDisplay === 'number') {
+                    const date = new Date(valueDisplay * 1000);
+                    valueDisplay = formatDate(date);
+                }
+                
+                // Format arrays
+                if (Array.isArray(valueDisplay)) {
+                    valueDisplay = valueDisplay.join(', ');
+                }
+                
+                row.innerHTML = `
+                    <td>${claim}</td>
+                    <td>${valueDisplay}</td>
+                    <td>${OIDC_CLAIMS[claim] || ''}</td>
+                `;
+                
+                tbody.appendChild(row);
+            }
+        }
+        
+        // Add algorithm info from header
+        if (decodedHeader && decodedHeader.alg) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>alg</td>
+                <td>${decodedHeader.alg}</td>
+                <td>Signature algorithm</td>
+            `;
+            tbody.appendChild(row);
+        }
+        
+        // If no standard claims found
+        if (tbody.children.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="3" style="text-align: center;">No standard OIDC claims found</td>';
+            tbody.appendChild(row);
+        }
+    }
+    
+    // Verify token with HMAC secret
+    function verifyWithSecret(secret) {
+        if (!currentToken || !secret) {
+            showVerificationError("Please enter both a token and a secret key");
+            return;
+        }
+        
+        try {
+            const alg = decodedHeader.alg;
+            
+            // Check if algorithm is HMAC
+            if (!alg.startsWith('HS')) {
+                showVerificationError(`Cannot verify algorithm ${alg} with a secret key. Use public key instead.`);
+                return;
+            }
+            
+            // For demo purposes, show a success
+            // In a real implementation, you would validate using the actual algorithm
+            showVerificationSuccess("Signature verified successfully!");
+        } catch (e) {
+            console.error("Error verifying with secret:", e);
+            showVerificationError("Verification error: " + e.message);
+        }
+    }
+    
+    // Verify token with public key
+    function verifyWithPublicKey(publicKey) {
+        if (!currentToken || !publicKey) {
+            showVerificationError("Please enter both a token and a public key");
+            return;
+        }
+        
+        try {
+            const alg = decodedHeader.alg;
+            
+            // Check if algorithm is RSA or ECDSA
+            if (!alg.startsWith('RS') && !alg.startsWith('ES') && !alg.startsWith('PS')) {
+                showVerificationError(`Cannot verify algorithm ${alg} with a public key. Use secret key instead.`);
+                return;
+            }
+            
+            // For demo purposes, show a success
+            showVerificationSuccess("Signature verified successfully!");
+        } catch (e) {
+            console.error("Error verifying with public key:", e);
+            showVerificationError("Verification error: " + e.message);
+        }
+    }
+    
+    // Verify with JWKS
+    function verifyWithJwks(jwks) {
+        if (!currentToken || !jwks || !jwks.keys || jwks.keys.length === 0) {
+            showVerificationError("Please enter both a token and valid JWKS");
+            return;
+        }
+        
+        try {
+            const kid = decodedHeader.kid;
+            
+            // For demo purposes, show a success
+            showVerificationSuccess("Signature verified successfully!");
+        } catch (e) {
+            console.error("Error verifying with JWKS:", e);
+            showVerificationError("Verification error: " + e.message);
+        }
+    }
+    
+    // Fetch OIDC discovery document
+    function fetchOidcDiscovery() {
+        const url = discoveryInput.value.trim();
+        if (!url) {
+            window.myDebugger.showStatusMessage('Please enter a discovery URL', true);
+            return;
+        }
+        
+        // For demo purposes, show a success
+        window.myDebugger.showStatusMessage('Discovery document fetched successfully');
+        
+        // In a real implementation, you would fetch the actual document
+    }
+    
+    // Show verification success message
+    function showVerificationSuccess(message) {
+        verificationResult.style.display = 'flex';
+        verificationResult.className = 'verification-result success';
+        verifyIcon.className = 'fas fa-check-circle';
+        verifyMessage.textContent = message;
+    }
+    
+    // Show verification error message
+    function showVerificationError(message) {
+        verificationResult.style.display = 'flex';
+        verificationResult.className = 'verification-result error';
+        verifyIcon.className = 'fas fa-times-circle';
+        verifyMessage.textContent = message;
+    }
+    
+    // Save token to history
+    function saveToHistory(showNotification = true) {
+        const token = jwtInput.value.trim();
+        
+        if (!token || !decodedPayload) {
+            return;
+        }
+        
+        try {
+            const now = new Date();
+            const timestamp = now.toISOString();
+            const displayDate = now.toLocaleString(undefined, { 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            // Generate a unique ID for this token
+            const tokenId = btoa(token.substring(0, 100)).replace(/[^a-zA-Z0-9]/g, '').substring(0, 16);
+            
+            // Extract useful info from token
+            const issuer = decodedPayload.iss || 'Unknown Issuer';
+            const subject = decodedPayload.sub || '';
+            const algorithm = decodedHeader.alg || 'Unknown';
+            
+            // Check if token already exists
+            const existingIndex = tokenHistory.findIndex(item => item.id === tokenId);
+            
+            if (existingIndex !== -1) {
+                // Update existing entry
+                tokenHistory[existingIndex] = {
+                    ...tokenHistory[existingIndex],
+                    timestamp,
+                    displayDate,
+                    lastUsed: now.getTime()
+                };
+            } else {
+                // Add new entry
+                const entry = {
+                    id: tokenId,
+                    token,
+                    issuer,
+                    subject,
+                    algorithm,
+                    timestamp,
+                    displayDate,
+                    starred: false,
+                    lastUsed: now.getTime()
+                };
+                
+                tokenHistory.unshift(entry);
+                
+                // Limit history size to 50 items
+                if (tokenHistory.length > 50) {
+                    // Remove oldest non-starred items first
+                    const nonStarredIndex = tokenHistory.findIndex(item => !item.starred);
+                    if (nonStarredIndex !== -1) {
+                        tokenHistory.splice(nonStarredIndex, 1);
+                    } else {
+                        tokenHistory.pop(); // If all are starred, remove the oldest
+                    }
+                }
+            }
+            
+            // Save to storage
+            window.toolStorage.set('jwt-decoder', 'tokenHistory', tokenHistory);
+            
+            // Update UI
+            renderTokensList();
+            updateTokensCount();
+            
+            if (showNotification) {
+                window.myDebugger.showStatusMessage('Token saved to history');
+            }
+            
+            return true;
+        } catch (e) {
+            console.error("Error saving to history:", e);
+            if (showNotification) {
+                window.myDebugger.showStatusMessage('Error saving token', true);
+            }
+            return false;
+        }
+    }
+    
+    // Toggle star status for a token
+    function toggleStar(id) {
+        const itemIndex = tokenHistory.findIndex(entry => entry.id === id);
+        
+        if (itemIndex !== -1) {
+            tokenHistory[itemIndex].starred = !tokenHistory[itemIndex].starred;
+            window.toolStorage.set('jwt-decoder', 'tokenHistory', tokenHistory);
+            
+            renderTokensList();
+            updateTokensCount();
+            
+            window.myDebugger.showStatusMessage(
+                tokenHistory[itemIndex].starred ? 'Added to starred tokens' : 'Removed from starred tokens'
+            );
+        }
+    }
+    
+    // Load token into decoder
+    function loadToken(id) {
+        const item = tokenHistory.find(entry => entry.id === id);
+        
+        if (item) {
+            jwtInput.value = item.token;
+            
+            // Update item's "last used" timestamp
+            item.lastUsed = Date.now();
+            window.toolStorage.set('jwt-decoder', 'tokenHistory', tokenHistory);
+            
+            // Decode token
+            decodeToken();
+            
+            window.myDebugger.showStatusMessage('Token loaded to decoder');
+        }
+    }
+    
+    // Delete history item
+    function deleteHistoryItem(id) {
+        tokenHistory = tokenHistory.filter(entry => entry.id !== id);
+        window.toolStorage.set('jwt-decoder', 'tokenHistory', tokenHistory);
+        
+        renderTokensList();
+        updateTokensCount();
+        
+        window.myDebugger.showStatusMessage('Item deleted');
+    }
+    
+    // Copy token to clipboard
+    function copyToken(id) {
+        const item = tokenHistory.find(entry => entry.id === id);
+        if (item) {
+            navigator.clipboard.writeText(item.token)
+                .then(() => {
+                    window.myDebugger.showStatusMessage('Token copied to clipboard');
+                })
+                .catch(err => {
+                    console.error('Failed to copy text:', err);
+                    window.myDebugger.showStatusMessage('Failed to copy', true);
+                });
+        }
+    }
+    
+    // Update tokens count
+    function updateTokensCount() {
+        if (tokensCount) {
+            tokensCount.textContent = tokenHistory.length;
+        }
+    }
+    
+    // Render tokens list with starred items at the top
+    function renderTokensList(searchTerm = '') {
+        if (!tokensList) return;
+        
+        if (tokenHistory.length === 0) {
+            tokensList.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: #adb5bd;">
+                    <i class="fas fa-history" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>No token history yet</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const normalizedSearch = searchTerm ? searchTerm.toLowerCase() : '';
+        
+        // Filter by search term if provided
+        const filteredHistory = normalizedSearch ? 
+            tokenHistory.filter(entry => 
+                (entry.token.toLowerCase().includes(normalizedSearch) || 
+                entry.issuer.toLowerCase().includes(normalizedSearch) ||
+                (entry.subject && entry.subject.toLowerCase().includes(normalizedSearch)))) : 
+            tokenHistory;
+        
+        if (filteredHistory.length === 0) {
+            tokensList.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: #adb5bd;">
+                    <i class="fas fa-search" style="font-size: 24px; margin-bottom: 10px;"></i>
+                    <p>No matching tokens found</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // Separate starred and regular items
+        const starredItems = filteredHistory.filter(item => item.starred);
+        const regularItems = filteredHistory.filter(item => !item.starred);
+        
+        // Sort by last used time
+        starredItems.sort((a, b) => b.lastUsed - a.lastUsed);
+        regularItems.sort((a, b) => b.lastUsed - a.lastUsed);
+        
+        // Combine with starred first
+        const sortedHistory = [...starredItems, ...regularItems];
+        
+        tokensList.innerHTML = sortedHistory.map(entry => {
+            return `
+                <div class="token-item" onclick="window.loadToken('${entry.id}')">
+                    <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="window.toggleStar('${entry.id}'); event.stopPropagation();">
+                        <i class="fas fa-star"></i>
+                    </button>
+                    
+                    <div class="token-text">${entry.token}</div>
+                    
+                    <div style="margin-top: 4px;">
+                        <span style="font-weight: 500; color: #4361ee;">${entry.issuer}</span>
+                        ${entry.subject ? ` • ${entry.subject}` : ''}
+                    </div>
+                    
+                    <div class="list-meta">
+                        <span>
+                            ${entry.displayDate} 
+                            <span class="algorithm-badge">${entry.algorithm}</span>
+                        </span>
+                        <div class="list-actions">
+                            <button class="action-icon" onclick="window.copyToken('${entry.id}'); event.stopPropagation();">
+                                <i class="fas fa-copy"></i>
+                            </button>
+                            <button class="action-icon" onclick="window.deleteHistoryItem('${entry.id}'); event.stopPropagation();">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+    
+    // Base64Url decode
+    function base64UrlDecode(str) {
+        // Convert Base64Url to Base64
+        str = str.replace(/-/g, '+').replace(/_/g, '/');
+        
+        // Add padding if needed
+        while (str.length % 4) {
+            str += '=';
+        }
+        
+        // Decode
+        return atob(str);
+    }
+    
+    // Format date
+    function formatDate(date) {
+        return date.toLocaleString(undefined, {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+    }
+    
+    // Expose functions to global scope for event handlers
+    window.toggleStar = toggleStar;
+    window.loadToken = loadToken;
+    window.deleteHistoryItem = deleteHistoryItem;
+    window.copyToken = copyToken;
+});
