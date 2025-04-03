@@ -1634,37 +1634,92 @@
                 const paddedCanvas = document.createElement('canvas');
                 const ctx = paddedCanvas.getContext('2d');
                 const padding = 40;
-                const textHeight = 70; // Increased height for URL text
+                const headerHeight = 50;
+                const footerHeight = 100;
+                const qrSize = Math.max(canvas.width, canvas.height);
                 
-                paddedCanvas.width = canvas.width + (padding * 2);
-                paddedCanvas.height = canvas.height + (padding * 2) + textHeight;
+                paddedCanvas.width = qrSize + (padding * 2);
+                paddedCanvas.height = qrSize + headerHeight + footerHeight + (padding * 2);
                 
                 // Fill with white background
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, paddedCanvas.width, paddedCanvas.height);
                 
-                // Draw the QR code
-                ctx.drawImage(canvas, padding, padding);
+                // Add "QR Code" title at the top in blue
+                ctx.font = 'bold 20px Arial';
+                ctx.fillStyle = '#4361ee';
+                ctx.textAlign = 'center';
+                ctx.fillText('QR Code', paddedCanvas.width / 2, padding);
                 
-                // Add title text
-                ctx.font = 'bold 18px Arial';
+                // Draw the QR code
+                ctx.drawImage(canvas, 
+                    padding, 
+                    headerHeight, 
+                    qrSize, 
+                    qrSize
+                );
+                
+                // Add "Scan with your phone" text
+                ctx.font = '14px Arial';
+                ctx.fillStyle = '#adb5bd';
+                ctx.textAlign = 'center';
+                ctx.fillText('Scan with your phone to open this link directly', 
+                    paddedCanvas.width / 2, 
+                    headerHeight + qrSize + 25
+                );
+                
+                // Get URL and try to find nickname
+                const url = container === qrOverlayImage ? qrOverlayUrl.textContent : currentQrCodeData;
+                let nickname = '';
+                
+                // Try to find nickname in history
+                const historyItem = urlHistory.find(item => item.encodedUrl === url);
+                if (historyItem && historyItem.nickname) {
+                    nickname = historyItem.nickname;
+                }
+                
+                // Add "Processed URL:" label in blue
+                ctx.font = 'bold 16px Arial';
+                ctx.fillStyle = '#4361ee';
+                ctx.textAlign = 'center';
+                ctx.fillText('Processed URL:', 
+                    paddedCanvas.width / 2, 
+                    headerHeight + qrSize + 50
+                );
+                
+                // Draw gray background for URL text
+                const urlBoxY = headerHeight + qrSize + 60;
+                const urlBoxHeight = 40;
+                ctx.fillStyle = '#f5f7fa';
+                ctx.fillRect(20, urlBoxY, paddedCanvas.width - 40, urlBoxHeight);
+                
+                // Add URL text with wrapping
+                ctx.font = '14px Arial';
                 ctx.fillStyle = '#333333';
                 ctx.textAlign = 'center';
-                ctx.fillText('Processed URL:', paddedCanvas.width / 2, canvas.height + padding + 25);
                 
-                // Add URL text (wrapped if needed)
-                const url = container === qrOverlayImage ? qrOverlayUrl.textContent : currentQrCodeData;
-                ctx.font = '14px Arial';
-                const maxWidth = paddedCanvas.width - (padding * 2);
+                // Word wrap the URL
+                const maxWidth = paddedCanvas.width - 60;
+                const words = url.split('');
+                let line = '';
+                let y = urlBoxY + 25;
                 
-                // Simple text wrapping for URL
-                if (url.length > 50) {
-                    const firstPart = url.substring(0, 50);
-                    const secondPart = url.substring(50);
-                    ctx.fillText(firstPart, paddedCanvas.width / 2, canvas.height + padding + 50);
-                    ctx.fillText(secondPart, paddedCanvas.width / 2, canvas.height + padding + 70);
+                if (url.length <= 80) {
+                    // For shorter URLs, just center in the box
+                    ctx.fillText(url, paddedCanvas.width / 2, y);
                 } else {
-                    ctx.fillText(url, paddedCanvas.width / 2, canvas.height + padding + 50);
+                    // For longer URLs, split into multiple lines
+                    const firstPart = url.substring(0, url.length / 2);
+                    const secondPart = url.substring(url.length / 2);
+                    ctx.fillText(firstPart, paddedCanvas.width / 2, urlBoxY + 18);
+                    ctx.fillText(secondPart, paddedCanvas.width / 2, urlBoxY + 38);
+                }
+                
+                // Add nickname as a subtitle if available
+                if (nickname) {
+                    ctx.font = 'italic 14px Arial';
+                    ctx.fillStyle = '#333333';
+                    ctx.fillText(`"${nickname}"`, paddedCanvas.width / 2, headerHeight - 10);
                 }
                 
                 // Create download link
@@ -1680,7 +1735,8 @@
                 
                 // Log QR code save
                 logger.log("QR code saved", { 
-                    url: url
+                    url: url,
+                    nickname: nickname || null
                 });
             } catch (e) {
                 logger.error("Error saving QR code:", e);
@@ -2207,7 +2263,7 @@
                     const protocol = entry.originalUrl.split('://')[0] || '';
                     const displayUrl = entry.nickname ? 
                         entry.nickname : 
-                        `${protocol}://${domain}`;
+                        entry.encodedUrl; // Show the full encoded URL
                     
                     return `
                         <div class="list-item ${entry.starred ? 'starred' : ''}">
