@@ -58,8 +58,8 @@ const toolRegistry = [
         icon: "share-alt",
         category: "url-tools",
         categoryName: "URL Tools", 
-        path: "/tools/dynamic-link-tracer.html",
-        canonicalUrl: "https://mydebugger.vercel.app/tools/dynamic-link-tracer.html",
+        path: "dynamic-link-tracer.html", // Fixed path
+        canonicalUrl: "https://mydebugger.vercel.app/dynamic-link-tracer.html",
         tags: ["firebase links", "appsflyer", "deep link tracking", "redirect chain", "marketing attribution"]
     }
 ];

@@ -1,0 +1,80 @@
+/* Dynamic Link Tracer Tool Styles */
+.redirect-chain {
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--light);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.redirect-step {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 15px;
+    padding: 15px;
+    background: white;
+    border-radius: 6px;
+    border: 1px solid #eee;
+}
+
+.step-number {
+    flex: 0 0 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary);
+    color: white;
+    border-radius: 50%;
+    margin-right: 15px;
+    font-weight: bold;
+}
+
+.step-details {
+    flex: 1;
+}
+
+.step-url {
+    font-family: monospace;
+    word-break: break-all;
+    margin-bottom: 8px;
+    padding: 8px;
+    background: var(--light);
+    border-radius: 4px;
+}
+
+.step-meta {
+    font-size: 0.9em;
+    color: var(--gray);
+}
+
+.link-summary {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.summary-item {
+    display: flex;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+.summary-label {
+    flex: 0 0 150px;
+    font-weight: 600;
+    color: var(--dark);
+}
+
+.summary-value {
+    flex: 1;
+    word-break: break-all;
+}
