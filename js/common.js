@@ -79,10 +79,46 @@ const logger = {
     }
 };
 
-// Get base path depending on current location (tools/ directory or root)
+// Get base path for all URLs
 function getBasePath() {
-    const path = window.location.pathname;
-    return path.includes('/tools/') ? '../' : '';
+    return ''; // Empty for root, adjust if needed
+}
+
+// Render header navigation
+function renderHeader() {
+    const headerContainer = document.getElementById('header-container');
+    if (!headerContainer) return;
+
+    const currentPage = window.location.pathname;
+    
+    const tools = [
+        { id: 'url-encoder', name: 'URL Encoder', path: 'index.html' },
+        { id: 'jwt-decoder', name: 'JWT Decoder', path: 'tools/jwt-decoder.html' },
+        { id: 'dynamic-link-tracer', name: 'Dynamic Link Tracer', path: 'tools/dynamic-link-tracer.html' },
+        // Add more tools here as they are created
+    ];
+
+    headerContainer.innerHTML = `
+        <header>
+            <div class="container">
+                <div class="logo">
+                    <a href="${getBasePath()}index.html">MyDebugger</a>
+                </div>
+                <nav>
+                    <ul>
+                        ${tools.map(tool => `
+                            <li>
+                                <a href="${getBasePath()}${tool.path}" 
+                                   class="${currentPage.includes(tool.path) ? 'active' : ''}">
+                                    ${tool.name}
+                                </a>
+                            </li>
+                        `).join('')}
+                    </ul>
+                </nav>
+            </div>
+        </header>
+    `;
 }
 
 // Show status message popup
@@ -144,25 +180,7 @@ function logVisitorInfo() {
 
 // Initialize common components
 document.addEventListener('DOMContentLoaded', function() {
-    // Inject header
-    const headerContainer = document.getElementById('header-container');
-    if (headerContainer) {
-        headerContainer.innerHTML = `
-            <header>
-                <div class="container">
-                    <div class="logo">
-                        <a href="${getBasePath()}index.html">MyDebugger</a>
-                    </div>
-                    <nav>
-                        <ul>
-                            <li><a href="${getBasePath()}index.html">Home</a></li>
-                            <li><a href="${getBasePath()}index.html#tools">Tools</a></li>
-                        </ul>
-                    </nav>
-                </div>
-            </header>
-        `;
-    }
+    renderHeader();
     
     // Inject footer
     const footerContainer = document.getElementById('footer-container');

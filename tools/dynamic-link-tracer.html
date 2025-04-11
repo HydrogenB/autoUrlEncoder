@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Link Tracer - MyDebugger</title>
+    <link rel="stylesheet" href="../css/common.css">
+    <link rel="stylesheet" href="../css/tools/dynamic-link-tracer.css">
+    <script src="https://kit.fontawesome.com/your-font-awesome-kit.js"></script>
+</head>
+<body>
+    <div id="header-container"></div>
+
+    <div class="container">
+        <h1>Dynamic Link Tracer</h1>
+        
+        <div class="tool-section">
+            <div class="input-group">
+                <input type="text" id="linkInput" class="form-control" 
+                       placeholder="Enter Firebase Dynamic Link or AppsFlyer OneLink URL">
+                <button id="traceBtn" class="btn btn-primary">
+                    <i class="fas fa-project-diagram"></i> Trace Link
+                </button>
+            </div>
+
+            <div class="result-container" id="resultContainer" style="display:none;">
+                <h3>Redirect Chain</h3>
+                <div id="redirectChain" class="redirect-chain"></div>
+                
+                <div class="summary-container">
+                    <h3>Summary</h3>
+                    <div id="linkSummary" class="link-summary"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="footer-container"></div>
+
+    <script src="../js/common.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/tools/dynamic-link-tracer.js"></script>
+</body>
+</html>

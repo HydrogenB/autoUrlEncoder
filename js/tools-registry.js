@@ -7,48 +7,61 @@
 const toolRegistry = [
     {
         id: "url-encoder",
-        name: "URL Parameter Encoder",
-        description: "Encode URL parameters and generate QR codes for deeplinks and marketing campaigns",
+        name: "URL Parameter Encoder | MyDebugger",
+        description: "Professional URL parameter encoder for deep links and marketing campaigns. Safely encode parameters, generate QR codes, and track marketing URLs. Free online tool for developers and marketers.",
         icon: "link",
-        category: "url-tools",
+        category: "url-tools", 
         categoryName: "URL Tools",
-        path: "tools/url-encoder.html",
-        tags: ["url", "parameter", "encoding", "qr", "deeplink"]
+        path: "/tools/url-encoder.html",
+        canonicalUrl: "https://mydebugger.vercel.app/tools/url-encoder.html",
+        tags: ["url encoder", "parameter encoding", "url builder", "qr code generator", "deep linking", "utm parameters"]
     },
-    // Add more tools here as they are developed
     {
         id: "json-formatter",
-        name: "JSON Formatter",
-        description: "Format, validate and beautify JSON data with syntax highlighting",
+        name: "JSON Formatter & Validator | MyDebugger",
+        description: "Free online JSON formatter, validator and beautifier with syntax highlighting. Debug JSON data, fix formatting errors and make JSON readable. Perfect for API development.",
         icon: "code",
         category: "data-transformation",
-        categoryName: "Data Transformation",
-        path: "tools/json-formatter.html",
-        tags: ["json", "format", "validate", "beautify"],
+        categoryName: "Data Transformation", 
+        path: "/tools/json-formatter.html",
+        canonicalUrl: "https://mydebugger.vercel.app/tools/json-formatter.html",
+        tags: ["json formatter", "json validator", "beautifier", "syntax highlight", "api tools"],
         comingSoon: true
     },
     {
         id: "jwt-decoder",
-        name: "JWT Decoder & Validator",
-        description: "Decode, inspect and validate JSON Web Tokens (JWT) for authentication and security debugging",
+        name: "JWT Decoder & Validator | MyDebugger",
+        description: "Online JSON Web Token (JWT) decoder and validator. Inspect JWT claims, verify signatures and debug authentication tokens. Essential security tool for developers.",
         icon: "shield-alt",
         category: "security-tools",
         categoryName: "Security Tools",
-        path: "tools/jwt-decoder.html",
-        tags: ["jwt", "token", "authentication", "oidc", "security"]
+        path: "/tools/jwt-decoder.html", 
+        canonicalUrl: "https://mydebugger.vercel.app/tools/jwt-decoder.html",
+        tags: ["jwt decoder", "token validator", "authentication debugging", "oidc tokens", "security tools"]
     },
     {
         id: "base64-converter",
-        name: "Base64 Converter",
-        description: "Encode and decode Base64 strings with support for files and images",
-        icon: "exchange-alt",
+        name: "Base64 Converter | MyDebugger",
+        description: "Convert text, files and images to/from Base64 encoding. Bulk conversion support with preview. Perfect for data embedding and API testing.",
+        icon: "exchange-alt", 
         category: "data-transformation",
         categoryName: "Data Transformation",
-        path: "tools/base64-converter.html",
-        tags: ["base64", "encode", "decode"],
+        path: "/tools/base64-converter.html",
+        canonicalUrl: "https://mydebugger.vercel.app/tools/base64-converter.html", 
+        tags: ["base64 encoder", "base64 decoder", "file converter", "image to base64", "data conversion"],
         comingSoon: true
     },
-    
+    {
+        id: "dynamic-link-tracer",
+        name: "Dynamic Link Tracer | MyDebugger",
+        description: "Track and analyze Firebase Dynamic Links and AppsFlyer OneLinks redirect chains. Debug mobile deep links and marketing attribution URLs. Essential for app marketers.",
+        icon: "share-alt",
+        category: "url-tools",
+        categoryName: "URL Tools", 
+        path: "/tools/dynamic-link-tracer.html",
+        canonicalUrl: "https://mydebugger.vercel.app/tools/dynamic-link-tracer.html",
+        tags: ["firebase links", "appsflyer", "deep link tracking", "redirect chain", "marketing attribution"]
+    }
 ];
 
 // Function to get tool by ID
@@ -166,6 +179,19 @@ function renderTools(containerId = 'tools-container', filterCategory = null, sea
         section.appendChild(grid);
         container.appendChild(section);
     });
+    
+    // Add SEO metadata when rendering tools
+    if (document.querySelector('meta[name="description"]')) {
+        const metaDesc = `Free online developer tools for URL encoding, JSON formatting, JWT debugging and more. ${
+            filterCategory ? `${categories[filterCategory]?.name} tools available.` : 'All tools available.'
+        }`;
+        document.querySelector('meta[name="description"]').setAttribute('content', metaDesc);
+    }
+    
+    if (document.querySelector('link[rel="canonical"]')) {
+        const canonicalUrl = `https://mydebugger.vercel.app${searchQuery ? '/search' : ''}${filterCategory ? '/category/' + filterCategory : ''}`;
+        document.querySelector('link[rel="canonical"]').setAttribute('href', canonicalUrl);
+    }
     
     // Log that tools were rendered
     if (window.myDebugger && window.myDebugger.logger) {
