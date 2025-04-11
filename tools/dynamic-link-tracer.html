@@ -6,134 +6,211 @@
     <title>Dynamic Link Tracer | MyDebugger</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Track and analyze Firebase Dynamic Links and AppsFlyer OneLinks redirect chains. Debug mobile deep links and marketing attribution URLs.">
-    <meta name="keywords" content="firebase dynamic links, appsflyer onelink, deep link tracker, redirect chain analyzer">
+    <meta name="description" content="Track and analyze Firebase Dynamic Links, AppsFlyer OneLinks, and other mobile attribution URLs. Debug redirect chains and marketing links.">
+    <meta name="keywords" content="firebase dynamic links, appsflyer onelink, deep link tracker, redirect analyzer, mobile attribution">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
     
-    <!-- Stylesheets -->
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://mydebugger.vercel.app/tools/dynamic-link-tracer.html">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mydebugger.vercel.app/tools/dynamic-link-tracer.html">
+    <meta property="og:title" content="Dynamic Link Tracer | MyDebugger">
+    <meta property="og:description" content="Track redirect chains in Firebase Dynamic Links, AppsFlyer OneLinks, and other attribution URLs.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="../assets/favicon.png">
+    
+    <!-- External Scripts and Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="../css/tools/dynamic-link-tracer.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
+    <!-- Header will be injected by common.js -->
     <div id="header-container"></div>
-
+    
+    <!-- Breadcrumbs for SEO -->
     <div class="container">
-        <nav aria-label="breadcrumb" class="breadcrumbs">
-            <div class="breadcrumb-item"><a href="../index.html">Home</a></div>
-            <div class="breadcrumb-separator">/</div>
-            <div class="breadcrumb-item"><a href="../index.html#tools">Tools</a></div>
-            <div class="breadcrumb-separator">/</div>
-            <div class="breadcrumb-item">Dynamic Link Tracer</div>
-        </nav>
+        <div class="two-column-span">
+            <nav aria-label="breadcrumb" class="breadcrumbs">
+                <div class="breadcrumb-item"><a href="../index.html">Home</a></div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item"><a href="../index.html#tools">Tools</a></div>
+                <div class="breadcrumb-separator">/</div>
+                <div class="breadcrumb-item">Dynamic Link Tracer</div>
+            </nav>
+        </div>
+    </div>
 
-        <div class="intro-section">
-            <div class="intro-collapse-toggle">
-                <h1 class="intro-title">Dynamic Link Tracer Tool</h1>
-                <i class="fas fa-chevron-down"></i>
-            </div>
-            <div class="intro-content">
-                <p class="intro-text">Track and analyze Firebase Dynamic Links, AppsFlyer OneLinks, and other marketing attribution URLs. Visualize redirect chains, detect loops, and debug mobile deep links. Essential for app marketers and developers working with attribution platforms.</p>
+    <!-- Tool Introduction -->
+    <div class="container">
+        <div class="two-column-span">
+            <section class="intro-section">
+                <div class="intro-collapse-toggle">
+                    <h1 class="intro-title">Dynamic Link Tracer Tool</h1>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="intro-content">
+                    <p class="intro-text">This professional-grade dynamic link tracer helps you analyze and debug Firebase Dynamic Links, AppsFlyer OneLinks, and other marketing attribution URLs. Visualize redirect chains, detect redirect loops, and troubleshoot deep linking issues. Perfect for app developers, marketers, and anyone working with mobile attribution links.</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- Main Application -->
+    <div class="container tool-container">
+        <!-- Main Tool Panel -->
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title"><i class="fas fa-project-diagram"></i> Trace Link Redirects</h2>
+                </div>
+                <div class="card-body">
+                    <div class="input-group">
+                        <label for="linkInput">Enter Dynamic Link URL:</label>
+                        <div class="input-wrapper">
+                            <input type="text" id="linkInput" class="form-control" 
+                               placeholder="Enter Firebase Dynamic Link, AppsFlyer OneLink, or any redirect URL">
+                            <button id="traceBtn" class="btn btn-primary">
+                                <i class="fas fa-project-diagram"></i> Trace Link
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="advanced-options">
+                        <label id="advanced-options-toggle" class="collapsible">
+                            <i class="fas fa-cog"></i> Advanced Options
+                        </label>
+                        <div class="options-content">
+                            <div class="option-group">
+                                <label for="userAgent">User Agent:</label>
+                                <select id="userAgent" class="form-control">
+                                    <option value="default">Default (MyDebugger Redirect Checker)</option>
+                                    <option value="browser">Current Browser User Agent</option>
+                                    <option value="iphone">iPhone Safari</option>
+                                    <option value="android">Android Chrome</option>
+                                    <option value="custom">Custom User Agent</option>
+                                </select>
+                                <input type="text" id="customUserAgent" class="form-control" placeholder="Enter custom user agent" style="display:none; margin-top: 8px;">
+                            </div>
+                            <div class="option-group">
+                                <label for="maxRedirects">Max Redirects:</label>
+                                <input type="number" id="maxRedirects" class="form-control" value="15" min="1" max="30">
+                            </div>
+                            <div class="option-group">
+                                <label>Trace Options:</label>
+                                <div class="option-check">
+                                    <input type="checkbox" id="followJsRedirects" checked>
+                                    <label for="followJsRedirects">Follow JavaScript Redirects</label>
+                                </div>
+                                <div class="option-check">
+                                    <input type="checkbox" id="detectLoops" checked>
+                                    <label for="detectLoops">Detect Redirect Loops</label>
+                                </div>
+                                <div class="option-check">
+                                    <input type="checkbox" id="traceMode" checked>
+                                    <label for="traceMode">Use CORS Proxy (uncheck for simulation mode)</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="resultContainer" class="result-container" style="display:none;">
+                        <div class="trace-date">Date Traced: <span id="traceDate"></span></div>
+                        <div class="trace-agent">User Agent: <span id="traceAgent"></span></div>
+                        
+                        <div class="trace-summary">
+                            <h3>Summary</h3>
+                            <div id="linkSummary" class="link-summary"></div>
+                        </div>
+
+                        <div class="trace-details">
+                            <h3>Redirect Chain</h3>
+                            <div class="redirect-header">
+                                <div class="cell num">#</div>
+                                <div class="cell status">Code</div>
+                                <div class="cell url">Requested URL</div>
+                            </div>
+                            <div id="redirectChain" class="redirect-chain"></div>
+                        </div>
+                        
+                        <div class="disclaimer">
+                            <p><em>NOTE: Results may vary depending on user-agent, IP location, and server configurations. Some servers may block automated redirect checks.</em></p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         
-        <div class="card">
-            <div class="card-header">
-                <h2 class="card-title"><i class="fas fa-project-diagram"></i> Trace Link Redirects</h2>
-            </div>
-            <div class="card-body">
-                <div class="input-group">
-                    <label for="linkInput">Enter Dynamic Link URL:</label>
-                    <div class="input-wrapper">
-                        <input type="text" id="linkInput" class="form-control" 
-                           placeholder="Enter Firebase Dynamic Link, AppsFlyer OneLink, or any redirect URL"
-                           // ...rest of attributes...
-                        >
-                        <button id="traceBtn" class="btn btn-primary">
-                            <i class="fas fa-project-diagram"></i> Trace Link
-                        </button>
-                    </div>
+        <!-- History Panel -->
+        <div>
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i> Recent Traces
+                        <span id="traceCount" class="badge badge-success">0</span>
+                    </h2>
                 </div>
-
-                <div class="advanced-options">
-                    <label id="advanced-options-toggle" class="collapsible">
-                        <i class="fas fa-cog"></i> Advanced Options
-                    </label>
-                    <div class="options-content">
-                        <div class="option-group">
-                            <label for="userAgent">User Agent:</label>
-                            <select id="userAgent" class="form-control">
-                                <option value="default">Default (MyDebugger Redirect Checker)</option>
-                                <option value="browser">Current Browser User Agent</option>
-                                <option value="iphone">iPhone Safari</option>
-                                <option value="android">Android Chrome</option>
-                            </select>
-                        </div>
-                        <div class="option-group">
-                            <label for="maxRedirects">Max Redirects:</label>
-                            <input type="number" id="maxRedirects" class="form-control" value="15" min="1" max="30">
-                        </div>
-                        <div class="option-check">
-                            <input type="checkbox" id="followJsRedirects" checked>
-                            <label for="followJsRedirects">Follow JavaScript Redirects</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="resultContainer" class="result-container" style="display:none;">
-                    <div class="trace-date">Date Traced: <span id="traceDate"></span></div>
-                    <div class="trace-agent">User Agent: <span id="traceAgent"></span></div>
-                    
-                    <div class="trace-summary">
-                        <h3>Summary</h3>
-                        <div id="linkSummary" class="link-summary"></div>
-                    </div>
-
-                    <div class="trace-details">
-                        <h3>Redirect Chain</h3>
-                        <div class="redirect-header">
-                            <div class="cell num">#</div>
-                            <div class="cell status">Code</div>
-                            <div class="cell url">Requested URL</div>
-                        </div>
-                        <div id="redirectChain" class="redirect-chain"></div>
+                <div class="card-body">
+                    <div class="search-container">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" class="search-input" placeholder="Search traces...">
+                        <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
                     </div>
                     
-                    <div class="disclaimer">
-                        <p><em>NOTE: Results may vary depending on user-agent, IP location, and server configurations. Some servers may block automated redirect checks.</em></p>
+                    <div id="tracesList" class="links-list">
+                        <!-- Traces will be inserted here -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
+    
+    <!-- Status message container -->
+    <div id="statusMessage" class="status-message"></div>
+    
+    <!-- Footer will be injected by common.js -->
     <div id="footer-container"></div>
-
+    
+    <!-- Common Scripts -->
     <script src="../js/common.js"></script>
     <script src="../js/storage.js"></script>
+    <script src="../js/tools-registry.js"></script>
+    
+    <!-- Tool-specific Script -->
     <script src="../js/tools/dynamic-link-tracer.js"></script>
-
+    
+    <!-- Initialize intro section toggle -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize collapsible elements
-            const introToggle = document.querySelector('.intro-collapse-toggle');
+            // Introduction collapsible toggle
+            const introCollapseToggle = document.querySelector('.intro-collapse-toggle');
             const introContent = document.querySelector('.intro-content');
             
-            if (introToggle && introContent) {
-                introToggle.addEventListener('click', () => {
-                    introToggle.querySelector('i').classList.toggle('fa-chevron-up');
-                    introToggle.querySelector('i').classList.toggle('fa-chevron-down');
+            if (introCollapseToggle && introContent) {
+                introCollapseToggle.addEventListener('click', () => {
+                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
+                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
                     introContent.classList.toggle('expanded');
                 });
             }
             
-            // Advanced options toggle
-            const advancedToggle = document.getElementById('advanced-options-toggle');
-            const optionsContent = document.querySelector('.options-content');
+            // Custom user agent toggle
+            const userAgentSelect = document.getElementById('userAgent');
+            const customUserAgent = document.getElementById('customUserAgent');
             
-            if (advancedToggle && optionsContent) {
-                advancedToggle.addEventListener('click', () => {
-                    optionsContent.classList.toggle('expanded');
-                    advancedToggle.classList.toggle('active');
+            if (userAgentSelect && customUserAgent) {
+                userAgentSelect.addEventListener('change', () => {
+                    if (userAgentSelect.value === 'custom') {
+                        customUserAgent.style.display = 'block';
+                    } else {
+                        customUserAgent.style.display = 'none';
+                    }
                 });
             }
         });
