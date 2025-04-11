@@ -16,6 +16,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const redirectChain = document.getElementById('redirectChain');
     const linkSummary = document.getElementById('linkSummary');
 
+    // Available CORS proxies (for redundancy)
+    const CORS_PROXIES = [
+        'https://api.allorigins.win/get?url=',
+        'https://cors-anywhere.herokuapp.com/',
+        'https://cors-proxy.htmldriven.com/?url=',
+        'https://api.codetabs.com/v1/proxy/?quest='
+    ];
+
     // Initialize browser user agent option
     if (userAgentSelect) {
         const browserOption = userAgentSelect.querySelector('option[value="browser"]');
@@ -56,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Log the trace
             window.myDebugger.logger.log("Link traced", { 
                 url, 
-                redirectCount: result.redirects.length,
+                redirectCount: result.redirects.length - 1,
                 linkType: result.linkType
             });
             
@@ -99,164 +107,159 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Trace redirects using a proxy service
-    async function traceRedirects(url, options) {
-        // In a real implementation, this would call your backend
-        // For now, we'll simulate with a mock response based on typical redirect patterns
+    // Get a working CORS proxy
+    async function getWorkingCorsProxy() {
+        // Default to first proxy
+        let workingProxy = CORS_PROXIES[0];
         
-        // For demo purposes, simulate API call with different responses based on URL patterns
-        if (url.includes('firebase') || url.includes('app.goo.gl')) {
-            return simulateFirebaseLink(url, options);
-        } else if (url.includes('onelink') || url.includes('appsflyer')) {
-            return simulateAppsFlyerLink(url, options);
-        } else {
-            return simulateGenericLink(url, options);
+        // Try a simple test with each proxy
+        for (const proxy of CORS_PROXIES) {
+            try {
+                const testUrl = 'https://httpbin.org/get';
+                const response = await fetch(`${proxy}${encodeURIComponent(testUrl)}`);
+                if (response.ok) {
+                    workingProxy = proxy;
+                    break;
+                }
+            } catch (e) {
+                console.log(`Proxy ${proxy} failed test: ${e.message}`);
+            }
+        }
+        
+        return workingProxy;
+    }
+
+    // Trace redirects using CORS proxy and fetch
+    async function traceRedirects(initialUrl, options) {
+        try {
+            const corsProxy = await getWorkingCorsProxy();
+            // First try with CORS proxy
+            return await traceWithCorsProxy(initialUrl, options, corsProxy);
+        } catch (corsError) {
+            window.myDebugger.logger.error("CORS proxy failed:", corsError);
+            window.myDebugger.showStatusMessage('Switching to alternative tracing method...', false);
+            
+            // Fall back to API service if CORS proxy fails
+            try {
+                return await traceWithApi(initialUrl, options);
+            } catch (apiError) {
+                window.myDebugger.logger.error("API fallback failed:", apiError);
+                throw new Error('Both tracing methods failed. Please try again later.');
+            }
         }
     }
 
-    // Simulate a Firebase Dynamic Link trace
-    function simulateFirebaseLink(url, options) {
-        const startTime = Date.now();
-        const redirects = [
-            {
-                url: url,
-                status: 302,
-                time: 150,
-                cookies: true
-            },
-            {
-                url: `https://app.goo.gl/${randomString(6)}`,
-                status: 302,
-                time: 120,
-                cookies: false
-            },
-            {
-                url: `https://firebasedynamiclinks-ipv4.googleapis.com/v1/link?deep_link_id=${randomString(10)}`,
-                status: 200,
-                time: 180,
-                cookies: true
-            },
-            {
-                url: `https://app.example.com/open?link=${randomString(12)}&utm_source=firebase&utm_medium=dynamic_link`,
-                status: 301,
-                time: 110,
-                cookies: true
-            },
-            {
-                url: `https://app.example.com/product/${randomString(8)}?ref=firebase`,
-                status: 200,
-                time: 200,
-                cookies: true
-            }
-        ];
-
-        return {
-            redirects,
-            finalUrl: redirects[redirects.length - 1].url,
-            totalTime: redirects.reduce((sum, r) => sum + r.time, 0),
-            totalRedirects: redirects.length - 1,
-            linkType: 'firebase',
-            traceDate: new Date().toISOString(),
-            userAgent: options.userAgent
-        };
-    }
-
-    // Simulate an AppsFlyer OneLink trace
-    function simulateAppsFlyerLink(url, options) {
-        const redirects = [
-            {
-                url: url,
-                status: 302,
-                time: 130,
-                cookies: true
-            },
-            {
-                url: `https://impression.appsflyer.com/${randomString(10)}`,
-                status: 302,
-                time: 140,
-                cookies: true
-            },
-            {
-                url: `https://app.appsflyer.com/${randomString(8)}?af_id=${randomString(12)}`,
-                status: 200,
-                time: 190,
-                cookies: true
-            },
-            {
-                url: `https://example.page.link/${randomString(7)}`,
-                status: 302,
-                time: 100,
-                cookies: false
-            },
-            {
-                url: `https://app.example.com/landing?utm_source=appsflyer&utm_campaign=${randomString(8)}`,
-                status: 200,
-                time: 180,
-                cookies: true
-            }
-        ];
-
-        return {
-            redirects,
-            finalUrl: redirects[redirects.length - 1].url,
-            totalTime: redirects.reduce((sum, r) => sum + r.time, 0),
-            totalRedirects: redirects.length - 1,
-            linkType: 'appsflyer',
-            traceDate: new Date().toISOString(),
-            userAgent: options.userAgent
-        };
-    }
-
-    // Simulate a generic link trace
-    function simulateGenericLink(url, options) {
-        // Create a random number of redirects (1-4)
-        const numRedirects = Math.floor(Math.random() * 4) + 1;
-        let redirects = [{
-            url: url,
-            status: 301,
-            time: 100 + Math.floor(Math.random() * 100),
-            cookies: Math.random() > 0.5
-        }];
-
-        // Generate random redirects
-        for (let i = 0; i < numRedirects; i++) {
-            const domain = `example${i}.com`;
-            const status = [301, 302, 303, 307][Math.floor(Math.random() * 4)];
-            redirects.push({
-                url: `https://${domain}/redirect?to=${randomString(8)}`,
-                status,
-                time: 100 + Math.floor(Math.random() * 150),
-                cookies: Math.random() > 0.5
+    // Helper function to try CORS proxy approach
+    async function traceWithCorsProxy(url, options, corsProxy) {
+        const redirects = [];
+        let currentUrl = url;
+        
+        while (true) {
+            const proxyUrl = `${corsProxy}${encodeURIComponent(currentUrl)}`;
+            const response = await fetch(proxyUrl, {
+                method: 'HEAD',
+                redirect: 'manual'
             });
+
+            redirects.push({
+                url: currentUrl,
+                statusCode: response.status,
+                headers: Object.fromEntries(response.headers)
+            });
+
+            if (response.status >= 300 && response.status < 400) {
+                const location = response.headers.get('location');
+                if (!location) break;
+                currentUrl = new URL(location, currentUrl).href;
+            } else {
+                break;
+            }
+
+            if (redirects.length >= options.maxRedirects) {
+                throw new Error(`Maximum number of redirects (${options.maxRedirects}) exceeded`);
+            }
         }
 
-        // Add final destination
-        redirects.push({
-            url: `https://final-destination.com/${randomString(10)}?ref=redirect`,
-            status: 200,
-            time: 150 + Math.floor(Math.random() * 100),
-            cookies: Math.random() > 0.5
+        return redirects;
+    }
+
+    // Helper function to use API fallback
+    async function traceWithApi(url, options) {
+        const response = await fetch('/api/trace-redirects', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                url: url,
+                maxRedirects: options.maxRedirects
+            })
         });
 
-        return {
-            redirects,
-            finalUrl: redirects[redirects.length - 1].url,
-            totalTime: redirects.reduce((sum, r) => sum + r.time, 0),
-            totalRedirects: redirects.length - 1,
-            linkType: 'unknown',
-            traceDate: new Date().toISOString(),
-            userAgent: options.userAgent
-        };
+        if (!response.ok) {
+            throw new Error(`API error: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json();
     }
 
-    // Helper to generate random strings
-    function randomString(length) {
-        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-        let result = '';
-        for (let i = 0; i < length; i++) {
-            result += chars.charAt(Math.floor(Math.random() * chars.length));
+    // Extract JavaScript redirects from HTML content
+    function extractJsRedirect(html, baseUrl) {
+        // Common redirect patterns
+        const patterns = [
+            // window.location redirect patterns
+            /window\.location(?:\.href)?\s*=\s*['"]([^'"]+)['"]/i,
+            /window\.location\.replace\(['"]([^'"]+)['"]\)/i,
+            /window\.location\.assign\(['"]([^'"]+)['"]\)/i,
+            
+            // Meta refresh patterns
+            /<meta\s+http-equiv=['"]refresh['"]\s+content=['"]\d+;\s*url=([^'"]+)['"]/i,
+            
+            // JavaScript frameworks patterns
+            /location\.replace\(['"]([^'"]+)['"]\)/i,
+            /location\.href\s*=\s*['"]([^'"]+)['"]/i,
+            
+            // Special redirect patterns for common services
+            /top\.location\.href\s*=\s*['"]([^'"]+)['"]/i,
+            /parent\.location\.href\s*=\s*['"]([^'"]+)['"]/i
+        ];
+        
+        for (const pattern of patterns) {
+            const match = html.match(pattern);
+            if (match && match[1]) {
+                try {
+                    // Resolve relative URLs against base URL
+                    return new URL(match[1], baseUrl).href;
+                } catch (e) {
+                    console.error('Error resolving redirect URL:', e);
+                }
+            }
         }
-        return result;
+        
+        return null;
+    }
+    
+    // Detect link type based on URLs in the redirect chain
+    function detectLinkType(redirects) {
+        const urls = redirects.map(r => r.url.toLowerCase());
+        
+        if (urls.some(url => url.includes('firebase') || url.includes('app.goo.gl'))) {
+            return 'firebase';
+        }
+        
+        if (urls.some(url => url.includes('onelink') || url.includes('appsflyer'))) {
+            return 'appsflyer';
+        }
+        
+        if (urls.some(url => url.includes('branch.io') || url.includes('bnc.lt'))) {
+            return 'branch';
+        }
+        
+        if (urls.some(url => url.includes('adj.st') || url.includes('adjust'))) {
+            return 'adjust';
+        }
+        
+        return 'unknown';
     }
 
     // Display trace results
@@ -301,6 +304,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${linkTypeLabel}
                 </div>
             </div>
+            ${result.loopDetected ? `
+            <div class="summary-item">
+                <div class="summary-label">Status:</div>
+                <div class="summary-value warning">
+                    <i class="fas fa-exclamation-triangle"></i> Redirect loop detected
+                </div>
+            </div>` : ''}
         `;
     }
 
@@ -313,6 +323,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return '<span class="link-type appsflyer">AppsFlyer</span>';
             case 'branch':
                 return '<span class="link-type branch">Branch</span>';
+            case 'adjust':
+                return '<span class="link-type adjust">Adjust</span>';
             default:
                 return '<span class="link-type unknown">Generic</span>';
         }
@@ -331,9 +343,9 @@ document.addEventListener('DOMContentLoaded', function() {
             redirectStep.className = 'redirect-step';
             
             redirectStep.innerHTML = `
-                <div class="cell num">${index + 1}</div>
+                <div class="cell num">${index}</div>
                 <div class="cell status">
-                    <span class="${statusClass}">${redirect.status || 'JS'}</span>
+                    <span class="${statusClass}">${redirect.status || '—'}</span>
                 </div>
                 <div class="cell url">
                     <div class="url-content">
@@ -443,6 +455,12 @@ document.addEventListener('DOMContentLoaded', function() {
             .replace(/'/g, "&#039;");
     }
 
+    // Get base path based on current location
+    function getBasePath() {
+        const path = window.location.pathname;
+        return path.includes('/tools/') ? '../' : '';
+    }
+
     // Initialize tool
     function init() {
         // Add Enter key support for the input field
@@ -452,10 +470,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // Set example URL in the input for demonstration
+        if (!linkInput.value) {
+            linkInput.value = 'https://example.page.link/demo';
+        }
+        
         // Record tool usage analytics
         if (window.toolAnalytics) {
             window.toolAnalytics.recordToolUsage('dynamic-link-tracer', 'view');
         }
+        
+        // Add current page highlight in navigation
+        highlightCurrentPage();
+    }
+
+    // Add this function to highlight the current page in navigation
+    function highlightCurrentPage() {
+        const path = window.location.pathname;
+        const navLinks = document.querySelectorAll('header nav a');
+        
+        navLinks.forEach(link => {
+            if (path.includes(link.getAttribute('href'))) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
     }
 
     // Call init function
