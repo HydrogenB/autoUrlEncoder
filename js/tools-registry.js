@@ -254,7 +254,17 @@ document.addEventListener("DOMContentLoaded", function () {
   // Render tools if container exists
   const toolsContainer = document.getElementById("tools-container");
   if (toolsContainer) {
-    renderTools("tools-container");
+    // Check if we're on the landing page
+    const isLandingPage = window.location.pathname.includes('landing.html') || 
+                         window.location.pathname.endsWith('/home');
+    
+    // If on landing page, always render all tools
+    if (isLandingPage) {
+      renderTools("tools-container");
+    } else {
+      // On other pages, only render if explicitly requested
+      renderTools("tools-container");
+    }
   }
 
   // Set up category filter if it exists
