@@ -107,6 +107,12 @@ function renderHeader() {
                 </div>
                 <nav>
                     <ul>
+                        <li>
+                            <a href="${getBasePath()}landing.html" 
+                               class="${currentPage.includes('landing.html') ? 'active' : ''}">
+                                Home
+                            </a>
+                        </li>
                         ${tools.map(tool => `
                             <li>
                                 <a href="${getBasePath()}${tool.path}" 
@@ -201,11 +207,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         <div class="footer-section">
                             <h3>Quick Links</h3>
                             <ul>
-                                <li><a href="${getBasePath()}index.html">Home</a></li>
-                                <li><a href="${getBasePath()}index.html#tools">Tools</a></li>
-                                <li><a href="${getBasePath()}tools/url-encoder.html">URL Encoder</a></li>
+                                <li><a href="${getBasePath()}landing.html">Tools Home</a></li>
+                                <li><a href="${getBasePath()}index.html">URL Encoder</a></li>
                                 <li><a href="${getBasePath()}tools/jwt-decoder.html">JWT Decoder</a></li>
                                 <li><a href="${getBasePath()}tools/dynamic-link-tracer.html">Dynamic Link Tracer</a></li>
+                                <li><a href="${getBasePath()}tools/base64-tool.html">Base64 Tool</a></li>
                             </ul>
                         </div>
                     </div>
