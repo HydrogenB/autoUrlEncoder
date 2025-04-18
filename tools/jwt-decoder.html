@@ -3,226 +3,1377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JWT Decoder | MyDebugger</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <!-- Import common styles from index.html -->
+    <title>JWT Decoder & URL Encoder Tool</title>
     <style>
-        /* Copy relevant styles from index.html */
+        /* CSS variables for theming */
         :root {
-            --primary: #4361ee;
-            --secondary: #3f37c9;
-            --success: #4cc9f0;
-            --danger: #f72585;
-            --warning: #f8961e;
-            --info: #4895ef;
-            --light: #f5f7fa;
-            --dark: #212529;
-            --gray: #adb5bd;
-            --white: #ffffff;
-            --border-radius: 12px;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            --transition: all 0.3s ease;
+            --primary-color: #4a6ee0;
+            --primary-hover: #3a5ec4;
+            --success-color: #48bb78;
+            --warning-color: #ecc94b;
+            --danger-color: #e53e3e;
+            --bg-color: #ffffff;
+            --text-color: #333333;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --input-bg: #f7fafc;
+            --json-key: #8b008b;
+            --json-string: #008000;
+            --json-number: #0000ff;
+            --json-boolean: #b22222;
+            --json-null: #808080;
         }
 
-        /* ...copy other base styles from index.html... */
+        /* Dark mode variables */
+        [data-theme="dark"] {
+            --primary-color: #5a7ae0;
+            --primary-hover: #4a6ac4;
+            --bg-color: #1a202c;
+            --text-color: #e2e8f0;
+            --card-bg: #2d3748;
+            --border-color: #4a5568;
+            --input-bg: #2d3748;
+            --json-key: #ff79c6;
+            --json-string: #50fa7b;
+            --json-number: #bd93f9;
+            --json-boolean: #ffb86c;
+            --json-null: #6272a4;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .tool-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .tab-button {
+            background-color: transparent;
+            border: none;
+            color: var(--text-color);
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .tab-button:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tool-section {
+            display: none;
+        }
+
+        .tool-section.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 15px 20px;
+            background: linear-gradient(to right, var(--primary-color), #7a98e9);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .validation-bar {
+            height: 5px;
+            transition: background-color 0.3s;
+            width: 100%;
+        }
+
+        .validation-bar.valid {
+            background-color: var(--success-color);
+        }
+
+        .validation-bar.invalid {
+            background-color: var(--danger-color);
+        }
+
+        .validation-bar.warning {
+            background-color: var(--warning-color);
+        }
+
+        .status-message {
+            font-size: 14px;
+            margin: 5px 0 15px;
+            padding: 5px 10px;
+            border-radius: 4px;
+        }
+
+        .status-message.success {
+            background-color: rgba(72, 187, 120, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-message.error {
+            background-color: rgba(229, 62, 62, 0.1);
+            color: var(--danger-color);
+        }
+
+        .status-message.warning {
+            background-color: rgba(236, 201, 75, 0.1);
+            color: var(--warning-color);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            font-family: monospace;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .collapsible {
+            margin-bottom: 15px;
+        }
+
+        .collapsible-header {
+            background-color: rgba(0,0,0,0.05);
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0;
+            font-weight: 600;
+        }
+
+        .collapsible-content {
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            max-height: 0;
+        }
+
+        .collapsible.open .collapsible-content {
+            max-height: 1000px;
+            border: 1px solid var(--border-color);
+            border-top: none;
+            border-radius: 0 0 4px 4px;
+        }
+
+        pre {
+            margin: 0;
+            padding: 15px;
+            overflow-x: auto;
+            background-color: var(--input-bg);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+
+        .json-key {
+            color: var(--json-key);
+        }
+
+        .json-string {
+            color: var(--json-string);
+        }
+
+        .json-number {
+            color: var(--json-number);
+        }
+
+        .json-boolean {
+            color: var(--json-boolean);
+        }
+
+        .json-null {
+            color: var(--json-null);
+        }
+
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-small {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .signature-section {
+            margin: 15px 0;
+            padding: 15px;
+            background-color: rgba(0,0,0,0.02);
+            border-radius: 4px;
+        }
+
+        .signature-info {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .signature-param {
+            background-color: var(--input-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge.valid {
+            background-color: var(--success-color);
+            color: white;
+        }
+
+        .badge.invalid {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .badge.skipped {
+            background-color: var(--warning-color);
+            color: white;
+        }
+
+        .claim-alert {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .claim-alert.success {
+            background-color: rgba(72, 187, 120, 0.1);
+            border-left: 3px solid var(--success-color);
+        }
+
+        .claim-alert.warning {
+            background-color: rgba(236, 201, 75, 0.1);
+            border-left: 3px solid var(--warning-color);
+        }
+
+        .claim-alert.danger {
+            background-color: rgba(229, 62, 62, 0.1);
+            border-left: 3px solid var(--danger-color);
+        }
+
+        .flex {
+            display: flex;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        .sidebar {
+            width: 300px;
+            margin-left: 20px;
+        }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border-color);
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .history-item:hover {
+            background-color: rgba(0,0,0,0.02);
+        }
+
+        .history-item-content {
+            flex: 1;
+        }
+
+        .history-item-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .history-item-date {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .star-btn {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 18px;
+            margin-right: 10px;
+        }
+
+        .star-btn.starred {
+            color: gold;
+        }
+
+        .search-box {
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .security-banner {
+            background-color: rgba(72, 187, 120, 0.1);
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .security-icon {
+            font-size: 20px;
+            color: var(--success-color);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 5px;
+            margin-left: auto;
+        }
+
+        footer {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 14px;
+            color: #666;
+            padding: 20px 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        @media (max-width: 768px) {
+            .flex {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                margin-left: 0;
+                margin-top: 20px;
+            }
+        }
     </style>
-    <link rel="icon" type="image/png" href="../assets/favicon.png">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.1/jsrsasign-all-min.js"></script>
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/tools/jwt-decoder.css">
 </head>
 <body>
-    <div id="header-container"></div>
-
     <div class="container">
-        <nav aria-label="breadcrumb" class="breadcrumbs">
-            <div class="breadcrumb-item"><a href="../index.html">Home</a></div>
-            <div class="breadcrumb-separator">/</div>
-            <div class="breadcrumb-item"><a href="../index.html#tools">Tools</a></div>
-            <div class="breadcrumb-separator">/</div>
-            <div class="breadcrumb-item">JWT Decoder</div>
+        <h1>JWT Decoder & URL Encoder Tool</h1>
+        
+        <div class="security-banner">
+            <span class="security-icon">🔒</span>
+            <span>100% browser-based processing. No data leaves your browser. Works offline too!</span>
+            <button id="themeToggle" class="theme-toggle">🌙</button>
+        </div>
+
+        <nav class="tool-tabs">
+            <button class="tab-button" data-tab="url">URL Encoder</button>
+            <button class="tab-button active" data-tab="jwt">JWT Decoder</button>
         </nav>
 
-        <div class="jwt-container">
-            <!-- JWT Intro Section -->
-            <div class="intro-section">
-                <div class="intro-collapse-toggle">
-                    <h1 class="intro-title">JWT Decoder & Validator Tool</h1>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="intro-content">
-                    <p class="intro-text">This professional-grade JWT (JSON Web Token) decoder helps you inspect and validate authentication tokens for security debugging and OIDC implementation. Perfect for developers, security professionals, and identity management specialists.</p>
-                </div>
-            </div>
+        <div class="flex">
+            <div class="main-content">
+                <!-- URL Encoder Section -->
+                <section id="urlSection" class="tool-section url-section">
+                    <div class="card">
+                        <div class="card-header">
+                            URL Parameter Encoder
+                        </div>
+                        <div class="validation-bar"></div>
+                        <div class="card-body">
+                            <textarea id="urlInput" placeholder="Enter URL to encode/decode..."></textarea>
+                            <div class="status-message"></div>
+                            <!-- URL encoder content would go here -->
+                            <div class="action-bar">
+                                <button class="btn" id="encodeBtn">Encode URL</button>
+                                <button class="btn" id="decodeBtn">Decode URL</button>
+                                <button class="btn" id="copyUrlBtn">Copy URL</button>
+                                <button class="btn" id="clearUrlBtn">Clear</button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
 
-            <!-- JWT Decoder Section -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-shield-alt"></i> JWT Decoder
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="input-group">
-                        <label for="jwtInput">Enter JWT Token:</label>
-                        <textarea id="jwtInput" class="jwt-input" placeholder="Paste your JWT token here (e.g. eyJhbG...)"
-                            >eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30</textarea>
-                    </div>
-                    
-                    <div class="action-bar">
-                        <button id="decodeBtn" class="btn btn-primary">
-                            <i class="fas fa-search"></i> Decode
-                        </button>
-                        <button id="clearBtn" class="btn">
-                            <i class="fas fa-trash"></i> Clear
-                        </button>
-                        <button id="saveBtn" class="btn">
-                            <i class="fas fa-save"></i> Save
-                        </button>
-                    </div>
-                    
-                    <div id="resultContainer" style="display: none; margin-top: 20px;">
-                        <div class="jwt-section">
-                            <div class="jwt-section-header">
-                                <span class="header-color">HEADER</span>
-                            </div>
-                            <div id="headerJson" class="jwt-section-content"></div>
+                <!-- JWT Decoder Section -->
+                <section id="jwtSection" class="tool-section jwt-section active">
+                    <div class="card">
+                        <div class="card-header">
+                            JWT Decoder & Inspector
                         </div>
-                        
-                        <div class="jwt-section">
-                            <div class="jwt-section-header">
-                                <span class="payload-color">PAYLOAD</span>
-                            </div>
-                            <div id="payloadJson" class="jwt-section-content"></div>
-                        </div>
-                        
-                        <div class="jwt-section">
-                            <div class="jwt-section-header">
-                                <span class="signature-color">SIGNATURE</span>
-                            </div>
-                            <div id="signatureData" class="jwt-section-content"></div>
-                        </div>
-                        
-                        <div class="jwt-section">
-                            <div class="jwt-section-header">
-                                <i class="fas fa-id-card"></i> OIDC Claims
-                            </div>
-                            <table class="claim-table" id="claimTable">
-                                <thead>
-                                    <tr>
-                                        <th>Claim</th>
-                                        <th>Value</th>
-                                        <th>Purpose</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Claims will be inserted here -->
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <div class="jwt-section">
-                            <div class="jwt-section-header">
-                                <i class="fas fa-check-circle"></i> Signature Verification
-                            </div>
+                        <div class="validation-bar" id="jwtValidationBar"></div>
+                        <div class="card-body">
+                            <textarea id="jwtInput" placeholder="Paste your JWT token or 'Authorization: Bearer [token]' header here..."></textarea>
+                            <div class="status-message" id="jwtStatusMessage"></div>
                             
-                            <div class="tabs">
-                                <button class="tab active" data-tab="secretKey">Secret Key</button>
-                                <button class="tab" data-tab="publicKey">Public Key</button>
-                                <button class="tab" data-tab="jwks">JWKS</button>
-                                <button class="tab" data-tab="discovery">OIDC Discovery</button>
-                            </div>
-                            
-                            <div id="secretKey" class="tab-content active">
-                                <div class="input-group">
-                                    <label for="secretKeyInput">HMAC Secret Key:</label>
-                                    <textarea id="secretKeyInput" placeholder="Enter your secret key for HS256/HS384/HS512 algorithms"></textarea>
+                            <div class="collapsible" id="headerCollapsible">
+                                <div class="collapsible-header">
+                                    <span>Header</span>
+                                    <span>▼</span>
                                 </div>
-                                <button id="verifySecretBtn" class="btn btn-primary">
-                                    <i class="fas fa-signature"></i> Verify Signature
-                                </button>
-                            </div>
-                            
-                            <div id="publicKey" class="tab-content">
-                                <div class="input-group">
-                                    <label for="publicKeyInput">Public Key or Certificate (PEM):</label>
-                                    <textarea id="publicKeyInput" placeholder="-----BEGIN PUBLIC KEY-----..."></textarea>
+                                <div class="collapsible-content">
+                                    <pre id="headerJson"></pre>
                                 </div>
-                                <button id="verifyPublicBtn" class="btn btn-primary">
-                                    <i class="fas fa-signature"></i> Verify Signature
-                                </button>
                             </div>
                             
-                            <div id="jwks" class="tab-content">
-                                <div class="input-group">
-                                    <label for="jwksInput">JWKS (JSON Web Key Set):</label>
-                                    <textarea id="jwksInput" placeholder='{"keys":[{"kty":"RSA","use":"sig","kid":"1","n":"...","e":"..."}]}'></textarea>
+                            <div class="collapsible" id="payloadCollapsible">
+                                <div class="collapsible-header">
+                                    <span>Payload</span>
+                                    <span>▼</span>
                                 </div>
-                                <button id="verifyJwksBtn" class="btn btn-primary">
-                                    <i class="fas fa-signature"></i> Verify Signature
-                                </button>
-                            </div>
-                            
-                            <div id="discovery" class="tab-content">
-                                <div class="input-group">
-                                    <label for="discoveryInput">OIDC Discovery URL:</label>
-                                    <input type="text" id="discoveryInput" placeholder="https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration">
+                                <div class="collapsible-content">
+                                    <pre id="payloadJson"></pre>
                                 </div>
-                                <button id="fetchDiscoveryBtn" class="btn btn-primary" style="margin-top: 10px;">
-                                    <i class="fas fa-download"></i> Fetch
-                                </button>
                             </div>
                             
-                            <div id="verificationResult" class="verification-result" style="display: none;">
-                                <i id="verifyIcon" class="fas"></i>
-                                <span id="verifyMessage"></span>
+                            <div class="signature-section">
+                                <h3>Signature</h3>
+                                <div class="signature-info" id="signatureInfo">
+                                    <!-- Signature info will be populated here -->
+                                </div>
+                                <div class="verify-section">
+                                    <textarea id="secretInput" placeholder="Enter secret or public key to verify signature (optional)"></textarea>
+                                    <div class="action-bar">
+                                        <button class="btn" id="verifyBtn">Verify Signature</button>
+                                        <span id="verifyBadge" class="badge skipped">Skipped</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="claimAlerts">
+                                <!-- Claim alerts will be populated here -->
+                            </div>
+                            
+                            <div class="action-bar">
+                                <button class="btn" id="copyJwtBtn">Copy JWT</button>
+                                <button class="btn" id="copyJsonBtn">Copy Payload JSON</button>
+                                <button class="btn" id="downloadJsonBtn">Download JSON</button>
+                                <button class="btn" id="clearJwtBtn">Clear</button>
                             </div>
                         </div>
                     </div>
-                </div>
+                </section>
             </div>
             
-            <!-- Recent Tokens Section -->
-            <div class="card">
-                <div class="card-header">
-                    <div class="card-title">
-                        <i class="fas fa-history"></i> Recent Tokens
-                        <span id="tokensCount" class="badge badge-success">0</span>
+            <aside class="sidebar">
+                <div class="card">
+                    <div class="card-header" id="historyHeader">
+                        Recent Tokens
+                    </div>
+                    <div class="card-body">
+                        <div class="search-box">
+                            <input type="text" id="historySearch" placeholder="Search history...">
+                        </div>
+                        <ul class="history-list" id="historyList">
+                            <!-- History items will be populated here -->
+                        </ul>
                     </div>
                 </div>
-                <div class="card-body">
-                    <div class="search-container">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Search tokens...">
-                    </div>
-                    
-                    <div id="tokensList" class="links-list">
-                        <!-- Tokens will be inserted here -->
-                    </div>
-                </div>
-            </div>
+            </aside>
         </div>
+        
+        <footer>
+            <p>JWT Decoder & URL Encoder Tool | All processing happens in your browser | No data is sent to any server</p>
+        </footer>
     </div>
-    
-    <div id="footer-container"></div>
-    
-    <script src="../js/common.js"></script>
-    <script src="../js/storage.js"></script>
-    <script src="../js/tools-registry.js"></script>
-    <script src="../js/tools/jwt-decoder.js"></script>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const introCollapseToggle = document.querySelector('.intro-collapse-toggle');
-            const introContent = document.querySelector('.intro-content');
+        // Utility functions
+        const logger = {
+            log: function(message, data = {}) {
+                console.log(`[LOG] ${message}`, data);
+                // In a production app, this might send to a logging service
+                // but only with appropriate masking for sensitive data
+            }
+        };
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function copyText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Success message could be shown here
+            }, (err) => {
+                console.error('Failed to copy: ', err);
+            });
+        }
+
+        function maskJwt(jwt) {
+            if (!jwt) return '';
+            if (jwt.length <= 20) return jwt; // Don't mask short tokens
+            return jwt.substr(0, 10) + '...' + jwt.substr(jwt.length - 10);
+        }
+
+        function formatJsonString(json) {
+            if (!json) return '';
+            // Replace with regex to highlight JSON syntax
+            return json.replace(/"([^"]+)":/g, '<span class="json-key">"$1":</span>')
+                .replace(/"([^"]*)"/g, '<span class="json-string">"$1"</span>')
+                .replace(/\b(\d+)(?![":])/g, '<span class="json-number">$1</span>')
+                .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
+                .replace(/\bnull\b/g, '<span class="json-null">null</span>');
+        }
+
+        function decodeTime(timestamp) {
+            if (!timestamp) return '';
+            const date = new Date(timestamp * 1000);
+            return date.toLocaleString();
+        }
+
+        function getTimeStatus(exp, nbf) {
+            const now = Math.floor(Date.now() / 1000);
             
-            if (introCollapseToggle && introContent) {
-                introCollapseToggle.addEventListener('click', () => {
-                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
-                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
-                    introContent.classList.toggle('expanded');
+            if (exp && now > exp) {
+                const expiredFor = Math.floor((now - exp) / 86400);
+                return {
+                    status: 'expired',
+                    message: `Expired ${expiredFor > 0 ? `(${expiredFor} day${expiredFor > 1 ? 's' : ''} ago)` : 'recently'}`,
+                    type: 'danger'
+                };
+            }
+            
+            if (exp && now > exp - 86400) {
+                const expiresIn = Math.floor((exp - now) / 3600);
+                return {
+                    status: 'expiring',
+                    message: `Expires soon (in ${expiresIn} hour${expiresIn > 1 ? 's' : ''})`,
+                    type: 'warning'
+                };
+            }
+            
+            if (nbf && now < nbf) {
+                const validIn = Math.floor((nbf - now) / 60);
+                return {
+                    status: 'notYetValid',
+                    message: `Not yet valid (valid in ${validIn} minute${validIn > 1 ? 's' : ''})`,
+                    type: 'warning'
+                };
+            }
+            
+            return {
+                status: 'valid',
+                message: 'Token is currently valid',
+                type: 'success'
+            };
+        }
+
+        // JWT Decoder functions
+        function parseJwt(token) {
+            try {
+                // Remove 'Bearer ' prefix if present
+                if (token.startsWith('Bearer ')) {
+                    token = token.split(' ')[1];
+                }
+                // Also handle Authorization header format
+                if (token.startsWith('Authorization: Bearer ')) {
+                    token = token.split(' ')[2];
+                }
+                
+                const parts = token.split('.');
+                if (parts.length !== 3) {
+                    throw new Error('Invalid JWT format');
+                }
+                
+                const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')));
+                const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                
+                return {
+                    header,
+                    payload,
+                    signature: parts[2],
+                    raw: {
+                        header: parts[0],
+                        payload: parts[1],
+                        signature: parts[2]
+                    }
+                };
+            } catch (e) {
+                throw new Error('Invalid JWT: ' + e.message);
+            }
+        }
+
+        // Lazy load jsrsasign for signature verification
+        let jsrsasignLoaded = false;
+        
+        async function loadJsrsasign() {
+            if (jsrsasignLoaded) return Promise.resolve();
+            
+            return new Promise((resolve, reject) => {
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.27/jsrsasign-all-min.js';
+                script.onload = () => {
+                    jsrsasignLoaded = true;
+                    resolve();
+                };
+                script.onerror = () => reject(new Error('Failed to load jsrsasign'));
+                document.head.appendChild(script);
+            });
+        }
+
+        async function verifySignature(jwt, secret) {
+            try {
+                await loadJsrsasign();
+                
+                // Remove 'Bearer ' prefix if present
+                if (jwt.startsWith('Bearer ')) {
+                    jwt = jwt.split(' ')[1];
+                }
+                // Also handle Authorization header format
+                if (jwt.startsWith('Authorization: Bearer ')) {
+                    jwt = jwt.split(' ')[2];
+                }
+                
+                // Parse the JWT to get the algorithm
+                const parsedJwt = parseJwt(jwt);
+                const alg = parsedJwt.header.alg;
+                
+                // Handle different algorithm types
+                if (alg.startsWith('HS')) {
+                    // HMAC algorithms
+                    return KJUR.jws.JWS.verifyJWT(jwt, secret, {alg: [alg]});
+                } else if (alg.startsWith('RS') || alg.startsWith('PS') || alg.startsWith('ES')) {
+                    // RSA and ECDSA algorithms
+                    return KJUR.jws.JWS.verifyJWT(jwt, {utf8: secret}, {alg: [alg]});
+                } else {
+                    throw new Error(`Unsupported algorithm: ${alg}`);
+                }
+            } catch (e) {
+                console.error('Verification error:', e);
+                return false;
+            }
+        }
+
+        // History management
+        class HistoryManager {
+            constructor(type) {
+                this.type = type;
+                this.storageKey = `${type}History`;
+                this.history = this.loadHistory();
+                this.idleTimerId = null;
+                this.idleDelay = 10000; // 10 seconds
+            }
+            
+            loadHistory() {
+                try {
+                    const stored = localStorage.getItem(this.storageKey);
+                    return stored ? JSON.parse(stored) : [];
+                } catch (e) {
+                    console.error('Error loading history:', e);
+                    return [];
+                }
+            }
+            
+            saveHistory() {
+                try {
+                    // Limit to 50 entries
+                    if (this.history.length > 50) {
+                        this.history = this.history.slice(0, 50);
+                    }
+                    localStorage.setItem(this.storageKey, JSON.stringify(this.history));
+                } catch (e) {
+                    console.error('Error saving history:', e);
+                }
+            }
+            
+            addEntry(entry) {
+                // Check if entry with same ID already exists
+                const existingIndex = this.history.findIndex(item => item.id === entry.id);
+                
+                if (existingIndex >= 0) {
+                    // Update existing entry
+                    const existing = this.history[existingIndex];
+                    entry.starred = existing.starred;
+                    if (existing.nickname) entry.nickname = existing.nickname;
+                    
+                    // Remove old entry
+                    this.history.splice(existingIndex, 1);
+                }
+                
+                // Add new entry at the beginning
+                this.history.unshift(entry);
+                this.saveHistory();
+                this.renderHistory();
+            }
+            
+            markStarred(id, starred) {
+                const index = this.history.findIndex(item => item.id === id);
+                if (index >= 0) {
+                    this.history[index].starred = starred;
+                    this.saveHistory();
+                    this.renderHistory();
+                }
+            }
+            
+            updateNickname(id, nickname) {
+                const index = this.history.findIndex(item => item.id === id);
+                if (index >= 0) {
+                    this.history[index].nickname = nickname;
+                    this.saveHistory();
+                    this.renderHistory();
+                }
+            }
+            
+            search(query) {
+                if (!query) {
+                    this.renderHistory();
+                    return;
+                }
+                
+                const filteredHistory = this.history.filter(item => {
+                    return (
+                        (item.nickname && item.nickname.toLowerCase().includes(query.toLowerCase())) ||
+                        (this.type === 'jwt' && item.header && JSON.stringify(item.header).toLowerCase().includes(query.toLowerCase())) ||
+                        (this.type === 'jwt' && item.payload && JSON.stringify(item.payload).toLowerCase().includes(query.toLowerCase())) ||
+                        (this.type === 'url' && item.url && item.url.toLowerCase().includes(query.toLowerCase()))
+                    );
+                });
+                
+                this.renderHistoryItems(filteredHistory);
+            }
+            
+            scheduleAutoSave(entry) {
+                // Clear any existing timer
+                if (this.idleTimerId) {
+                    clearTimeout(this.idleTimerId);
+                }
+                
+                // Set new timer
+                this.idleTimerId = setTimeout(() => {
+                    this.addEntry(entry);
+                    this.idleTimerId = null;
+                }, this.idleDelay);
+            }
+            
+            renderHistory() {
+                // Sort: starred first, then by timestamp (newest first)
+                const sortedHistory = [...this.history].sort((a, b) => {
+                    if (a.starred && !b.starred) return -1;
+                    if (!a.starred && b.starred) return 1;
+                    return new Date(b.timestamp) - new Date(a.timestamp);
+                });
+                
+                this.renderHistoryItems(sortedHistory);
+            }
+            
+            renderHistoryItems(items) {
+                const historyList = document.getElementById('historyList');
+                if (!historyList) return;
+                
+                historyList.innerHTML = '';
+                
+                if (items.length === 0) {
+                    historyList.innerHTML = '<li class="history-item">No history items yet</li>';
+                    return;
+                }
+                
+                items.forEach(item => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    
+                    const starBtn = document.createElement('button');
+                    starBtn.className = `star-btn ${item.starred ? 'starred' : ''}`;
+                    starBtn.textContent = '★';
+                    starBtn.title = item.starred ? 'Unstar' : 'Star';
+                    starBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        this.markStarred(item.id, !item.starred);
+                    };
+                    
+                    const content = document.createElement('div');
+                    content.className = 'history-item-content';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'history-item-title';
+                    title.textContent = item.nickname || (this.type === 'jwt' ? item.jwtMasked : item.urlMasked);
+                    
+                    const date = document.createElement('div');
+                    date.className = 'history-item-date';
+                    date.textContent = item.displayDate;
+                    
+                    content.appendChild(title);
+                    content.appendChild(date);
+                    
+                    li.appendChild(starBtn);
+                    li.appendChild(content);
+                    
+                    // Add double-click to edit nickname
+                    content.ondblclick = (e) => {
+                        const newNickname = prompt('Enter nickname:', item.nickname || '');
+                        if (newNickname !== null) {
+                            this.updateNickname(item.id, newNickname);
+                        }
+                    };
+                    
+                    // Add click to load
+                    li.onclick = () => {
+                        if (this.type === 'jwt') {
+                            // Load JWT data
+                            const jwtInput = document.getElementById('jwtInput');
+                            if (jwtInput) {
+                                const jwtApp = window.jwtApp; // Get the JwtApp instance
+                                if (jwtApp) {
+                                    const parts = [item.raw.header, item.raw.payload, item.raw.signature].join('.');
+                                    jwtInput.value = parts;
+                                    jwtApp.processJwt(parts);
+                                }
+                            }
+                        } else if (this.type === 'url') {
+                            // Load URL data (assuming urlApp exists)
+                            const urlInput = document.getElementById('urlInput');
+                            if (urlInput && window.urlApp) {
+                                urlInput.value = item.url;
+                                window.urlApp.processUrl(item.url);
+                            }
+                        }
+                    };
+                    
+                    historyList.appendChild(li);
                 });
             }
+        }
+
+        // Main application
+        class JwtApp {
+            constructor() {
+                this.historyManager = new HistoryManager('jwt');
+                this.currentJwt = null;
+                this.signatureStatus = 'skipped';
+                
+                this.elements = {
+                    jwtInput: document.getElementById('jwtInput'),
+                    validationBar: document.getElementById('jwtValidationBar'),
+                    statusMessage: document.getElementById('jwtStatusMessage'),
+                    headerJson: document.getElementById('headerJson'),
+                    payloadJson: document.getElementById('payloadJson'),
+                    signatureInfo: document.getElementById('signatureInfo'),
+                    secretInput: document.getElementById('secretInput'),
+                    verifyBtn: document.getElementById('verifyBtn'),
+                    verifyBadge: document.getElementById('verifyBadge'),
+                    claimAlerts: document.getElementById('claimAlerts'),
+                    copyJwtBtn: document.getElementById('copyJwtBtn'),
+                    copyJsonBtn: document.getElementById('copyJsonBtn'),
+                    downloadJsonBtn: document.getElementById('downloadJsonBtn'),
+                    clearJwtBtn: document.getElementById('clearJwtBtn'),
+                    headerCollapsible: document.getElementById('headerCollapsible'),
+                    payloadCollapsible: document.getElementById('payloadCollapsible')
+                };
+                
+                this.initializeEvents();
+                
+                // Initialize collapsibles
+                document.querySelectorAll('.collapsible').forEach(coll => {
+                    coll.querySelector('.collapsible-header').addEventListener('click', () => {
+                        coll.classList.toggle('open');
+                        const arrow = coll.querySelector('.collapsible-header span:last-child');
+                        arrow.textContent = coll.classList.contains('open') ? '▲' : '▼';
+                    });
+                });
+                
+                // Render initial history
+                this.historyManager.renderHistory();
+            }
+            
+            initializeEvents() {
+                // JWT input event
+                this.elements.jwtInput.addEventListener('input', () => {
+                    const jwt = this.elements.jwtInput.value.trim();
+                    if (jwt) {
+                        this.processJwt(jwt);
+                    } else {
+                        this.clearDisplay();
+                    }
+                });
+                
+                // Verify button
+                this.elements.verifyBtn.addEventListener('click', () => {
+                    const jwt = this.elements.jwtInput.value.trim();
+                    const secret = this.elements.secretInput.value.trim();
+                    
+                    if (jwt && secret) {
+                        this.verifyJwtSignature(jwt, secret);
+                    } else {
+                        this.setStatus('Please enter both JWT and secret/key', 'error');
+                    }
+                });
+                
+                // Copy buttons
+                this.elements.copyJwtBtn.addEventListener('click', () => {
+                    const jwt = this.elements.jwtInput.value.trim();
+                    if (jwt) {
+                        copyText(jwt);
+                        this.setStatus('JWT copied to clipboard', 'success');
+                    }
+                });
+                
+                this.elements.copyJsonBtn.addEventListener('click', () => {
+                    if (this.currentJwt && this.currentJwt.payload) {
+                        const json = JSON.stringify(this.currentJwt.payload, null, 2);
+                        copyText(json);
+                        this.setStatus('Payload JSON copied to clipboard', 'success');
+                    }
+                });
+                
+                // Download button
+                this.elements.downloadJsonBtn.addEventListener('click', () => {
+                    if (this.currentJwt) {
+                        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
+                            JSON.stringify({
+                                header: this.currentJwt.header,
+                                payload: this.currentJwt.payload
+                            }, null, 2)
+                        );
+                        const downloadAnchor = document.createElement('a');
+                        downloadAnchor.setAttribute("href", dataStr);
+                        downloadAnchor.setAttribute("download", "jwt-decoded.json");
+                        document.body.appendChild(downloadAnchor);
+                        downloadAnchor.click();
+                        downloadAnchor.remove();
+                    }
+                });
+                
+                // Clear button
+                this.elements.clearJwtBtn.addEventListener('click', () => {
+                    this.elements.jwtInput.value = '';
+                    this.clearDisplay();
+                });
+                
+                // History search
+                const historySearch = document.getElementById('historySearch');
+                if (historySearch) {
+                    historySearch.addEventListener('input', () => {
+                        this.historyManager.search(historySearch.value);
+                    });
+                }
+            }
+            
+            processJwt(jwt) {
+                try {
+                    this.currentJwt = parseJwt(jwt);
+                    
+                    // Reset signature status
+                    this.signatureStatus = 'skipped';
+                    this.elements.verifyBadge.textContent = 'Skipped';
+                    this.elements.verifyBadge.className = 'badge skipped';
+                    
+                    // Display header and payload
+                    this.displayHeader(this.currentJwt.header);
+                    this.displayPayload(this.currentJwt.payload);
+                    
+                    // Display signature info
+                    this.displaySignatureInfo(this.currentJwt.header);
+                    
+                    // Check claims
+                    this.analyzeClaims(this.currentJwt.payload);
+                    
+                    // Set status
+                    this.elements.validationBar.className = 'validation-bar valid';
+                    this.setStatus('JWT successfully decoded', 'success');
+                    
+                    // Auto open collapsibles
+                    this.elements.headerCollapsible.classList.add('open');
+                    this.elements.payloadCollapsible.classList.add('open');
+                    
+                    // Log the action
+                    logger.log("JWT decoded", {
+                        kid: this.currentJwt.header.kid,
+                        alg: this.currentJwt.header.alg,
+                        claims: Object.keys(this.currentJwt.payload),
+                        valid: true
+                    });
+                    
+                    // Schedule auto-save to history
+                    const rawJwt = [this.currentJwt.raw.header, this.currentJwt.raw.payload, this.currentJwt.raw.signature].join('.');
+                    const jwtEntry = {
+                        id: this.generateId(rawJwt),
+                        jwtMasked: maskJwt(rawJwt),
+                        header: this.currentJwt.header,
+                        payload: this.currentJwt.payload,
+                        signatureValid: this.signatureStatus,
+                        timestamp: new Date().toISOString(),
+                        displayDate: new Date().toLocaleString(),
+                        starred: false,
+                        nickname: '',
+                        raw: {
+                            header: this.currentJwt.raw.header,
+                            payload: this.currentJwt.raw.payload,
+                            signature: this.currentJwt.raw.signature
+                        }
+                    };
+                    
+                    this.historyManager.scheduleAutoSave(jwtEntry);
+                    
+                } catch (error) {
+                    this.handleError(error);
+                }
+            }
+            
+            displayHeader(header) {
+                if (!header) return;
+                const jsonStr = JSON.stringify(header, null, 2);
+                this.elements.headerJson.innerHTML = formatJsonString(escapeHtml(jsonStr));
+            }
+            
+            displayPayload(payload) {
+                if (!payload) return;
+                const jsonStr = JSON.stringify(payload, null, 2);
+                this.elements.payloadJson.innerHTML = formatJsonString(escapeHtml(jsonStr));
+            }
+            
+            displaySignatureInfo(header) {
+                if (!header) return;
+                
+                const info = document.createElement('div');
+                info.className = 'signature-info';
+                
+                if (header.alg) {
+                    const alg = document.createElement('div');
+                    alg.innerHTML = `<strong>Algorithm:</strong> <span class="signature-param">${escapeHtml(header.alg)}</span>`;
+                    info.appendChild(alg);
+                }
+                
+                if (header.kid) {
+                    const kid = document.createElement('div');
+                    kid.innerHTML = `<strong>Key ID:</strong> <span class="signature-param">${escapeHtml(header.kid)}</span>`;
+                    info.appendChild(kid);
+                }
+                
+                if (header.typ) {
+                    const typ = document.createElement('div');
+                    typ.innerHTML = `<strong>Type:</strong> <span class="signature-param">${escapeHtml(header.typ)}</span>`;
+                    info.appendChild(typ);
+                }
+                
+                this.elements.signatureInfo.innerHTML = '';
+                this.elements.signatureInfo.appendChild(info);
+            }
+            
+            analyzeClaims(payload) {
+                if (!payload) return;
+                
+                this.elements.claimAlerts.innerHTML = '';
+                
+                // Check expiration and validity time
+                const timeStatus = getTimeStatus(payload.exp, payload.nbf);
+                if (timeStatus.status !== 'valid' || payload.exp) {
+                    const alert = document.createElement('div');
+                    alert.className = `claim-alert ${timeStatus.type}`;
+                    alert.textContent = timeStatus.message;
+                    this.elements.claimAlerts.appendChild(alert);
+                }
+                
+                // Display timestamps in human-readable format
+                const timeFields = {
+                    exp: 'Expires',
+                    iat: 'Issued at',
+                    nbf: 'Not valid before'
+                };
+                
+                for (const [field, label] of Object.entries(timeFields)) {
+                    if (payload[field]) {
+                        const timeBlock = document.createElement('div');
+                        timeBlock.className = 'claim-info';
+                        timeBlock.innerHTML = `<strong>${label}:</strong> ${decodeTime(payload[field])} <span class="signature-param">${payload[field]}</span>`;
+                        this.elements.claimAlerts.appendChild(timeBlock);
+                    }
+                }
+                
+                // Display other important claims
+                const importantClaims = {
+                    iss: 'Issuer',
+                    sub: 'Subject',
+                    aud: 'Audience'
+                };
+                
+                for (const [field, label] of Object.entries(importantClaims)) {
+                    if (payload[field]) {
+                        const claimBlock = document.createElement('div');
+                        claimBlock.className = 'claim-info';
+                        
+                        let value = payload[field];
+                        if (typeof value === 'object') {
+                            value = JSON.stringify(value);
+                        }
+                        
+                        claimBlock.innerHTML = `<strong>${label}:</strong> ${escapeHtml(value)}`;
+                        this.elements.claimAlerts.appendChild(claimBlock);
+                    }
+                }
+            }
+            
+            async verifyJwtSignature(jwt, secret) {
+                try {
+                    this.setStatus('Verifying signature...', 'warning');
+                    
+                    const isValid = await verifySignature(jwt, secret);
+                    
+                    this.signatureStatus = isValid ? 'valid' : 'invalid';
+                    this.elements.verifyBadge.textContent = isValid ? 'Valid' : 'Invalid';
+                    this.elements.verifyBadge.className = `badge ${isValid ? 'valid' : 'invalid'}`;
+                    
+                    this.setStatus(
+                        isValid ? 'Signature verified successfully' : 'Invalid signature',
+                        isValid ? 'success' : 'error'
+                    );
+                    
+                    // Update history entry if exists
+                    if (this.currentJwt) {
+                        const rawJwt = [this.currentJwt.raw.header, this.currentJwt.raw.payload, this.currentJwt.raw.signature].join('.');
+                        const id = this.generateId(rawJwt);
+                        const existingEntry = this.historyManager.history.find(item => item.id === id);
+                        
+                        if (existingEntry) {
+                            existingEntry.signatureValid = this.signatureStatus;
+                            this.historyManager.saveHistory();
+                        }
+                    }
+                    
+                    // Log the verification
+                    logger.log("JWT signature verified", {
+                        valid: isValid,
+                        alg: this.currentJwt?.header?.alg
+                    });
+                    
+                } catch (error) {
+                    this.signatureStatus = 'invalid';
+                    this.elements.verifyBadge.textContent = 'Error';
+                    this.elements.verifyBadge.className = 'badge invalid';
+                    this.setStatus('Verification error: ' + error.message, 'error');
+                    
+                    logger.log("JWT verification error", {
+                        error: error.message,
+                        alg: this.currentJwt?.header?.alg
+                    });
+                }
+            }
+            
+            setStatus(message, type) {
+                this.elements.statusMessage.textContent = message;
+                this.elements.statusMessage.className = `status-message ${type}`;
+            }
+            
+            clearDisplay() {
+                this.currentJwt = null;
+                this.signatureStatus = 'skipped';
+                
+                this.elements.headerJson.innerHTML = '';
+                this.elements.payloadJson.innerHTML = '';
+                this.elements.signatureInfo.innerHTML = '';
+                this.elements.claimAlerts.innerHTML = '';
+                this.elements.statusMessage.textContent = '';
+                this.elements.statusMessage.className = 'status-message';
+                this.elements.validationBar.className = 'validation-bar';
+                this.elements.verifyBadge.textContent = 'Skipped';
+                this.elements.verifyBadge.className = 'badge skipped';
+            }
+            
+            handleError(error) {
+                this.clearDisplay();
+                this.elements.validationBar.className = 'validation-bar invalid';
+                this.setStatus(error.message, 'error');
+                
+                logger.log("JWT decode error", {
+                    error: error.message,
+                    jwtMasked: maskJwt(this.elements.jwtInput.value)
+                });
+            }
+            
+            generateId(text) {
+                // Simple hash function for ID generation
+                // In a real app, you might want to use SHA-256 or similar
+                let hash = 0;
+                if (text.length === 0) return hash.toString(16);
+                
+                for (let i = 0; i < text.length; i++) {
+                    const char = text.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32bit integer
+                }
+                
+                return Math.abs(hash).toString(16).substr(0, 16);
+            }
+        }
+
+        // Tabs Manager
+        class TabsManager {
+            constructor() {
+                this.tabs = document.querySelectorAll('.tab-button');
+                this.sections = document.querySelectorAll('.tool-section');
+                this.storageKey = 'selectedTool';
+                
+                this.initialize();
+            }
+            
+            initialize() {
+                // Set up tab click events
+                this.tabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.dataset.tab;
+                        this.switchTab(tabId);
+                    });
+                });
+                
+                // Load last selected tab
+                const lastTab = localStorage.getItem(this.storageKey);
+                if (lastTab) {
+                    this.switchTab(lastTab);
+                }
+            }
+            
+            switchTab(tabId) {
+                // Update tab buttons
+                this.tabs.forEach(tab => {
+                    if (tab.dataset.tab === tabId) {
+                        tab.classList.add('active');
+                    } else {
+                        tab.classList.remove('active');
+                    }
+                });
+                
+                // Update sections
+                this.sections.forEach(section => {
+                    if (section.id === `${tabId}Section`) {
+                        section.classList.add('active');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                });
+                
+                // Update history header
+                const historyHeader = document.getElementById('historyHeader');
+                if (historyHeader) {
+                    historyHeader.textContent = tabId === 'jwt' ? 'Recent Tokens' : 'Recent Links';
+                }
+                
+                // Save selection
+                localStorage.setItem(this.storageKey, tabId);
+            }
+        }
+
+        // Theme toggle
+        function initializeThemeToggle() {
+            const themeToggle = document.getElementById('themeToggle');
+            if (!themeToggle) return;
+            
+            // Check for saved theme
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.setAttribute('data-theme', 'dark');
+                themeToggle.textContent = '☀️';
+            }
+            
+            themeToggle.addEventListener('click', () => {
+                if (document.body.getAttribute('data-theme') === 'dark') {
+                    document.body.removeAttribute('data-theme');
+                    themeToggle.textContent = '🌙';
+                    localStorage.setItem('theme', 'light');
+                } else {
+                    document.body.setAttribute('data-theme', 'dark');
+                    themeToggle.textContent = '☀️';
+                    localStorage.setItem('theme', 'dark');
+                }
+            });
+        }
+
+        // Initialize everything when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            window.tabsManager = new TabsManager();
+            window.jwtApp = new JwtApp();
+            
+            // Initialize theme toggle
+            initializeThemeToggle();
+            
+            // URL encoder app would be initialized here in a complete implementation
+            // window.urlApp = new UrlApp();
         });
     </script>
 </body>
