@@ -81,7 +81,8 @@ const logger = {
 
 // Get base path for all URLs
 function getBasePath() {
-    return ''; // Empty for root, adjust if needed
+    const path = window.location.pathname;
+    return path.includes('/tools/') ? '../' : '';
 }
 
 // Render header navigation
@@ -95,7 +96,7 @@ function renderHeader() {
         { id: 'url-encoder', name: 'URL Encoder', path: 'index.html' },
         { id: 'jwt-decoder', name: 'JWT Decoder', path: 'tools/jwt-decoder.html' },
         { id: 'dynamic-link-tracer', name: 'Dynamic Link Tracer', path: 'tools/dynamic-link-tracer.html' },
-        // Add more tools here as they are created
+        { id: 'base64-converter', name: 'Base64 Tool', path: 'tools/base64-tool.html' }
     ];
 
     headerContainer.innerHTML = `
@@ -109,7 +110,9 @@ function renderHeader() {
                         ${tools.map(tool => `
                             <li>
                                 <a href="${getBasePath()}${tool.path}" 
-                                   class="${currentPage.includes(tool.path) ? 'active' : ''}">
+                                   class="${currentPage.includes(tool.path) || 
+                                          (tool.path === 'index.html' && (currentPage === '/' || currentPage === '')) ? 
+                                          'active' : ''}">
                                     ${tool.name}
                                 </a>
                             </li>
@@ -200,6 +203,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             <ul>
                                 <li><a href="${getBasePath()}index.html">Home</a></li>
                                 <li><a href="${getBasePath()}index.html#tools">Tools</a></li>
+                                <li><a href="${getBasePath()}tools/url-encoder.html">URL Encoder</a></li>
+                                <li><a href="${getBasePath()}tools/jwt-decoder.html">JWT Decoder</a></li>
+                                <li><a href="${getBasePath()}tools/dynamic-link-tracer.html">Dynamic Link Tracer</a></li>
                             </ul>
                         </div>
                     </div>
