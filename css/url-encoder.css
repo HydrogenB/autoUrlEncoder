@@ -520,6 +520,12 @@
     z-index: 10;
 }
 
+/* Tooltip accessibility: show on focus */
+.tooltip:focus::after, .tooltip:active::after {
+    opacity: 1;
+    pointer-events: none;
+}
+
 /* Autosave indicator */
 .autosave-indicator {
     display: inline-block;
@@ -667,4 +673,60 @@
 
 .edit-mode.active {
     display: block;
+}
+
+/* Focus styles for accessibility */
+button:focus, .btn:focus, .action-icon:focus, .star-btn:focus, .toggle-qr:focus, .nickname-edit:focus, .add-nickname-btn:focus, .clear-search:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 2px;
+    z-index: 2;
+    background-color: rgba(67, 97, 238, 0.08);
+}
+
+input:focus, textarea:focus, .param-editable.editing:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+    background-color: #fffbe6;
+}
+
+/* Visually hidden utility for screen readers */
+.visually-hidden {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0,0,0,0) !important;
+    border: 0 !important;
+}
+
+/* Improve contrast for action icons on hover/focus */
+.action-icon:hover, .action-icon:focus {
+    color: var(--primary);
+    background-color: rgba(67, 97, 238, 0.15);
+}
+
+/* Improve contrast for star button on focus */
+.star-btn:focus {
+    color: var(--warning);
+    background-color: rgba(248, 150, 30, 0.12);
+}
+
+/* Overlay focus trap (optional, for keyboard navigation) */
+.qr-overlay:focus-within {
+    outline: 3px solid var(--primary);
+}
+
+/* ARIA live region for status messages */
+.status-message[aria-live] {
+    min-height: 1.5em;
+    display: block;
+    margin-top: 10px;
+    font-size: 0.95em;
+    color: var(--primary);
+    background: #f5f7fa;
+    border-radius: 4px;
+    padding: 6px 12px;
+    border: 1px solid #e0e0e0;
 }

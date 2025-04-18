@@ -360,7 +360,7 @@ function updateQRCode(url) {
     }
 }
 
-// Show QR code in overlay
+// Show QR code in overlay (focus management for accessibility)
 function showQrOverlay(url) {
     qrOverlayImage.innerHTML = '';
     qrOverlayUrl.textContent = url;
@@ -376,6 +376,11 @@ function showQrOverlay(url) {
         });
         
         qrOverlay.classList.add('active');
+        
+        // Accessibility: focus overlay close button
+        setTimeout(() => {
+            if (qrOverlayClose) qrOverlayClose.focus();
+        }, 100);
         
         // Log QR code view
         window.myDebugger.logger.log("QR code overlay opened", { url: url });
@@ -825,23 +830,46 @@ function loadUrlToEditor(id) {
     }
 }
 
-// Copy URL to clipboard
+// Copy URL to clipboard (with fallback and ARIA)
 function copyUrl(text) {
     try {
-        navigator.clipboard.writeText(text)
-            .then(() => {
-                window.myDebugger.showStatusMessage('Copied to clipboard');
-                
-                // Log copy action
-                window.myDebugger.logger.log("URL copied to clipboard");
-            })
-            .catch(err => {
-                window.myDebugger.logger.error('Failed to copy text:', err);
-                window.myDebugger.showStatusMessage('Failed to copy', true);
-            });
+        // Try Clipboard API
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    window.myDebugger.showStatusMessage('Copied to clipboard');
+                    // Log copy action
+                    window.myDebugger.logger.log("URL copied to clipboard");
+                })
+                .catch(err => {
+                    fallbackCopyTextToClipboard(text);
+                });
+        } else {
+            fallbackCopyTextToClipboard(text);
+        }
     } catch (e) {
         window.myDebugger.logger.error("Error copying URL:", e);
         window.myDebugger.showStatusMessage('Error copying URL', true);
+    }
+}
+
+// Fallback copy for older browsers
+function fallbackCopyTextToClipboard(text) {
+    try {
+        const textarea = document.createElement("textarea");
+        textarea.value = text;
+        textarea.setAttribute('readonly', '');
+        textarea.style.position = 'absolute';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        window.myDebugger.showStatusMessage('Copied to clipboard');
+        window.myDebugger.logger.log("URL copied to clipboard (fallback)");
+    } catch (e) {
+        window.myDebugger.logger.error("Fallback copy failed:", e);
+        window.myDebugger.showStatusMessage('Failed to copy', true);
     }
 }
 
@@ -976,7 +1004,7 @@ function renderLinksList(searchTerm = '') {
     try {
         if (urlHistory.length === 0) {
             linksList.innerHTML = `
-                <div class="empty-state">
+                <div class="empty-state" aria-live="polite">
                     <i class="fas fa-history"></i>
                     <p>No history yet</p>
                 </div>
@@ -996,7 +1024,7 @@ function renderLinksList(searchTerm = '') {
         
         if (filteredHistory.length === 0) {
             linksList.innerHTML = `
-                <div class="empty-state">
+                <div class="empty-state" aria-live="polite">
                     <i class="fas fa-search"></i>
                     <p>No matching links found</p>
                 </div>
@@ -1025,27 +1053,25 @@ function renderLinksList(searchTerm = '') {
             
             return `
                 <div class="list-item ${entry.starred ? 'starred' : ''}">
-                    <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="toggleStar('${entry.id}')">
-                        <i class="fas fa-star"></i>
-                    </button>
+                    <button class="star-btn ${entry.starred ? 'active' : ''}" onclick="toggleStar('${entry.id}')" aria-label="${entry.starred ? 'Unstar' : 'Star'} link"></button>
                     
-                    <div class="list-url" onclick="loadUrlToEditor('${entry.id}')">
+                    <div class="list-url" onclick="loadUrlToEditor('${entry.id}')" tabindex="0" aria-label="Load URL to editor">
                         ${window.myDebugger.escapeHtml(displayUrl)}
                     </div>
                     
                     <div id="nickname-section-${entry.id}" class="list-nickname" style="${entry.nickname ? 'display:flex' : 'display:none'}">
                         <div id="nickname-display-${entry.id}" class="nickname-display">
                             <span id="nickname-text-${entry.id}">${entry.nickname ? window.myDebugger.escapeHtml(entry.nickname) : 'No nickname'}</span>
-                            <button class="nickname-edit" onclick="editNickname('${entry.id}')"><i class="fas fa-pencil-alt"></i></button>
+                            <button class="nickname-edit" onclick="editNickname('${entry.id}')" aria-label="Edit nickname"><i class="fas fa-pencil-alt"></i></button>
                         </div>
                         <div id="nickname-edit-${entry.id}" class="edit-mode">
-                            <input type="text" id="nickname-input-${entry.id}" class="nickname-input" value="${window.myDebugger.escapeHtml(entry.nickname || '')}" placeholder="Enter nickname">
-                            <button class="btn btn-primary" onclick="saveNickname('${entry.id}')">Save</button>
+                            <input type="text" id="nickname-input-${entry.id}" class="nickname-input" value="${window.myDebugger.escapeHtml(entry.nickname || '')}" placeholder="Enter nickname" aria-label="Nickname for this link">
+                            <button class="btn btn-primary" onclick="saveNickname('${entry.id}')" aria-label="Save nickname">Save</button>
                         </div>
                     </div>
                     
                     ${!entry.nickname ? `
-                        <button id="add-nickname-${entry.id}" class="add-nickname-btn" onclick="addNickname('${entry.id}')">
+                        <button id="add-nickname-${entry.id}" class="add-nickname-btn" onclick="addNickname('${entry.id}')" aria-label="Add nickname">
                             <i class="fas fa-tag"></i> Add Nickname
                         </button>
                     ` : ''}
@@ -1053,28 +1079,28 @@ function renderLinksList(searchTerm = '') {
                     <div class="list-meta">
                         <span>${window.myDebugger.escapeHtml(entry.displayDate)} · ${entry.requestMode ? entry.requestMode.toUpperCase() : 'GET'}</span>
                         <div class="list-actions">
-                            <button class="action-icon tooltip" data-tooltip="Copy" onclick="copyUrl('${window.myDebugger.escapeHtml(entry.encodedUrl)}')">
+                            <button class="action-icon tooltip" data-tooltip="Copy" aria-label="Copy URL" onclick="copyUrl('${window.myDebugger.escapeHtml(entry.encodedUrl)}')">
                                 <i class="fas fa-copy"></i>
                             </button>
-                            <button class="action-icon tooltip" data-tooltip="Open" onclick="runUrl('${window.myDebugger.escapeHtml(entry.encodedUrl)}', '${entry.requestMode || 'get'}', '${entry.postParams ? window.myDebugger.escapeHtml(entry.postParams.replace(/'/g, "\\'")) : ''}')">
+                            <button class="action-icon tooltip" data-tooltip="Open" aria-label="Open URL" onclick="runUrl('${window.myDebugger.escapeHtml(entry.encodedUrl)}', '${entry.requestMode || 'get'}', '${entry.postParams ? window.myDebugger.escapeHtml(entry.postParams.replace(/'/g, "\\'")) : ''}')">
                                 <i class="fas fa-external-link-alt"></i>
                             </button>
-                            <button id="toggle-qr-${entry.id}" class="toggle-qr" onclick="toggleListQR('${entry.id}')">
+                            <button id="toggle-qr-${entry.id}" class="toggle-qr" onclick="toggleListQR('${entry.id}')" aria-label="Show or hide QR code">
                                 <i class="fas fa-qrcode"></i> Show QR
                             </button>
-                            <button class="action-icon tooltip" data-tooltip="Delete" onclick="deleteHistoryItem('${entry.id}')">
+                            <button class="action-icon tooltip" data-tooltip="Delete" aria-label="Delete from history" onclick="deleteHistoryItem('${entry.id}')">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
                     </div>
                     
-                    <div id="qr-${entry.id}" class="list-qr" onclick="showListQrOverlay('${entry.id}')"></div>
+                    <div id="qr-${entry.id}" class="list-qr" onclick="showListQrOverlay('${entry.id}')" tabindex="0" aria-label="Show QR code for this link"></div>
                 </div>
             `;
         }).join('');
     } catch (e) {
         window.myDebugger.logger.error("Error rendering links list:", e);
-        linksList.innerHTML = `<div class="empty-state">Error loading links</div>`;
+        linksList.innerHTML = `<div class="empty-state" aria-live="polite">Error loading links</div>`;
     }
 }
 
@@ -1265,4 +1291,10 @@ document.addEventListener('DOMContentLoaded', function() {
     window.editNickname = editNickname;
     window.saveNickname = saveNickname;
     window.addNickname = addNickname;
+    
+    // Add ARIA live region to status message
+    if (window.statusMessage) {
+        window.statusMessage.setAttribute('aria-live', 'polite');
+        window.statusMessage.setAttribute('role', 'status');
+    }
 });

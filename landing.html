@@ -40,7 +40,7 @@
         <section class="hero">
             <h1>MyDebugger Tools Platform</h1>
             <p>A comprehensive collection of web-based developer tools, designed to streamline your workflow. Built for developers, testers, and marketers with a focus on usability and privacy.</p>
-            <a href="#tools" class="btn">Explore Tools</a>
+            <a href="#tools" class="btn" id="explore-tools-btn">Explore Tools</a>
         </section>
     </div>
     
@@ -72,22 +72,22 @@
         <section class="features">
             <h2>Key Features</h2>
             <div class="features-grid">
-                <div class="feature-card">
+                <div class="feature-card" id="feature-client-side">
                     <i class="fas fa-lock"></i>
                     <h3>Client-side Processing</h3>
                     <p>All tools run directly in your browser. Your data never leaves your device, ensuring maximum privacy and security.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card" id="feature-history">
                     <i class="fas fa-history"></i>
                     <h3>History & Saved Items</h3>
                     <p>Automatically save your work and access your history for all tools, making your workflow more efficient.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card" id="feature-developer-focused">
                     <i class="fas fa-code"></i>
                     <h3>Developer Focused</h3>
                     <p>Built by developers for developers, with attention to detail and features that streamline everyday tasks.</p>
                 </div>
-                <div class="feature-card">
+                <div class="feature-card" id="feature-mobile-friendly">
                     <i class="fas fa-mobile-alt"></i>
                     <h3>Mobile Friendly</h3>
                     <p>All tools are fully responsive and work perfectly on mobile devices, so you can debug on the go.</p>
@@ -103,6 +103,32 @@
     <script src="js/common.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/tools-registry.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Scroll to tools section when "Explore Tools" is clicked
+            const exploreToolsBtn = document.getElementById('explore-tools-btn');
+            exploreToolsBtn.addEventListener('click', () => {
+                document.getElementById('tools').scrollIntoView({ behavior: 'smooth' });
+            });
+
+            // Add click handlers for feature cards
+            document.getElementById('feature-client-side').addEventListener('click', () => {
+                alert('Client-side processing ensures your data stays private.');
+            });
+
+            document.getElementById('feature-history').addEventListener('click', () => {
+                alert('History and saved items feature is coming soon!');
+            });
+
+            document.getElementById('feature-developer-focused').addEventListener('click', () => {
+                alert('Developer-focused tools to streamline your workflow.');
+            });
+
+            document.getElementById('feature-mobile-friendly').addEventListener('click', () => {
+                alert('Mobile-friendly tools for debugging on the go.');
+            });
+        });
+    </script>
     
     <style>
         /* Styles specific to landing page */
