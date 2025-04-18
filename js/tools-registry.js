@@ -7,13 +7,13 @@
 const toolRegistry = [
   {
     id: "url-encoder",
-    name: "URL Parameter Encoder | MyDebugger",
+    name: "URL Parameter Encoder",
     description:
-      "Professional URL parameter encoder for deep links and marketing campaigns. Safely encode parameters, generate QR codes, and track marketing URLs. Free online tool for developers and marketers.",
+      "Encode URL parameters for deep links, marketing campaigns, and secure data sharing. Generate QR codes and save links for future use.",
     icon: "link",
     category: "url-tools",
     categoryName: "URL Tools",
-    path: "/tools/url-encoder.html",
+    path: "tools/url-encoder.html",
     canonicalUrl: "https://mydebugger.vercel.app/tools/url-encoder.html",
     tags: [
       "url encoder",
@@ -25,33 +25,14 @@ const toolRegistry = [
     ],
   },
   {
-    id: "json-formatter",
-    name: "JSON Formatter & Validator | MyDebugger",
-    description:
-      "Free online JSON formatter, validator and beautifier with syntax highlighting. Debug JSON data, fix formatting errors and make JSON readable. Perfect for API development.",
-    icon: "code",
-    category: "data-transformation",
-    categoryName: "Data Transformation",
-    path: "/tools/json-formatter.html",
-    canonicalUrl: "https://mydebugger.vercel.app/tools/json-formatter.html",
-    tags: [
-      "json formatter",
-      "json validator",
-      "beautifier",
-      "syntax highlight",
-      "api tools",
-    ],
-    comingSoon: true,
-  },
-  {
     id: "jwt-decoder",
-    name: "JWT Decoder & Validator | MyDebugger",
+    name: "JWT Decoder & Validator",
     description:
-      "Online JSON Web Token (JWT) decoder and validator. Inspect JWT claims, verify signatures and debug authentication tokens. Essential security tool for developers.",
+      "Decode and verify JSON Web Tokens (JWT). Inspect token content, validate signatures, and debug authentication issues.",
     icon: "shield-alt",
     category: "security-tools",
     categoryName: "Security Tools",
-    path: "/tools/jwt-decoder.html",
+    path: "tools/jwt-decoder.html",
     canonicalUrl: "https://mydebugger.vercel.app/tools/jwt-decoder.html",
     tags: [
       "jwt decoder",
@@ -62,26 +43,6 @@ const toolRegistry = [
     ],
   },
   {
-    id: "base64-converter",
-    name: "Base64 Converter | MyDebugger",
-    description:
-      "Convert text, files and images to/from Base64 encoding. Bulk conversion support with preview. Perfect for data embedding and API testing.",
-    icon: "exchange-alt",
-    category: "data-transformation",
-    categoryName: "Data Transformation",
-    path: "/tools/base64-converter.html",
-    canonicalUrl: "https://mydebugger.vercel.app/tools/base64-converter.html",
-    tags: [
-      "base64 encoder",
-      "base64 decoder",
-      "file converter",
-      "image to base64",
-      "data conversion",
-    ],
-    comingSoon: true,
-  },
-  // Add or update this entry in the toolRegistry array
-  {
     id: "dynamic-link-tracer",
     name: "Dynamic Link Tracer",
     description:
@@ -89,7 +50,7 @@ const toolRegistry = [
     icon: "share-alt",
     category: "url-tools",
     categoryName: "URL Tools",
-    path: "/tools/dynamic-link-tracer.html",
+    path: "tools/dynamic-link-tracer.html",
     canonicalUrl:
       "https://mydebugger.vercel.app/tools/dynamic-link-tracer.html",
     tags: [
@@ -100,6 +61,42 @@ const toolRegistry = [
       "mobile attribution",
     ],
   },
+  {
+    id: "base64-converter",
+    name: "Base64 Converter",
+    description:
+      "Convert text to and from Base64 encoding. Simple, fast, and works entirely in your browser.",
+    icon: "exchange-alt",
+    category: "data-transformation",
+    categoryName: "Data Transformation",
+    path: "tools/base64-tool.html",
+    canonicalUrl: "https://mydebugger.vercel.app/tools/base64-converter.html",
+    tags: [
+      "base64 encoder",
+      "base64 decoder",
+      "text converter",
+      "data conversion",
+    ],
+  },
+  {
+    id: "json-formatter",
+    name: "JSON Formatter & Validator",
+    description:
+      "Format, validate and beautify JSON data with syntax highlighting. Debug JSON data, fix formatting errors and make JSON readable.",
+    icon: "code",
+    category: "data-transformation",
+    categoryName: "Data Transformation", 
+    path: "tools/json-formatter.html",
+    canonicalUrl: "https://mydebugger.vercel.app/tools/json-formatter.html",
+    tags: [
+      "json formatter",
+      "json validator",
+      "beautifier",
+      "syntax highlight",
+      "api tools",
+    ],
+    comingSoon: true,
+  }
 ];
 
 // Function to get tool by ID
@@ -118,9 +115,11 @@ function getToolsByCategory(category = null) {
 // Function to get all categories
 function getAllCategories() {
   const categories = [];
+  const categoryMap = {};
 
   toolRegistry.forEach((tool) => {
-    if (!categories.find((cat) => cat.id === tool.category)) {
+    if (!categoryMap[tool.category]) {
+      categoryMap[tool.category] = true;
       categories.push({
         id: tool.category,
         name: tool.categoryName,
@@ -183,11 +182,11 @@ function renderTools(
   // Check if we have any tools after filtering
   if (Object.keys(categories).length === 0) {
     container.innerHTML = `
-            <div class="empty-state">
-                <i class="fas fa-search"></i>
-                <p>No tools found matching your criteria</p>
-            </div>
-        `;
+      <div class="empty-state">
+        <i class="fas fa-search"></i>
+        <p>No tools found matching your criteria</p>
+      </div>
+    `;
     return;
   }
 
@@ -209,19 +208,19 @@ function renderTools(
         : "";
 
       grid.innerHTML += `
-                <div class="tool-card ${comingSoonClass}" data-tool-id="${
+        <div class="tool-card ${comingSoonClass}" data-tool-id="${
         tool.id
       }">
-                    <i class="fas fa-${tool.icon}"></i>
-                    <h3>${tool.name} ${comingSoonBadge}</h3>
-                    <p>${tool.description}</p>
-                    ${
-                      !tool.comingSoon
-                        ? `<a href="${tool.path}" class="btn btn-primary">Open Tool</a>`
-                        : `<button class="btn" disabled>Stay Tuned</button>`
-                    }
-                </div>
-            `;
+          <i class="fas fa-${tool.icon}"></i>
+          <h3>${tool.name} ${comingSoonBadge}</h3>
+          <p>${tool.description}</p>
+          ${
+            !tool.comingSoon
+              ? `<a href="${tool.path}" class="btn btn-primary">Open Tool</a>`
+              : `<button class="btn" disabled>Stay Tuned</button>`
+          }
+        </div>
+      `;
     });
 
     section.appendChild(grid);
@@ -238,15 +237,6 @@ function renderTools(
     document
       .querySelector('meta[name="description"]')
       .setAttribute("content", metaDesc);
-  }
-
-  if (document.querySelector('link[rel="canonical"]')) {
-    const canonicalUrl = `https://mydebugger.vercel.app${
-      searchQuery ? "/search" : ""
-    }${filterCategory ? "/category/" + filterCategory : ""}`;
-    document
-      .querySelector('link[rel="canonical"]')
-      .setAttribute("href", canonicalUrl);
   }
 
   // Log that tools were rendered
