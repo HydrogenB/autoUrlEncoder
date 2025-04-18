@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Optimized Title -->
+    <title>MyDebugger Tools | Developer Utilities for URL, JSON, JWT and More</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Free developer tools for URL encoding, JSON formatting, JWT debugging, and more. All tools run client-side for maximum privacy and security.">
+    <meta name="keywords" content="developer tools, url encoder, jwt decoder, json formatter, base64 converter, dynamic link tracer">
+    <meta name="robots" content="index, follow">
+    <meta name="revisit-after" content="7 days">
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://mydebugger.vercel.app/landing.html">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://mydebugger.vercel.app/landing.html">
+    <meta property="og:title" content="MyDebugger Tools | Developer Utilities">
+    <meta property="og:description" content="Free developer tools for URL encoding, JSON formatting, JWT debugging, and more. All tools run client-side for maximum privacy and security.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="assets/favicon.png">
+    
+    <!-- External Scripts and Styles -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <!-- Header will be injected by common.js -->
+    <div id="header-container"></div>
+    
+    <!-- Hero Section -->
+    <div class="container">
+        <section class="hero">
+            <h1>MyDebugger Tools Platform</h1>
+            <p>A comprehensive collection of web-based developer tools, designed to streamline your workflow. Built for developers, testers, and marketers with a focus on usability and privacy.</p>
+            <a href="#tools" class="btn">Explore Tools</a>
+        </section>
+    </div>
+    
+    <!-- Tools Search & Filter -->
+    <div class="container">
+        <div class="tools-control">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-tools" placeholder="Search tools...">
+            </div>
+            <div class="filter-box">
+                <select id="category-filter">
+                    <option value="">All Categories</option>
+                    <!-- Categories will be populated by tools-registry.js -->
+                </select>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Tools Container -->
+    <div class="container" id="tools">
+        <div id="tools-container">
+            <!-- Tools will be rendered by tools-registry.js -->
+        </div>
+    </div>
+    
+    <!-- Features Section -->
+    <div class="container">
+        <section class="features">
+            <h2>Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>Client-side Processing</h3>
+                    <p>All tools run directly in your browser. Your data never leaves your device, ensuring maximum privacy and security.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-history"></i>
+                    <h3>History & Saved Items</h3>
+                    <p>Automatically save your work and access your history for all tools, making your workflow more efficient.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-code"></i>
+                    <h3>Developer Focused</h3>
+                    <p>Built by developers for developers, with attention to detail and features that streamline everyday tasks.</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Mobile Friendly</h3>
+                    <p>All tools are fully responsive and work perfectly on mobile devices, so you can debug on the go.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+    <!-- Footer will be injected by common.js -->
+    <div id="footer-container"></div>
+    
+    <!-- Common Scripts -->
+    <script src="js/common.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/tools-registry.js"></script>
+    
+    <style>
+        /* Styles specific to landing page */
+        .hero {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            border-radius: var(--border-radius);
+            padding: 60px 24px;
+            margin: 24px 0 48px;
+            color: var(--white);
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            margin-bottom: 24px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .hero .btn {
+            background-color: var(--white);
+            color: var(--primary);
+            font-weight: 600;
+            padding: 12px 24px;
+            font-size: 1rem;
+        }
+        
+        .hero .btn:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+        
+        .tools-control {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+        }
+        
+        .filter-box {
+            width: 200px;
+        }
+        
+        .filter-box select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            background-color: var(--white);
+        }
+        
+        .features {
+            margin: 60px 0;
+            text-align: center;
+        }
+        
+        .features h2 {
+            margin-bottom: 40px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .features h2:after {
+            content: '';
+            position: absolute;
+            width: 80px;
+            height: 3px;
+            background-color: var(--primary);
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .feature-card {
+            background-color: var(--white);
+            padding: 30px 20px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .feature-card i {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .feature-card p {
+            color: var(--gray);
+            line-height: 1.6;
+        }
+        
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1rem;
+            }
+            
+            .tools-control {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .filter-box {
+                width: 100%;
+            }
+        }
+    </style>
+</body>
+</html>
