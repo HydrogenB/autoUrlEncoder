@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JWT Decoder & URL Encoder Tool</title>
+    <title>Enhanced JWT Decoder & URL Encoder Tool</title>
     <style>
         /* CSS variables for theming */
         :root {
             --primary-color: #4a6ee0;
             --primary-hover: #3a5ec4;
+            --primary-light: rgba(74, 110, 224, 0.1);
             --success-color: #48bb78;
             --warning-color: #ecc94b;
             --danger-color: #e53e3e;
@@ -22,12 +23,16 @@
             --json-number: #0000ff;
             --json-boolean: #b22222;
             --json-null: #808080;
+            --sidebar-bg: #f8fafc;
+            --tooltip-bg: #2d3748;
+            --tooltip-color: #fff;
         }
 
         /* Dark mode variables */
         [data-theme="dark"] {
             --primary-color: #5a7ae0;
             --primary-hover: #4a6ac4;
+            --primary-light: rgba(90, 122, 224, 0.15);
             --bg-color: #1a202c;
             --text-color: #e2e8f0;
             --card-bg: #2d3748;
@@ -38,6 +43,9 @@
             --json-number: #bd93f9;
             --json-boolean: #ffb86c;
             --json-null: #6272a4;
+            --sidebar-bg: #2d3748;
+            --tooltip-bg: #e2e8f0;
+            --tooltip-color: #1a202c;
         }
 
         body {
@@ -46,16 +54,33 @@
             color: var(--text-color);
             line-height: 1.5;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             transition: background-color 0.3s ease;
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1440px;
             margin: 0 auto;
+            padding: 20px;
+        }
+
+        .app-header {
             display: flex;
-            flex-direction: column;
-            gap: 20px;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
         }
 
         .tool-tabs {
@@ -137,7 +162,7 @@
         .status-message {
             font-size: 14px;
             margin: 5px 0 15px;
-            padding: 5px 10px;
+            padding: 8px 12px;
             border-radius: 4px;
         }
 
@@ -156,7 +181,12 @@
             color: var(--warning-color);
         }
 
-        textarea {
+        .status-message.info {
+            background-color: rgba(66, 153, 225, 0.1);
+            color: var(--primary-color);
+        }
+
+        textarea, .editable-area {
             width: 100%;
             min-height: 80px;
             padding: 12px;
@@ -164,12 +194,19 @@
             border-radius: 4px;
             background-color: var(--input-bg);
             color: var(--text-color);
-            font-family: monospace;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
             resize: vertical;
             box-sizing: border-box;
+            line-height: 1.5;
+            font-size: 14px;
         }
 
-        input[type="text"] {
+        .editable-area {
+            white-space: pre-wrap;
+            outline: none;
+        }
+
+        input[type="text"], input[type="url"] {
             padding: 8px 12px;
             border: 1px solid var(--border-color);
             border-radius: 4px;
@@ -177,21 +214,23 @@
             color: var(--text-color);
             width: 100%;
             box-sizing: border-box;
+            font-size: 14px;
         }
 
         .collapsible {
             margin-bottom: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
         }
 
         .collapsible-header {
-            background-color: rgba(0,0,0,0.05);
+            background-color: rgba(0,0,0,0.03);
             padding: 10px 15px;
             cursor: pointer;
-            border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0;
             font-weight: 600;
         }
 
@@ -202,10 +241,7 @@
         }
 
         .collapsible.open .collapsible-content {
-            max-height: 1000px;
-            border: 1px solid var(--border-color);
-            border-top: none;
-            border-radius: 0 0 4px 4px;
+            max-height: 2000px;
         }
 
         pre {
@@ -213,8 +249,7 @@
             padding: 15px;
             overflow-x: auto;
             background-color: var(--input-bg);
-            border-radius: 4px;
-            font-family: monospace;
+            font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
             font-size: 14px;
         }
 
@@ -247,6 +282,9 @@
             cursor: pointer;
             font-size: 14px;
             transition: background-color 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .btn:hover {
@@ -256,6 +294,58 @@
         .btn-small {
             padding: 4px 8px;
             font-size: 12px;
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(0,0,0,0.05);
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .btn-warning {
+            background-color: var(--warning-color);
+            color: #744210;
+        }
+
+        .btn-warning:hover {
+            background-color: #d69e2e;
+        }
+
+        .btn-success {
+            background-color: var(--success-color);
+        }
+
+        .btn-success:hover {
+            background-color: #38a169;
+        }
+
+        .btn-icon {
+            padding: 6px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-group.vertical {
+            flex-direction: column;
         }
 
         .action-bar {
@@ -276,6 +366,7 @@
             display: flex;
             gap: 15px;
             margin-bottom: 10px;
+            flex-wrap: wrap;
         }
 
         .signature-param {
@@ -334,6 +425,26 @@
             display: flex;
         }
 
+        .flex-col {
+            flex-direction: column;
+        }
+
+        .items-center {
+            align-items: center;
+        }
+
+        .justify-between {
+            justify-content: space-between;
+        }
+
+        .gap-2 {
+            gap: 8px;
+        }
+
+        .gap-4 {
+            gap: 16px;
+        }
+
         .main-content {
             flex: 1;
         }
@@ -347,6 +458,8 @@
             list-style: none;
             padding: 0;
             margin: 0;
+            max-height: 600px;
+            overflow-y: auto;
         }
 
         .history-item {
@@ -417,7 +530,6 @@
             cursor: pointer;
             font-size: 18px;
             padding: 5px;
-            margin-left: auto;
         }
 
         footer {
@@ -429,6 +541,500 @@
             border-top: 1px solid var(--border-color);
         }
 
+        .tabs-row {
+            display: flex;
+            border-bottom: 1px solid var(--border-color);
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab:hover {
+            background-color: var(--primary-light);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--primary-color);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 15px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .grid-cols-2 {
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        /* Token editor styles */
+        .token-editor {
+            position: relative;
+        }
+
+        .token-part {
+            margin-bottom: 15px;
+        }
+
+        .token-part-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+            gap: 8px;
+        }
+
+        .token-part-label {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .token-signature-options {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* JWKS styles */
+        .jwks-url-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .jwks-url-input input {
+            flex: 1;
+        }
+
+        .jwks-keys {
+            margin-top: 15px;
+        }
+
+        .jwks-key {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 10px;
+            transition: border-color 0.2s;
+        }
+
+        .jwks-key:hover {
+            border-color: var(--primary-color);
+        }
+
+        .jwks-key-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .jwks-key-id {
+            font-weight: 600;
+        }
+
+        .jwks-key-alg {
+            color: #666;
+        }
+
+        /* Form groups */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        /* Token comparison */
+        .token-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .comparison-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .comparison-title {
+            font-weight: 600;
+        }
+
+        .diff-highlight {
+            background-color: rgba(236, 201, 75, 0.2);
+        }
+
+        .diff-addition {
+            background-color: rgba(72, 187, 120, 0.2);
+        }
+
+        .diff-removal {
+            background-color: rgba(229, 62, 62, 0.2);
+            text-decoration: line-through;
+        }
+
+        /* Tooltips for keyboard shortcuts */
+        .has-tooltip {
+            position: relative;
+        }
+
+        .tooltip {
+            visibility: hidden;
+            position: absolute;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--tooltip-bg);
+            color: var(--tooltip-color);
+            text-align: center;
+            padding: 5px 10px;
+            border-radius: 4px;
+            z-index: 1;
+            white-space: nowrap;
+            font-size: 12px;
+            font-weight: normal;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .has-tooltip:hover .tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* Keyboard shortcut indicator */
+        .keyboard-shortcut {
+            display: inline-block;
+            background-color: rgba(0,0,0,0.07);
+            color: var(--text-color);
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-family: monospace;
+            margin-left: 5px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+
+        /* Modal dialog */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+
+        .modal-backdrop.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-dialog {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-20px);
+            transition: transform 0.3s;
+        }
+
+        .modal-backdrop.show .modal-dialog {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .modal-footer {
+            padding: 15px 20px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--text-color);
+        }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .toast {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-radius: 4px;
+            padding: 12px 20px;
+            margin-top: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(120%);
+            transition: transform 0.3s ease;
+            border-left: 4px solid var(--primary-color);
+            max-width: 300px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.success {
+            border-left-color: var(--success-color);
+        }
+
+        .toast.error {
+            border-left-color: var(--danger-color);
+        }
+
+        .toast.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .toast-icon {
+            font-size: 18px;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .toast-message {
+            font-size: 14px;
+        }
+
+        /* Token visualization */
+        .token-viz {
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        .token-timeline {
+            height: 80px;
+            position: relative;
+            margin: 30px 0;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: var(--border-color);
+            transform: translateY(-50%);
+        }
+
+        .timeline-now {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background-color: var(--primary-color);
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .timeline-now::after {
+            content: 'Now';
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .timeline-marker {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .timeline-marker.exp {
+            background-color: var(--danger-color);
+        }
+
+        .timeline-marker.nbf {
+            background-color: var(--warning-color);
+        }
+
+        .timeline-marker.iat {
+            background-color: var(--success-color);
+        }
+
+        .timeline-marker::after {
+            content: attr(data-label);
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .timeline-marker::before {
+            content: attr(data-time);
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        /* Loading spinner */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 0.8s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Severity indicators for claims */
+        .severity-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .severity-high {
+            background-color: var(--danger-color);
+        }
+
+        .severity-medium {
+            background-color: var(--warning-color);
+        }
+
+        .severity-low {
+            background-color: var(--success-color);
+        }
+
+        .severity-info {
+            background-color: var(--primary-color);
+        }
+
+        /* Tag styles */
+        .tag {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 12px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+
+        /* Category filter */
+        .category-filters {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        .category-filter {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 13px;
+            background-color: var(--primary-light);
+            color: var(--primary-color);
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .category-filter.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Responsive styles */
+        @media (max-width: 1024px) {
+            .grid-cols-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .flex {
                 flex-direction: column;
@@ -438,18 +1044,37 @@
                 margin-left: 0;
                 margin-top: 20px;
             }
+            .token-comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .signature-info {
+                flex-direction: column;
+                gap: 8px;
+            }
+            .action-bar {
+                flex-direction: column;
+            }
+            .btn {
+                width: 100%;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>JWT Decoder & URL Encoder Tool</h1>
-        
-        <div class="security-banner">
-            <span class="security-icon">🔒</span>
-            <span>100% browser-based processing. No data leaves your browser. Works offline too!</span>
-            <button id="themeToggle" class="theme-toggle">🌙</button>
-        </div>
+        <header class="app-header">
+            <h1 class="app-title">JWT Decoder & URL Encoder</h1>
+            <div class="header-actions">
+                <div class="security-banner">
+                    <span class="security-icon">🔒</span>
+                    <span>100% browser-based processing. No data leaves your browser.</span>
+                </div>
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle dark mode">🌙</button>
+            </div>
+        </header>
 
         <nav class="tool-tabs">
             <button class="tab-button" data-tab="url">URL Encoder</button>
@@ -470,10 +1095,22 @@
                             <div class="status-message"></div>
                             <!-- URL encoder content would go here -->
                             <div class="action-bar">
-                                <button class="btn" id="encodeBtn">Encode URL</button>
-                                <button class="btn" id="decodeBtn">Decode URL</button>
-                                <button class="btn" id="copyUrlBtn">Copy URL</button>
-                                <button class="btn" id="clearUrlBtn">Clear</button>
+                                <button class="btn has-tooltip" id="encodeBtn">
+                                    Encode URL
+                                    <span class="tooltip">Shortcut: Alt+E</span>
+                                </button>
+                                <button class="btn has-tooltip" id="decodeBtn">
+                                    Decode URL
+                                    <span class="tooltip">Shortcut: Alt+D</span>
+                                </button>
+                                <button class="btn has-tooltip" id="copyUrlBtn">
+                                    Copy URL
+                                    <span class="tooltip">Shortcut: Alt+C</span>
+                                </button>
+                                <button class="btn btn-secondary has-tooltip" id="clearUrlBtn">
+                                    Clear
+                                    <span class="tooltip">Shortcut: Esc</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -484,55 +1121,208 @@
                     <div class="card">
                         <div class="card-header">
                             JWT Decoder & Inspector
+                            <div class="btn-group">
+                                <button id="helpBtn" class="btn btn-secondary btn-small has-tooltip">
+                                    <span>?</span>
+                                    <span class="tooltip">Keyboard Shortcuts</span>
+                                </button>
+                            </div>
                         </div>
                         <div class="validation-bar" id="jwtValidationBar"></div>
                         <div class="card-body">
-                            <textarea id="jwtInput" placeholder="Paste your JWT token or 'Authorization: Bearer [token]' header here..."></textarea>
-                            <div class="status-message" id="jwtStatusMessage"></div>
-                            
-                            <div class="collapsible" id="headerCollapsible">
-                                <div class="collapsible-header">
-                                    <span>Header</span>
-                                    <span>▼</span>
+                            <div class="tabs-row">
+                                <div class="tab active" data-tab="decoder">Decoder</div>
+                                <div class="tab" data-tab="editor">Editor</div>
+                                <div class="tab" data-tab="verify">Verify</div>
+                                <div class="tab" data-tab="compare">Compare</div>
+                                <div class="tab" data-tab="visualize">Visualize</div>
+                            </div>
+
+                            <!-- Decoder Tab -->
+                            <div class="tab-content active" id="decoderTab">
+                                <textarea id="jwtInput" placeholder="Paste your JWT token or 'Authorization: Bearer [token]' header here..."></textarea>
+                                <div class="status-message" id="jwtStatusMessage"></div>
+                                
+                                <div class="collapsible" id="headerCollapsible">
+                                    <div class="collapsible-header">
+                                        <span>Header</span>
+                                        <span>▼</span>
+                                    </div>
+                                    <div class="collapsible-content">
+                                        <pre id="headerJson"></pre>
+                                    </div>
                                 </div>
-                                <div class="collapsible-content">
-                                    <pre id="headerJson"></pre>
+                                
+                                <div class="collapsible" id="payloadCollapsible">
+                                    <div class="collapsible-header">
+                                        <span>Payload</span>
+                                        <span>▼</span>
+                                    </div>
+                                    <div class="collapsible-content">
+                                        <pre id="payloadJson"></pre>
+                                    </div>
+                                </div>
+                                
+                                <div class="signature-section">
+                                    <h3>Signature</h3>
+                                    <div class="signature-info" id="signatureInfo">
+                                        <!-- Signature info will be populated here -->
+                                    </div>
+                                </div>
+                                
+                                <div id="claimAlerts">
+                                    <!-- Claim alerts will be populated here -->
+                                </div>
+                                
+                                <div class="action-bar">
+                                    <button class="btn has-tooltip" id="copyJwtBtn">
+                                        Copy JWT
+                                        <span class="tooltip">Shortcut: Alt+J</span>
+                                    </button>
+                                    <button class="btn has-tooltip" id="copyJsonBtn">
+                                        Copy Payload JSON
+                                        <span class="tooltip">Shortcut: Alt+P</span>
+                                    </button>
+                                    <button class="btn has-tooltip" id="downloadJsonBtn">
+                                        Download JSON
+                                        <span class="tooltip">Shortcut: Alt+S</span>
+                                    </button>
+                                    <button class="btn btn-secondary has-tooltip" id="clearJwtBtn">
+                                        Clear
+                                        <span class="tooltip">Shortcut: Esc</span>
+                                    </button>
                                 </div>
                             </div>
-                            
-                            <div class="collapsible" id="payloadCollapsible">
-                                <div class="collapsible-header">
-                                    <span>Payload</span>
-                                    <span>▼</span>
-                                </div>
-                                <div class="collapsible-content">
-                                    <pre id="payloadJson"></pre>
-                                </div>
-                            </div>
-                            
-                            <div class="signature-section">
-                                <h3>Signature</h3>
-                                <div class="signature-info" id="signatureInfo">
-                                    <!-- Signature info will be populated here -->
-                                </div>
-                                <div class="verify-section">
-                                    <textarea id="secretInput" placeholder="Enter secret or public key to verify signature (optional)"></textarea>
+
+                            <!-- Editor Tab -->
+                            <div class="tab-content" id="editorTab">
+                                <div class="token-editor">
+                                    <div class="token-part">
+                                        <div class="token-part-header">
+                                            <div class="token-part-label">Header</div>
+                                            <button class="btn btn-secondary btn-small" id="formatHeaderBtn">Format</button>
+                                            <button class="btn btn-secondary btn-small" id="validateHeaderBtn">Validate</button>
+                                        </div>
+                                        <div id="headerEditor" class="editable-area" contenteditable="true" spellcheck="false"></div>
+                                    </div>
+                                    
+                                    <div class="token-part">
+                                        <div class="token-part-header">
+                                            <div class="token-part-label">Payload</div>
+                                            <button class="btn btn-secondary btn-small" id="formatPayloadBtn">Format</button>
+                                            <button class="btn btn-secondary btn-small" id="validatePayloadBtn">Validate</button>
+                                            <button class="btn btn-secondary btn-small" id="addClaimBtn">Add Claim</button>
+                                        </div>
+                                        <div id="payloadEditor" class="editable-area" contenteditable="true" spellcheck="false"></div>
+                                    </div>
+                                    
+                                    <div class="token-signature-options">
+                                        <div class="form-group">
+                                            <label for="signingAlgorithm">Signing Algorithm</label>
+                                            <select id="signingAlgorithm" class="form-control">
+                                                <option value="HS256">HS256 - HMAC with SHA-256</option>
+                                                <option value="HS384">HS384 - HMAC with SHA-384</option>
+                                                <option value="HS512">HS512 - HMAC with SHA-512</option>
+                                                <option value="RS256">RS256 - RSA with SHA-256</option>
+                                                <option value="RS384">RS384 - RSA with SHA-384</option>
+                                                <option value="RS512">RS512 - RSA with SHA-512</option>
+                                                <option value="ES256">ES256 - ECDSA with SHA-256</option>
+                                                <option value="ES384">ES384 - ECDSA with SHA-384</option>
+                                                <option value="ES512">ES512 - ECDSA with SHA-512</option>
+                                                <option value="none">none - No signature</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-group" id="secretKeyGroup">
+                                            <label for="secretKey">Secret Key / Private Key</label>
+                                            <textarea id="secretKey" placeholder="Enter your secret key or private key for signing"></textarea>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="action-bar">
-                                        <button class="btn" id="verifyBtn">Verify Signature</button>
-                                        <span id="verifyBadge" class="badge skipped">Skipped</span>
+                                        <button class="btn btn-success" id="generateTokenBtn">Generate Token</button>
+                                        <button class="btn" id="copyNewTokenBtn">Copy Token</button>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div id="claimAlerts">
-                                <!-- Claim alerts will be populated here -->
+
+                            <!-- Verify Tab -->
+                            <div class="tab-content" id="verifyTab">
+                                <div class="grid grid-cols-2">
+                                    <div>
+                                        <h3>Signature Verification</h3>
+                                        <div class="form-group">
+                                            <label for="verifySecret">Secret / Public Key</label>
+                                            <textarea id="verifySecret" placeholder="Enter secret key, public key, or certificate for verification"></textarea>
+                                        </div>
+                                        <div class="action-bar">
+                                            <button class="btn has-tooltip" id="verifyBtn">
+                                                Verify Signature
+                                                <span class="tooltip">Shortcut: Alt+V</span>
+                                            </button>
+                                            <span id="verifyBadge" class="badge skipped">Skipped</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div>
+                                        <h3>JWKS Verification</h3>
+                                        <div class="jwks-url-input">
+                                            <input type="url" id="jwksUrl" placeholder="Enter JWKS URL (e.g., https://example.com/.well-known/jwks.json)">
+                                            <button class="btn" id="fetchJwksBtn">Fetch</button>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="jwksInput">Or paste JWKS JSON</label>
+                                            <textarea id="jwksInput" placeholder="Paste JWKS content here..."></textarea>
+                                        </div>
+                                        <div class="jwks-keys" id="jwksKeys">
+                                            <!-- JWKS keys will be displayed here -->
+                                        </div>
+                                        <div class="action-bar">
+                                            <button class="btn" id="verifyJwksBtn">Verify with JWKS</button>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            
-                            <div class="action-bar">
-                                <button class="btn" id="copyJwtBtn">Copy JWT</button>
-                                <button class="btn" id="copyJsonBtn">Copy Payload JSON</button>
-                                <button class="btn" id="downloadJsonBtn">Download JSON</button>
-                                <button class="btn" id="clearJwtBtn">Clear</button>
+
+                            <!-- Compare Tab -->
+                            <div class="tab-content" id="compareTab">
+                                <div class="token-comparison">
+                                    <div>
+                                        <div class="comparison-header">
+                                            <div class="comparison-title">Token A</div>
+                                            <button class="btn btn-secondary btn-small" id="pasteCurrentABtn">Use Current</button>
+                                        </div>
+                                        <textarea id="compareTokenA" placeholder="Paste first JWT to compare..."></textarea>
+                                    </div>
+                                    <div>
+                                        <div class="comparison-header">
+                                            <div class="comparison-title">Token B</div>
+                                            <button class="btn btn-secondary btn-small" id="pasteCurrentBBtn">Use Current</button>
+                                        </div>
+                                        <textarea id="compareTokenB" placeholder="Paste second JWT to compare..."></textarea>
+                                    </div>
+                                </div>
+                                <div class="action-bar">
+                                    <button class="btn" id="compareTokensBtn">Compare Tokens</button>
+                                </div>
+                                <div id="comparisonResults"></div>
+                            </div>
+
+                            <!-- Visualize Tab -->
+                            <div class="tab-content" id="visualizeTab">
+                                <div class="token-viz">
+                                    <h3>Token Lifetime</h3>
+                                    <div class="token-timeline" id="tokenTimeline">
+                                        <div class="timeline-line"></div>
+                                        <div class="timeline-now"></div>
+                                        <!-- Timeline markers will be added here -->
+                                    </div>
+                                    
+                                    <h3>Claims Analysis</h3>
+                                    <div id="claimsAnalysis">
+                                        <!-- Claims analysis will be displayed here -->
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -548,6 +1338,12 @@
                         <div class="search-box">
                             <input type="text" id="historySearch" placeholder="Search history...">
                         </div>
+                        <div class="category-filters" id="categoryFilters">
+                            <div class="category-filter active" data-category="all">All</div>
+                            <div class="category-filter" data-category="starred">Starred</div>
+                            <div class="category-filter" data-category="valid">Valid</div>
+                            <div class="category-filter" data-category="invalid">Invalid</div>
+                        </div>
                         <ul class="history-list" id="historyList">
                             <!-- History items will be populated here -->
                         </ul>
@@ -556,561 +1352,531 @@
             </aside>
         </div>
         
+        <!-- Keyboard shortcuts modal -->
+        <div class="modal-backdrop" id="shortcutsModal">
+            <div class="modal-dialog">
+                <div class="modal-header">
+                    <h2 class="modal-title">Keyboard Shortcuts</h2>
+                    <button class="close-btn" id="closeShortcutsBtn">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <h3>Navigation</h3>
+                    <ul>
+                        <li><span class="keyboard-shortcut">Alt+1</span> Switch to Decoder tab</li>
+                        <li><span class="keyboard-shortcut">Alt+2</span> Switch to Editor tab</li>
+                        <li><span class="keyboard-shortcut">Alt+3</span> Switch to Verify tab</li>
+                        <li><span class="keyboard-shortcut">Alt+4</span> Switch to Compare tab</li>
+                        <li><span class="keyboard-shortcut">Alt+5</span> Switch to Visualize tab</li>
+                    </ul>
+                    
+                    <h3>Actions</h3>
+                    <ul>
+                        <li><span class="keyboard-shortcut">Alt+J</span> Copy JWT</li>
+                        <li><span class="keyboard-shortcut">Alt+P</span> Copy Payload JSON</li>
+                        <li><span class="keyboard-shortcut">Alt+V</span> Verify Signature</li>
+                        <li><span class="keyboard-shortcut">Alt+S</span> Download JSON</li>
+                        <li><span class="keyboard-shortcut">Alt+G</span> Generate Token (in Editor)</li>
+                        <li><span class="keyboard-shortcut">Alt+E</span> Encode URL (in URL Encoder)</li>
+                        <li><span class="keyboard-shortcut">Alt+D</span> Decode URL (in URL Encoder)</li>
+                        <li><span class="keyboard-shortcut">Alt+N</span> Add Nickname (to selected history item)</li>
+                        <li><span class="keyboard-shortcut">Esc</span> Clear current input</li>
+                    </ul>
+                    
+                    <h3>History Navigation</h3>
+                    <ul>
+                        <li><span class="keyboard-shortcut">j</span> Next history item</li>
+                        <li><span class="keyboard-shortcut">k</span> Previous history item</li>
+                        <li><span class="keyboard-shortcut">s</span> Star/unstar selected history item</li>
+                        <li><span class="keyboard-shortcut">Enter</span> Load selected history item</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Toast notification container -->
+        <div class="toast-container" id="toastContainer">
+            <!-- Toast notifications will be dynamically added here -->
+        </div>
+        
         <footer>
-            <p>JWT Decoder & URL Encoder Tool | All processing happens in your browser | No data is sent to any server</p>
+            <p>Enhanced JWT Decoder & URL Encoder Tool | All processing happens in your browser | No data is sent to any server</p>
         </footer>
     </div>
 
+    <!-- Load jose library from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/jose@4.14.4/dist/browser/index.js"></script>
+
     <script>
-        // Utility functions
-        const logger = {
-            log: function(message, data = {}) {
-                console.log(`[LOG] ${message}`, data);
-                // In a production app, this might send to a logging service
-                // but only with appropriate masking for sensitive data
-            }
-        };
-
-        function escapeHtml(unsafe) {
-            return unsafe
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;");
-        }
-
-        function copyText(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                // Success message could be shown here
-            }, (err) => {
-                console.error('Failed to copy: ', err);
-            });
-        }
-
-        function maskJwt(jwt) {
-            if (!jwt) return '';
-            if (jwt.length <= 20) return jwt; // Don't mask short tokens
-            return jwt.substr(0, 10) + '...' + jwt.substr(jwt.length - 10);
-        }
-
-        function formatJsonString(json) {
-            if (!json) return '';
-            // Replace with regex to highlight JSON syntax
-            return json.replace(/"([^"]+)":/g, '<span class="json-key">"$1":</span>')
-                .replace(/"([^"]*)"/g, '<span class="json-string">"$1"</span>')
-                .replace(/\b(\d+)(?![":])/g, '<span class="json-number">$1</span>')
-                .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
-                .replace(/\bnull\b/g, '<span class="json-null">null</span>');
-        }
-
-        function decodeTime(timestamp) {
-            if (!timestamp) return '';
-            const date = new Date(timestamp * 1000);
-            return date.toLocaleString();
-        }
-
-        function getTimeStatus(exp, nbf) {
-            const now = Math.floor(Date.now() / 1000);
-            
-            if (exp && now > exp) {
-                const expiredFor = Math.floor((now - exp) / 86400);
-                return {
-                    status: 'expired',
-                    message: `Expired ${expiredFor > 0 ? `(${expiredFor} day${expiredFor > 1 ? 's' : ''} ago)` : 'recently'}`,
-                    type: 'danger'
-                };
-            }
-            
-            if (exp && now > exp - 86400) {
-                const expiresIn = Math.floor((exp - now) / 3600);
-                return {
-                    status: 'expiring',
-                    message: `Expires soon (in ${expiresIn} hour${expiresIn > 1 ? 's' : ''})`,
-                    type: 'warning'
-                };
-            }
-            
-            if (nbf && now < nbf) {
-                const validIn = Math.floor((nbf - now) / 60);
-                return {
-                    status: 'notYetValid',
-                    message: `Not yet valid (valid in ${validIn} minute${validIn > 1 ? 's' : ''})`,
-                    type: 'warning'
-                };
-            }
-            
-            return {
-                status: 'valid',
-                message: 'Token is currently valid',
-                type: 'success'
+        // Main application code
+        document.addEventListener('DOMContentLoaded', () => {
+            // Global app state
+            const AppState = {
+                currentJwt: null,
+                signatureStatus: 'skipped',
+                selectedHistoryItem: null,
+                worker: null,
+                db: null,
+                jwksKeys: [],
+                compareResults: null,
+                keyboardShortcutsEnabled: true
             };
-        }
 
-        // JWT Decoder functions
-        function parseJwt(token) {
-            try {
-                // Remove 'Bearer ' prefix if present
-                if (token.startsWith('Bearer ')) {
-                    token = token.split(' ')[1];
-                }
-                // Also handle Authorization header format
-                if (token.startsWith('Authorization: Bearer ')) {
-                    token = token.split(' ')[2];
-                }
-                
-                const parts = token.split('.');
-                if (parts.length !== 3) {
-                    throw new Error('Invalid JWT format');
-                }
-                
-                const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')));
-                const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-                
-                return {
-                    header,
-                    payload,
-                    signature: parts[2],
-                    raw: {
-                        header: parts[0],
-                        payload: parts[1],
-                        signature: parts[2]
-                    }
-                };
-            } catch (e) {
-                throw new Error('Invalid JWT: ' + e.message);
-            }
-        }
-
-        // Lazy load jsrsasign for signature verification
-        let jsrsasignLoaded = false;
-        
-        async function loadJsrsasign() {
-            if (jsrsasignLoaded) return Promise.resolve();
-            
-            return new Promise((resolve, reject) => {
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.5.27/jsrsasign-all-min.js';
-                script.onload = () => {
-                    jsrsasignLoaded = true;
-                    resolve();
-                };
-                script.onerror = () => reject(new Error('Failed to load jsrsasign'));
-                document.head.appendChild(script);
-            });
-        }
-
-        async function verifySignature(jwt, secret) {
-            try {
-                await loadJsrsasign();
-                
-                // Remove 'Bearer ' prefix if present
-                if (jwt.startsWith('Bearer ')) {
-                    jwt = jwt.split(' ')[1];
-                }
-                // Also handle Authorization header format
-                if (jwt.startsWith('Authorization: Bearer ')) {
-                    jwt = jwt.split(' ')[2];
-                }
-                
-                // Parse the JWT to get the algorithm
-                const parsedJwt = parseJwt(jwt);
-                const alg = parsedJwt.header.alg;
-                
-                // Handle different algorithm types
-                if (alg.startsWith('HS')) {
-                    // HMAC algorithms
-                    return KJUR.jws.JWS.verifyJWT(jwt, secret, {alg: [alg]});
-                } else if (alg.startsWith('RS') || alg.startsWith('PS') || alg.startsWith('ES')) {
-                    // RSA and ECDSA algorithms
-                    return KJUR.jws.JWS.verifyJWT(jwt, {utf8: secret}, {alg: [alg]});
-                } else {
-                    throw new Error(`Unsupported algorithm: ${alg}`);
-                }
-            } catch (e) {
-                console.error('Verification error:', e);
-                return false;
-            }
-        }
-
-        // History management
-        class HistoryManager {
-            constructor(type) {
-                this.type = type;
-                this.storageKey = `${type}History`;
-                this.history = this.loadHistory();
-                this.idleTimerId = null;
-                this.idleDelay = 10000; // 10 seconds
-            }
-            
-            loadHistory() {
-                try {
-                    const stored = localStorage.getItem(this.storageKey);
-                    return stored ? JSON.parse(stored) : [];
-                } catch (e) {
-                    console.error('Error loading history:', e);
-                    return [];
-                }
-            }
-            
-            saveHistory() {
-                try {
-                    // Limit to 50 entries
-                    if (this.history.length > 50) {
-                        this.history = this.history.slice(0, 50);
-                    }
-                    localStorage.setItem(this.storageKey, JSON.stringify(this.history));
-                } catch (e) {
-                    console.error('Error saving history:', e);
-                }
-            }
-            
-            addEntry(entry) {
-                // Check if entry with same ID already exists
-                const existingIndex = this.history.findIndex(item => item.id === entry.id);
-                
-                if (existingIndex >= 0) {
-                    // Update existing entry
-                    const existing = this.history[existingIndex];
-                    entry.starred = existing.starred;
-                    if (existing.nickname) entry.nickname = existing.nickname;
+            // Initialize Web Worker for crypto operations
+            function initializeWorker() {
+                // Create a blob URL for the worker script
+                const workerCode = `
+                    importScripts('https://cdn.jsdelivr.net/npm/jose@4.14.4/dist/browser/index.js');
                     
-                    // Remove old entry
-                    this.history.splice(existingIndex, 1);
-                }
-                
-                // Add new entry at the beginning
-                this.history.unshift(entry);
-                this.saveHistory();
-                this.renderHistory();
-            }
-            
-            markStarred(id, starred) {
-                const index = this.history.findIndex(item => item.id === id);
-                if (index >= 0) {
-                    this.history[index].starred = starred;
-                    this.saveHistory();
-                    this.renderHistory();
-                }
-            }
-            
-            updateNickname(id, nickname) {
-                const index = this.history.findIndex(item => item.id === id);
-                if (index >= 0) {
-                    this.history[index].nickname = nickname;
-                    this.saveHistory();
-                    this.renderHistory();
-                }
-            }
-            
-            search(query) {
-                if (!query) {
-                    this.renderHistory();
-                    return;
-                }
-                
-                const filteredHistory = this.history.filter(item => {
-                    return (
-                        (item.nickname && item.nickname.toLowerCase().includes(query.toLowerCase())) ||
-                        (this.type === 'jwt' && item.header && JSON.stringify(item.header).toLowerCase().includes(query.toLowerCase())) ||
-                        (this.type === 'jwt' && item.payload && JSON.stringify(item.payload).toLowerCase().includes(query.toLowerCase())) ||
-                        (this.type === 'url' && item.url && item.url.toLowerCase().includes(query.toLowerCase()))
-                    );
-                });
-                
-                this.renderHistoryItems(filteredHistory);
-            }
-            
-            scheduleAutoSave(entry) {
-                // Clear any existing timer
-                if (this.idleTimerId) {
-                    clearTimeout(this.idleTimerId);
-                }
-                
-                // Set new timer
-                this.idleTimerId = setTimeout(() => {
-                    this.addEntry(entry);
-                    this.idleTimerId = null;
-                }, this.idleDelay);
-            }
-            
-            renderHistory() {
-                // Sort: starred first, then by timestamp (newest first)
-                const sortedHistory = [...this.history].sort((a, b) => {
-                    if (a.starred && !b.starred) return -1;
-                    if (!a.starred && b.starred) return 1;
-                    return new Date(b.timestamp) - new Date(a.timestamp);
-                });
-                
-                this.renderHistoryItems(sortedHistory);
-            }
-            
-            renderHistoryItems(items) {
-                const historyList = document.getElementById('historyList');
-                if (!historyList) return;
-                
-                historyList.innerHTML = '';
-                
-                if (items.length === 0) {
-                    historyList.innerHTML = '<li class="history-item">No history items yet</li>';
-                    return;
-                }
-                
-                items.forEach(item => {
-                    const li = document.createElement('li');
-                    li.className = 'history-item';
-                    
-                    const starBtn = document.createElement('button');
-                    starBtn.className = `star-btn ${item.starred ? 'starred' : ''}`;
-                    starBtn.textContent = '★';
-                    starBtn.title = item.starred ? 'Unstar' : 'Star';
-                    starBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        this.markStarred(item.id, !item.starred);
-                    };
-                    
-                    const content = document.createElement('div');
-                    content.className = 'history-item-content';
-                    
-                    const title = document.createElement('div');
-                    title.className = 'history-item-title';
-                    title.textContent = item.nickname || (this.type === 'jwt' ? item.jwtMasked : item.urlMasked);
-                    
-                    const date = document.createElement('div');
-                    date.className = 'history-item-date';
-                    date.textContent = item.displayDate;
-                    
-                    content.appendChild(title);
-                    content.appendChild(date);
-                    
-                    li.appendChild(starBtn);
-                    li.appendChild(content);
-                    
-                    // Add double-click to edit nickname
-                    content.ondblclick = (e) => {
-                        const newNickname = prompt('Enter nickname:', item.nickname || '');
-                        if (newNickname !== null) {
-                            this.updateNickname(item.id, newNickname);
-                        }
-                    };
-                    
-                    // Add click to load
-                    li.onclick = () => {
-                        if (this.type === 'jwt') {
-                            // Load JWT data
-                            const jwtInput = document.getElementById('jwtInput');
-                            if (jwtInput) {
-                                const jwtApp = window.jwtApp; // Get the JwtApp instance
-                                if (jwtApp) {
-                                    const parts = [item.raw.header, item.raw.payload, item.raw.signature].join('.');
-                                    jwtInput.value = parts;
-                                    jwtApp.processJwt(parts);
+                    self.onmessage = async function(e) {
+                        const { action, data } = e.data;
+                        
+                        try {
+                            if (action === 'verifyJwt') {
+                                const { jwt, secret, algorithm } = data;
+                                let result = false;
+                                
+                                if (algorithm.startsWith('HS')) {
+                                    // HMAC verification
+                                    const secretBytes = new TextEncoder().encode(secret);
+                                    try {
+                                        await jose.jwtVerify(jwt, secretBytes);
+                                        result = true;
+                                    } catch (err) {
+                                        result = false;
+                                    }
+                                } else if (algorithm.startsWith('RS') || algorithm.startsWith('PS') || algorithm.startsWith('ES')) {
+                                    // RSA & ECDSA verification with public key
+                                    try {
+                                        const publicKey = await jose.importSPKI(secret, algorithm);
+                                        await jose.jwtVerify(jwt, publicKey);
+                                        result = true;
+                                    } catch (err) {
+                                        result = false;
+                                    }
+                                }
+                                
+                                self.postMessage({ action: 'verifyJwtResult', result });
+                            } else if (action === 'generateJwt') {
+                                const { header, payload, secret, algorithm } = data;
+                                
+                                if (algorithm === 'none') {
+                                    // Create unsigned token
+                                    const headerBase64 = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+                                    const payloadBase64 = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+                                    const token = `${headerBase64}.${payloadBase64}.`;
+                                    self.postMessage({ action: 'generateJwtResult', token });
+                                } else if (algorithm.startsWith('HS')) {
+                                    // HMAC signing
+                                    const secretBytes = new TextEncoder().encode(secret);
+                                    const key = await jose.importJWK({ kty: 'oct', k: jose.base64url.encode(secretBytes) }, algorithm);
+                                    
+                                    const token = await new jose.SignJWT(payload)
+                                        .setProtectedHeader({ alg: algorithm, ...header })
+                                        .sign(key);
+                                    
+                                    self.postMessage({ action: 'generateJwtResult', token });
+                                } else if (algorithm.startsWith('RS') || algorithm.startsWith('PS') || algorithm.startsWith('ES')) {
+                                    // RSA & ECDSA signing with private key
+                                    try {
+                                        const privateKey = await jose.importPKCS8(secret, algorithm);
+                                        
+                                        const token = await new jose.SignJWT(payload)
+                                            .setProtectedHeader({ alg: algorithm, ...header })
+                                            .sign(privateKey);
+                                        
+                                        self.postMessage({ action: 'generateJwtResult', token });
+                                    } catch (err) {
+                                        self.postMessage({ action: 'error', error: err.message });
+                                    }
+                                }
+                            } else if (action === 'verifyJwks') {
+                                const { jwt, jwks } = data;
+                                
+                                try {
+                                    // Parse the JWT header to get kid
+                                    const parts = jwt.split('.');
+                                    const headerBase64 = parts[0];
+                                    const header = JSON.parse(atob(headerBase64.replace(/-/g, '+').replace(/_/g, '/')));
+                                    
+                                    // Find the key in JWKS
+                                    const kid = header.kid;
+                                    const matchingKey = jwks.keys.find(key => key.kid === kid);
+                                    
+                                    if (!matchingKey) {
+                                        throw new Error('No matching key found in JWKS');
+                                    }
+                                    
+                                    // Import the JWK
+                                    const publicKey = await jose.importJWK(matchingKey, header.alg);
+                                    
+                                    // Verify the JWT
+                                    await jose.jwtVerify(jwt, publicKey);
+                                    
+                                    self.postMessage({ action: 'verifyJwksResult', result: true, kid });
+                                } catch (err) {
+                                    self.postMessage({ action: 'verifyJwksResult', result: false, error: err.message });
+                                }
+                            } else if (action === 'compareTokens') {
+                                const { tokenA, tokenB } = data;
+                                
+                                try {
+                                    // Parse tokens
+                                    const partsA = tokenA.split('.');
+                                    const partsB = tokenB.split('.');
+                                    
+                                    const headerA = JSON.parse(atob(partsA[0].replace(/-/g, '+').replace(/_/g, '/')));
+                                    const payloadA = JSON.parse(atob(partsA[1].replace(/-/g, '+').replace(/_/g, '/')));
+                                    
+                                    const headerB = JSON.parse(atob(partsB[0].replace(/-/g, '+').replace(/_/g, '/')));
+                                    const payloadB = JSON.parse(atob(partsB[1].replace(/-/g, '+').replace(/_/g, '/')));
+                                    
+                                    // Compare headers
+                                    const headerDiff = compareObjects(headerA, headerB);
+                                    
+                                    // Compare payloads
+                                    const payloadDiff = compareObjects(payloadA, payloadB);
+                                    
+                                    // Compare signatures
+                                    const signatureDiff = partsA[2] === partsB[2];
+                                    
+                                    self.postMessage({ 
+                                        action: 'compareTokensResult',
+                                        result: {
+                                            headerDiff,
+                                            payloadDiff,
+                                            signatureDiff,
+                                            headerA,
+                                            headerB,
+                                            payloadA,
+                                            payloadB
+                                        }
+                                    });
+                                } catch (err) {
+                                    self.postMessage({ action: 'error', error: err.message });
                                 }
                             }
-                        } else if (this.type === 'url') {
-                            // Load URL data (assuming urlApp exists)
-                            const urlInput = document.getElementById('urlInput');
-                            if (urlInput && window.urlApp) {
-                                urlInput.value = item.url;
-                                window.urlApp.processUrl(item.url);
+                        } catch (err) {
+                            self.postMessage({ action: 'error', error: err.message });
+                        }
+                    };
+                    
+                    // Helper function to compare objects and find differences
+                    function compareObjects(a, b) {
+                        const allKeys = new Set([...Object.keys(a), ...Object.keys(b)]);
+                        const diff = {};
+                        
+                        for (const key of allKeys) {
+                            // Key in A but not in B
+                            if (key in a && !(key in b)) {
+                                diff[key] = { type: 'removed', value: a[key] };
+                            }
+                            // Key in B but not in A
+                            else if (!(key in a) && key in b) {
+                                diff[key] = { type: 'added', value: b[key] };
+                            }
+                            // Key in both but values differ
+                            else if (JSON.stringify(a[key]) !== JSON.stringify(b[key])) {
+                                diff[key] = { 
+                                    type: 'changed', 
+                                    oldValue: a[key], 
+                                    newValue: b[key] 
+                                };
                             }
                         }
-                    };
-                    
-                    historyList.appendChild(li);
-                });
-            }
-        }
-
-        // Main application
-        class JwtApp {
-            constructor() {
-                this.historyManager = new HistoryManager('jwt');
-                this.currentJwt = null;
-                this.signatureStatus = 'skipped';
+                        
+                        return Object.keys(diff).length > 0 ? diff : null;
+                    }
+                `;
                 
-                this.elements = {
-                    jwtInput: document.getElementById('jwtInput'),
-                    validationBar: document.getElementById('jwtValidationBar'),
-                    statusMessage: document.getElementById('jwtStatusMessage'),
-                    headerJson: document.getElementById('headerJson'),
-                    payloadJson: document.getElementById('payloadJson'),
-                    signatureInfo: document.getElementById('signatureInfo'),
-                    secretInput: document.getElementById('secretInput'),
-                    verifyBtn: document.getElementById('verifyBtn'),
-                    verifyBadge: document.getElementById('verifyBadge'),
-                    claimAlerts: document.getElementById('claimAlerts'),
-                    copyJwtBtn: document.getElementById('copyJwtBtn'),
-                    copyJsonBtn: document.getElementById('copyJsonBtn'),
-                    downloadJsonBtn: document.getElementById('downloadJsonBtn'),
-                    clearJwtBtn: document.getElementById('clearJwtBtn'),
-                    headerCollapsible: document.getElementById('headerCollapsible'),
-                    payloadCollapsible: document.getElementById('payloadCollapsible')
+                const blob = new Blob([workerCode], { type: 'application/javascript' });
+                const workerUrl = URL.createObjectURL(blob);
+                
+                AppState.worker = new Worker(workerUrl);
+                
+                // Set up worker message handling
+                AppState.worker.onmessage = function(e) {
+                    const { action, result, error, token, kid } = e.data;
+                    
+                    if (action === 'verifyJwtResult') {
+                        // Handle verification result
+                        handleVerificationResult(result);
+                    } else if (action === 'generateJwtResult') {
+                        // Handle token generation result
+                        handleTokenGeneration(token);
+                    } else if (action === 'verifyJwksResult') {
+                        // Handle JWKS verification result
+                        handleJwksVerificationResult(result, kid, error);
+                    } else if (action === 'compareTokensResult') {
+                        // Handle token comparison result
+                        handleComparisonResult(result);
+                    } else if (action === 'error') {
+                        // Handle errors
+                        showToast('Error', error, 'error');
+                    }
+                };
+            }
+
+            // Initialize IndexedDB for storage
+            function initializeDatabase() {
+                const request = indexedDB.open('JwtDecoderDB', 1);
+                
+                request.onerror = function(event) {
+                    console.error('IndexedDB error:', event.target.error);
+                    // Fall back to localStorage if IndexedDB fails
+                    AppState.db = null;
                 };
                 
-                this.initializeEvents();
-                
-                // Initialize collapsibles
-                document.querySelectorAll('.collapsible').forEach(coll => {
-                    coll.querySelector('.collapsible-header').addEventListener('click', () => {
-                        coll.classList.toggle('open');
-                        const arrow = coll.querySelector('.collapsible-header span:last-child');
-                        arrow.textContent = coll.classList.contains('open') ? '▲' : '▼';
-                    });
-                });
-                
-                // Render initial history
-                this.historyManager.renderHistory();
-            }
-            
-            initializeEvents() {
-                // JWT input event
-                this.elements.jwtInput.addEventListener('input', () => {
-                    const jwt = this.elements.jwtInput.value.trim();
-                    if (jwt) {
-                        this.processJwt(jwt);
-                    } else {
-                        this.clearDisplay();
-                    }
-                });
-                
-                // Verify button
-                this.elements.verifyBtn.addEventListener('click', () => {
-                    const jwt = this.elements.jwtInput.value.trim();
-                    const secret = this.elements.secretInput.value.trim();
+                request.onupgradeneeded = function(event) {
+                    const db = event.target.result;
                     
-                    if (jwt && secret) {
-                        this.verifyJwtSignature(jwt, secret);
-                    } else {
-                        this.setStatus('Please enter both JWT and secret/key', 'error');
+                    // Create object stores
+                    if (!db.objectStoreNames.contains('tokens')) {
+                        const tokenStore = db.createObjectStore('tokens', { keyPath: 'id' });
+                        tokenStore.createIndex('timestamp', 'timestamp', { unique: false });
+                        tokenStore.createIndex('starred', 'starred', { unique: false });
+                        tokenStore.createIndex('nickname', 'nickname', { unique: false });
+                        tokenStore.createIndex('signatureValid', 'signatureValid', { unique: false });
                     }
-                });
-                
-                // Copy buttons
-                this.elements.copyJwtBtn.addEventListener('click', () => {
-                    const jwt = this.elements.jwtInput.value.trim();
-                    if (jwt) {
-                        copyText(jwt);
-                        this.setStatus('JWT copied to clipboard', 'success');
+                    
+                    if (!db.objectStoreNames.contains('settings')) {
+                        db.createObjectStore('settings', { keyPath: 'id' });
                     }
-                });
+                };
                 
-                this.elements.copyJsonBtn.addEventListener('click', () => {
-                    if (this.currentJwt && this.currentJwt.payload) {
-                        const json = JSON.stringify(this.currentJwt.payload, null, 2);
-                        copyText(json);
-                        this.setStatus('Payload JSON copied to clipboard', 'success');
-                    }
-                });
+                request.onsuccess = function(event) {
+                    AppState.db = event.target.result;
+                    console.log('IndexedDB initialized successfully');
+                    
+                    // Load history after DB is ready
+                    loadJwtHistory();
+                };
+            }
+
+            // Toast notification system
+            const toastSystem = {
+                container: document.getElementById('toastContainer'),
                 
-                // Download button
-                this.elements.downloadJsonBtn.addEventListener('click', () => {
-                    if (this.currentJwt) {
-                        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
-                            JSON.stringify({
-                                header: this.currentJwt.header,
-                                payload: this.currentJwt.payload
-                            }, null, 2)
-                        );
-                        const downloadAnchor = document.createElement('a');
-                        downloadAnchor.setAttribute("href", dataStr);
-                        downloadAnchor.setAttribute("download", "jwt-decoded.json");
-                        document.body.appendChild(downloadAnchor);
-                        downloadAnchor.click();
-                        downloadAnchor.remove();
-                    }
-                });
-                
-                // Clear button
-                this.elements.clearJwtBtn.addEventListener('click', () => {
-                    this.elements.jwtInput.value = '';
-                    this.clearDisplay();
-                });
-                
-                // History search
-                const historySearch = document.getElementById('historySearch');
-                if (historySearch) {
-                    historySearch.addEventListener('input', () => {
-                        this.historyManager.search(historySearch.value);
-                    });
+                show: function(title, message, type = 'info', duration = 3000) {
+                    const toast = document.createElement('div');
+                    toast.className = `toast ${type}`;
+                    
+                    let icon = '🔔';
+                    if (type === 'success') icon = '✅';
+                    if (type === 'error') icon = '❌';
+                    if (type === 'warning') icon = '⚠️';
+                    
+                    toast.innerHTML = `
+                        <div class="toast-icon">${icon}</div>
+                        <div class="toast-content">
+                            <div class="toast-title">${title}</div>
+                            <div class="toast-message">${message}</div>
+                        </div>
+                    `;
+                    
+                    this.container.appendChild(toast);
+                    
+                    // Trigger reflow to enable transition
+                    toast.offsetHeight;
+                    toast.classList.add('show');
+                    
+                    setTimeout(() => {
+                        toast.classList.remove('show');
+                        setTimeout(() => {
+                            this.container.removeChild(toast);
+                        }, 300);
+                    }, duration);
                 }
+            };
+
+            function showToast(title, message, type = 'info', duration = 3000) {
+                toastSystem.show(title, message, type, duration);
             }
-            
-            processJwt(jwt) {
+
+            // Utility functions
+            function escapeHtml(unsafe) {
+                return unsafe
+                    .replace(/&/g, "&amp;")
+                    .replace(/</g, "&lt;")
+                    .replace(/>/g, "&gt;")
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;");
+            }
+
+            function copyText(text) {
+                navigator.clipboard.writeText(text).then(() => {
+                    showToast('Copied', 'Copied to clipboard', 'success');
+                }, (err) => {
+                    console.error('Failed to copy: ', err);
+                    showToast('Error', 'Failed to copy text', 'error');
+                });
+            }
+
+            function maskJwt(jwt) {
+                if (!jwt) return '';
+                if (jwt.length <= 20) return jwt; // Don't mask short tokens
+                return jwt.substr(0, 10) + '...' + jwt.substr(jwt.length - 10);
+            }
+
+            function formatJsonString(json) {
+                if (!json) return '';
+                // Replace with regex to highlight JSON syntax
+                return json.replace(/"([^"]+)":/g, '<span class="json-key">"$1":</span>')
+                    .replace(/"([^"]*)"/g, '<span class="json-string">"$1"</span>')
+                    .replace(/\b(\d+)(?![":])/g, '<span class="json-number">$1</span>')
+                    .replace(/\b(true|false)\b/g, '<span class="json-boolean">$1</span>')
+                    .replace(/\bnull\b/g, '<span class="json-null">null</span>');
+            }
+
+            function decodeTime(timestamp) {
+                if (!timestamp) return '';
+                const date = new Date(timestamp * 1000);
+                return date.toLocaleString();
+            }
+
+            function getTimeStatus(exp, nbf) {
+                const now = Math.floor(Date.now() / 1000);
+                
+                if (exp && now > exp) {
+                    const expiredFor = Math.floor((now - exp) / 86400);
+                    return {
+                        status: 'expired',
+                        message: `Expired ${expiredFor > 0 ? `(${expiredFor} day${expiredFor > 1 ? 's' : ''} ago)` : 'recently'}`,
+                        type: 'danger'
+                    };
+                }
+                
+                if (exp && now > exp - 86400) {
+                    const expiresIn = Math.floor((exp - now) / 3600);
+                    return {
+                        status: 'expiring',
+                        message: `Expires soon (in ${expiresIn} hour${expiresIn > 1 ? 's' : ''})`,
+                        type: 'warning'
+                    };
+                }
+                
+                if (nbf && now < nbf) {
+                    const validIn = Math.floor((nbf - now) / 60);
+                    return {
+                        status: 'notYetValid',
+                        message: `Not yet valid (valid in ${validIn} minute${validIn > 1 ? 's' : ''})`,
+                        type: 'warning'
+                    };
+                }
+                
+                return {
+                    status: 'valid',
+                    message: 'Token is currently valid',
+                    type: 'success'
+                };
+            }
+
+            // JWT parsing and handling
+            function parseJwt(token) {
                 try {
-                    this.currentJwt = parseJwt(jwt);
+                    // Remove 'Bearer ' prefix if present
+                    if (token.startsWith('Bearer ')) {
+                        token = token.split(' ')[1];
+                    }
+                    // Also handle Authorization header format
+                    if (token.startsWith('Authorization: Bearer ')) {
+                        token = token.split(' ')[2];
+                    }
                     
-                    // Reset signature status
-                    this.signatureStatus = 'skipped';
-                    this.elements.verifyBadge.textContent = 'Skipped';
-                    this.elements.verifyBadge.className = 'badge skipped';
+                    const parts = token.split('.');
+                    if (parts.length !== 3) {
+                        throw new Error('Invalid JWT format');
+                    }
                     
-                    // Display header and payload
-                    this.displayHeader(this.currentJwt.header);
-                    this.displayPayload(this.currentJwt.payload);
+                    const header = JSON.parse(atob(parts[0].replace(/-/g, '+').replace(/_/g, '/')));
+                    const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
                     
-                    // Display signature info
-                    this.displaySignatureInfo(this.currentJwt.header);
-                    
-                    // Check claims
-                    this.analyzeClaims(this.currentJwt.payload);
-                    
-                    // Set status
-                    this.elements.validationBar.className = 'validation-bar valid';
-                    this.setStatus('JWT successfully decoded', 'success');
-                    
-                    // Auto open collapsibles
-                    this.elements.headerCollapsible.classList.add('open');
-                    this.elements.payloadCollapsible.classList.add('open');
-                    
-                    // Log the action
-                    logger.log("JWT decoded", {
-                        kid: this.currentJwt.header.kid,
-                        alg: this.currentJwt.header.alg,
-                        claims: Object.keys(this.currentJwt.payload),
-                        valid: true
-                    });
-                    
-                    // Schedule auto-save to history
-                    const rawJwt = [this.currentJwt.raw.header, this.currentJwt.raw.payload, this.currentJwt.raw.signature].join('.');
-                    const jwtEntry = {
-                        id: this.generateId(rawJwt),
-                        jwtMasked: maskJwt(rawJwt),
-                        header: this.currentJwt.header,
-                        payload: this.currentJwt.payload,
-                        signatureValid: this.signatureStatus,
-                        timestamp: new Date().toISOString(),
-                        displayDate: new Date().toLocaleString(),
-                        starred: false,
-                        nickname: '',
+                    return {
+                        header,
+                        payload,
+                        signature: parts[2],
                         raw: {
-                            header: this.currentJwt.raw.header,
-                            payload: this.currentJwt.raw.payload,
-                            signature: this.currentJwt.raw.signature
+                            header: parts[0],
+                            payload: parts[1],
+                            signature: parts[2]
                         }
                     };
+                } catch (e) {
+                    throw new Error('Invalid JWT: ' + e.message);
+                }
+            }
+
+            // Process JWT in the decoder tab
+            function processJwt(jwt) {
+                try {
+                    AppState.currentJwt = parseJwt(jwt);
                     
-                    this.historyManager.scheduleAutoSave(jwtEntry);
+                    // Reset signature status
+                    AppState.signatureStatus = 'skipped';
+                    const verifyBadge = document.getElementById('verifyBadge');
+                    if (verifyBadge) {
+                        verifyBadge.textContent = 'Skipped';
+                        verifyBadge.className = 'badge skipped';
+                    }
+                    
+                    // Display header and payload
+                    displayHeader(AppState.currentJwt.header);
+                    displayPayload(AppState.currentJwt.payload);
+                    
+                    // Display signature info
+                    displaySignatureInfo(AppState.currentJwt.header);
+                    
+                    // Check claims
+                    analyzeClaims(AppState.currentJwt.payload);
+                    
+                    // Set status
+                    const validationBar = document.getElementById('jwtValidationBar');
+                    if (validationBar) {
+                        validationBar.className = 'validation-bar valid';
+                    }
+                    
+                    setStatus('JWT successfully decoded', 'success');
+                    
+                    // Auto open collapsibles
+                    document.getElementById('headerCollapsible').classList.add('open');
+                    document.getElementById('payloadCollapsible').classList.add('open');
+                    
+                    // Update editor tab
+                    updateTokenEditor(AppState.currentJwt);
+                    
+                    // Update visualization tab
+                    updateTokenVisualization(AppState.currentJwt);
+                    
+                    // Schedule auto-save to history
+                    saveJwtToHistory(AppState.currentJwt);
                     
                 } catch (error) {
-                    this.handleError(error);
+                    handleError(error);
+                }
+            }
+
+            function displayHeader(header) {
+                if (!header) return;
+                const headerJson = document.getElementById('headerJson');
+                if (headerJson) {
+                    const jsonStr = JSON.stringify(header, null, 2);
+                    headerJson.innerHTML = formatJsonString(escapeHtml(jsonStr));
                 }
             }
             
-            displayHeader(header) {
-                if (!header) return;
-                const jsonStr = JSON.stringify(header, null, 2);
-                this.elements.headerJson.innerHTML = formatJsonString(escapeHtml(jsonStr));
-            }
-            
-            displayPayload(payload) {
+            function displayPayload(payload) {
                 if (!payload) return;
-                const jsonStr = JSON.stringify(payload, null, 2);
-                this.elements.payloadJson.innerHTML = formatJsonString(escapeHtml(jsonStr));
+                const payloadJson = document.getElementById('payloadJson');
+                if (payloadJson) {
+                    const jsonStr = JSON.stringify(payload, null, 2);
+                    payloadJson.innerHTML = formatJsonString(escapeHtml(jsonStr));
+                }
             }
             
-            displaySignatureInfo(header) {
+            function displaySignatureInfo(header) {
                 if (!header) return;
+                
+                const signatureInfo = document.getElementById('signatureInfo');
+                if (!signatureInfo) return;
                 
                 const info = document.createElement('div');
                 info.className = 'signature-info';
@@ -1133,14 +1899,17 @@
                     info.appendChild(typ);
                 }
                 
-                this.elements.signatureInfo.innerHTML = '';
-                this.elements.signatureInfo.appendChild(info);
+                signatureInfo.innerHTML = '';
+                signatureInfo.appendChild(info);
             }
             
-            analyzeClaims(payload) {
+            function analyzeClaims(payload) {
                 if (!payload) return;
                 
-                this.elements.claimAlerts.innerHTML = '';
+                const claimAlerts = document.getElementById('claimAlerts');
+                if (!claimAlerts) return;
+                
+                claimAlerts.innerHTML = '';
                 
                 // Check expiration and validity time
                 const timeStatus = getTimeStatus(payload.exp, payload.nbf);
@@ -1148,7 +1917,7 @@
                     const alert = document.createElement('div');
                     alert.className = `claim-alert ${timeStatus.type}`;
                     alert.textContent = timeStatus.message;
-                    this.elements.claimAlerts.appendChild(alert);
+                    claimAlerts.appendChild(alert);
                 }
                 
                 // Display timestamps in human-readable format
@@ -1163,7 +1932,7 @@
                         const timeBlock = document.createElement('div');
                         timeBlock.className = 'claim-info';
                         timeBlock.innerHTML = `<strong>${label}:</strong> ${decodeTime(payload[field])} <span class="signature-param">${payload[field]}</span>`;
-                        this.elements.claimAlerts.appendChild(timeBlock);
+                        claimAlerts.appendChild(timeBlock);
                     }
                 }
                 
@@ -1171,7 +1940,9 @@
                 const importantClaims = {
                     iss: 'Issuer',
                     sub: 'Subject',
-                    aud: 'Audience'
+                    aud: 'Audience',
+                    jti: 'JWT ID',
+                    scope: 'Scope'
                 };
                 
                 for (const [field, label] of Object.entries(importantClaims)) {
@@ -1185,89 +1956,1136 @@
                         }
                         
                         claimBlock.innerHTML = `<strong>${label}:</strong> ${escapeHtml(value)}`;
-                        this.elements.claimAlerts.appendChild(claimBlock);
+                        claimAlerts.appendChild(claimBlock);
                     }
                 }
             }
+
+            function setStatus(message, type) {
+                const statusMessage = document.getElementById('jwtStatusMessage');
+                if (statusMessage) {
+                    statusMessage.textContent = message;
+                    statusMessage.className = `status-message ${type}`;
+                }
+            }
             
-            async verifyJwtSignature(jwt, secret) {
+            function handleError(error) {
+                clearDisplay();
+                
+                const validationBar = document.getElementById('jwtValidationBar');
+                if (validationBar) {
+                    validationBar.className = 'validation-bar invalid';
+                }
+                
+                setStatus(error.message, 'error');
+                
+                console.error('JWT decode error:', error);
+            }
+            
+            function clearDisplay() {
+                AppState.currentJwt = null;
+                AppState.signatureStatus = 'skipped';
+                
+                const headerJson = document.getElementById('headerJson');
+                const payloadJson = document.getElementById('payloadJson');
+                const signatureInfo = document.getElementById('signatureInfo');
+                const claimAlerts = document.getElementById('claimAlerts');
+                const statusMessage = document.getElementById('jwtStatusMessage');
+                const validationBar = document.getElementById('jwtValidationBar');
+                const verifyBadge = document.getElementById('verifyBadge');
+                
+                if (headerJson) headerJson.innerHTML = '';
+                if (payloadJson) payloadJson.innerHTML = '';
+                if (signatureInfo) signatureInfo.innerHTML = '';
+                if (claimAlerts) claimAlerts.innerHTML = '';
+                if (statusMessage) {
+                    statusMessage.textContent = '';
+                    statusMessage.className = 'status-message';
+                }
+                if (validationBar) validationBar.className = 'validation-bar';
+                if (verifyBadge) {
+                    verifyBadge.textContent = 'Skipped';
+                    verifyBadge.className = 'badge skipped';
+                }
+            }
+
+            // Token editor functionality
+            function updateTokenEditor(jwt) {
+                if (!jwt) return;
+                
+                const headerEditor = document.getElementById('headerEditor');
+                const payloadEditor = document.getElementById('payloadEditor');
+                
+                if (headerEditor) {
+                    headerEditor.textContent = JSON.stringify(jwt.header, null, 2);
+                }
+                
+                if (payloadEditor) {
+                    payloadEditor.textContent = JSON.stringify(jwt.payload, null, 2);
+                }
+            }
+            
+            function formatEditorJson(editorId) {
+                const editor = document.getElementById(editorId);
+                if (!editor) return;
+                
                 try {
-                    this.setStatus('Verifying signature...', 'warning');
-                    
-                    const isValid = await verifySignature(jwt, secret);
-                    
-                    this.signatureStatus = isValid ? 'valid' : 'invalid';
-                    this.elements.verifyBadge.textContent = isValid ? 'Valid' : 'Invalid';
-                    this.elements.verifyBadge.className = `badge ${isValid ? 'valid' : 'invalid'}`;
-                    
-                    this.setStatus(
-                        isValid ? 'Signature verified successfully' : 'Invalid signature',
-                        isValid ? 'success' : 'error'
-                    );
-                    
-                    // Update history entry if exists
-                    if (this.currentJwt) {
-                        const rawJwt = [this.currentJwt.raw.header, this.currentJwt.raw.payload, this.currentJwt.raw.signature].join('.');
-                        const id = this.generateId(rawJwt);
-                        const existingEntry = this.historyManager.history.find(item => item.id === id);
-                        
-                        if (existingEntry) {
-                            existingEntry.signatureValid = this.signatureStatus;
-                            this.historyManager.saveHistory();
-                        }
-                    }
-                    
-                    // Log the verification
-                    logger.log("JWT signature verified", {
-                        valid: isValid,
-                        alg: this.currentJwt?.header?.alg
-                    });
-                    
+                    const content = editor.textContent;
+                    const parsed = JSON.parse(content);
+                    editor.textContent = JSON.stringify(parsed, null, 2);
                 } catch (error) {
-                    this.signatureStatus = 'invalid';
-                    this.elements.verifyBadge.textContent = 'Error';
-                    this.elements.verifyBadge.className = 'badge invalid';
-                    this.setStatus('Verification error: ' + error.message, 'error');
-                    
-                    logger.log("JWT verification error", {
-                        error: error.message,
-                        alg: this.currentJwt?.header?.alg
-                    });
+                    showToast('Error', 'Invalid JSON format', 'error');
                 }
             }
             
-            setStatus(message, type) {
-                this.elements.statusMessage.textContent = message;
-                this.elements.statusMessage.className = `status-message ${type}`;
+            function validateEditorJson(editorId) {
+                const editor = document.getElementById(editorId);
+                if (!editor) return false;
+                
+                try {
+                    JSON.parse(editor.textContent);
+                    showToast('Valid', 'JSON format is valid', 'success');
+                    return true;
+                } catch (error) {
+                    showToast('Error', `Invalid JSON: ${error.message}`, 'error');
+                    return false;
+                }
             }
             
-            clearDisplay() {
-                this.currentJwt = null;
-                this.signatureStatus = 'skipped';
+            function generateToken() {
+                const headerEditor = document.getElementById('headerEditor');
+                const payloadEditor = document.getElementById('payloadEditor');
+                const secretKey = document.getElementById('secretKey');
+                const signingAlgorithm = document.getElementById('signingAlgorithm');
                 
-                this.elements.headerJson.innerHTML = '';
-                this.elements.payloadJson.innerHTML = '';
-                this.elements.signatureInfo.innerHTML = '';
-                this.elements.claimAlerts.innerHTML = '';
-                this.elements.statusMessage.textContent = '';
-                this.elements.statusMessage.className = 'status-message';
-                this.elements.validationBar.className = 'validation-bar';
-                this.elements.verifyBadge.textContent = 'Skipped';
-                this.elements.verifyBadge.className = 'badge skipped';
+                if (!headerEditor || !payloadEditor || !signingAlgorithm) return;
+                
+                try {
+                    const header = JSON.parse(headerEditor.textContent);
+                    const payload = JSON.parse(payloadEditor.textContent);
+                    const algorithm = signingAlgorithm.value;
+                    
+                    // Add alg to header if not present
+                    if (!header.alg) {
+                        header.alg = algorithm;
+                    } else if (header.alg !== algorithm) {
+                        if (!confirm(`Header specifies algorithm ${header.alg} but you selected ${algorithm}. Update header?`)) {
+                            return;
+                        }
+                        header.alg = algorithm;
+                    }
+                    
+                    // For none algorithm, we don't need a secret
+                    if (algorithm === 'none') {
+                        // Generate token directly
+                        const headerBase64 = btoa(JSON.stringify(header)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+                        const payloadBase64 = btoa(JSON.stringify(payload)).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+                        const token = `${headerBase64}.${payloadBase64}.`;
+                        handleTokenGeneration(token);
+                    } else {
+                        // For other algorithms, we need a secret
+                        const secret = secretKey.value.trim();
+                        if (!secret) {
+                            showToast('Error', 'Secret key is required for signed tokens', 'error');
+                            return;
+                        }
+                        
+                        // Use worker for token generation
+                        AppState.worker.postMessage({
+                            action: 'generateJwt',
+                            data: { header, payload, secret, algorithm }
+                        });
+                    }
+                } catch (error) {
+                    showToast('Error', `Failed to generate token: ${error.message}`, 'error');
+                }
             }
             
-            handleError(error) {
-                this.clearDisplay();
-                this.elements.validationBar.className = 'validation-bar invalid';
-                this.setStatus(error.message, 'error');
+            function handleTokenGeneration(token) {
+                if (!token) return;
                 
-                logger.log("JWT decode error", {
-                    error: error.message,
-                    jwtMasked: maskJwt(this.elements.jwtInput.value)
+                const jwtInput = document.getElementById('jwtInput');
+                if (jwtInput) {
+                    jwtInput.value = token;
+                }
+                
+                processJwt(token);
+                showToast('Success', 'Token generated successfully', 'success');
+                
+                // Switch to decoder tab
+                switchTab('decoder');
+            }
+
+            // Verification functionality
+            function verifyJwtSignature() {
+                const jwt = document.getElementById('jwtInput').value.trim();
+                const secret = document.getElementById('verifySecret').value.trim();
+                
+                if (!jwt) {
+                    showToast('Error', 'No JWT token to verify', 'error');
+                    return;
+                }
+                
+                if (!secret) {
+                    showToast('Error', 'Secret key is required for verification', 'error');
+                    return;
+                }
+                
+                try {
+                    const parsedJwt = parseJwt(jwt);
+                    const algorithm = parsedJwt.header.alg;
+                    
+                    setStatus('Verifying signature...', 'warning');
+                    
+                    // Use worker for verification
+                    AppState.worker.postMessage({
+                        action: 'verifyJwt',
+                        data: { jwt, secret, algorithm }
+                    });
+                } catch (error) {
+                    showToast('Error', `Failed to parse JWT: ${error.message}`, 'error');
+                }
+            }
+            
+            function handleVerificationResult(isValid) {
+                AppState.signatureStatus = isValid ? 'valid' : 'invalid';
+                
+                const verifyBadge = document.getElementById('verifyBadge');
+                if (verifyBadge) {
+                    verifyBadge.textContent = isValid ? 'Valid' : 'Invalid';
+                    verifyBadge.className = `badge ${isValid ? 'valid' : 'invalid'}`;
+                }
+                
+                setStatus(
+                    isValid ? 'Signature verified successfully' : 'Invalid signature',
+                    isValid ? 'success' : 'error'
+                );
+                
+                // Update token in history
+                updateTokenSignatureStatus(AppState.currentJwt, AppState.signatureStatus);
+            }
+
+            // JWKS functionality
+            function fetchJwks() {
+                const jwksUrl = document.getElementById('jwksUrl').value.trim();
+                
+                if (!jwksUrl) {
+                    showToast('Error', 'Please enter a JWKS URL', 'error');
+                    return;
+                }
+                
+                // Show loading state
+                const fetchButton = document.getElementById('fetchJwksBtn');
+                const originalText = fetchButton.textContent;
+                fetchButton.innerHTML = '<div class="spinner"></div> Fetching...';
+                fetchButton.disabled = true;
+                
+                fetch(jwksUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(jwks => {
+                        // Process JWKS
+                        handleJwksData(jwks);
+                        showToast('Success', 'JWKS fetched successfully', 'success');
+                    })
+                    .catch(error => {
+                        showToast('Error', `Failed to fetch JWKS: ${error.message}`, 'error');
+                    })
+                    .finally(() => {
+                        // Reset button state
+                        fetchButton.innerHTML = originalText;
+                        fetchButton.disabled = false;
+                    });
+            }
+            
+            function handleJwksData(jwks) {
+                if (!jwks || !jwks.keys || !Array.isArray(jwks.keys)) {
+                    showToast('Error', 'Invalid JWKS format', 'error');
+                    return;
+                }
+                
+                // Store JWKS keys
+                AppState.jwksKeys = jwks.keys;
+                
+                // Display keys
+                displayJwksKeys(jwks.keys);
+                
+                // Update JWKS input
+                const jwksInput = document.getElementById('jwksInput');
+                if (jwksInput) {
+                    jwksInput.value = JSON.stringify(jwks, null, 2);
+                }
+            }
+            
+            function displayJwksKeys(keys) {
+                const keysContainer = document.getElementById('jwksKeys');
+                if (!keysContainer) return;
+                
+                keysContainer.innerHTML = '';
+                
+                if (keys.length === 0) {
+                    keysContainer.innerHTML = '<div>No keys found in JWKS</div>';
+                    return;
+                }
+                
+                keys.forEach(key => {
+                    const keyElement = document.createElement('div');
+                    keyElement.className = 'jwks-key';
+                    
+                    const header = document.createElement('div');
+                    header.className = 'jwks-key-header';
+                    
+                    const keyId = document.createElement('div');
+                    keyId.className = 'jwks-key-id';
+                    keyId.textContent = key.kid || 'No Key ID';
+                    
+                    const keyAlg = document.createElement('div');
+                    keyAlg.className = 'jwks-key-alg';
+                    keyAlg.textContent = key.alg || key.kty || 'Unknown algorithm';
+                    
+                    header.appendChild(keyId);
+                    header.appendChild(keyAlg);
+                    
+                    const keyDetails = document.createElement('div');
+                    keyDetails.className = 'jwks-key-details';
+                    
+                    // Add key type and use
+                    keyDetails.innerHTML = `
+                        <div><strong>Type:</strong> ${key.kty || 'Unknown'}</div>
+                        <div><strong>Use:</strong> ${key.use || 'Not specified'}</div>
+                    `;
+                    
+                    keyElement.appendChild(header);
+                    keyElement.appendChild(keyDetails);
+                    
+                    // Add click event to verify with this key
+                    keyElement.addEventListener('click', () => {
+                        verifyWithJwksKey(key);
+                    });
+                    
+                    keysContainer.appendChild(keyElement);
                 });
             }
             
-            generateId(text) {
+            function verifyWithJwksKey(key) {
+                const jwt = document.getElementById('jwtInput').value.trim();
+                
+                if (!jwt) {
+                    showToast('Error', 'No JWT token to verify', 'error');
+                    return;
+                }
+                
+                // Verify using worker
+                AppState.worker.postMessage({
+                    action: 'verifyJwks',
+                    data: { 
+                        jwt, 
+                        jwks: { keys: [key] }
+                    }
+                });
+            }
+            
+            function verifyWithJwks() {
+                const jwt = document.getElementById('jwtInput').value.trim();
+                const jwksInput = document.getElementById('jwksInput').value.trim();
+                
+                if (!jwt) {
+                    showToast('Error', 'No JWT token to verify', 'error');
+                    return;
+                }
+                
+                if (!jwksInput) {
+                    showToast('Error', 'JWKS data is required', 'error');
+                    return;
+                }
+                
+                try {
+                    const jwks = JSON.parse(jwksInput);
+                    
+                    if (!jwks.keys || !Array.isArray(jwks.keys)) {
+                        showToast('Error', 'Invalid JWKS format', 'error');
+                        return;
+                    }
+                    
+                    // Store JWKS keys
+                    AppState.jwksKeys = jwks.keys;
+                    
+                    // Verify using worker
+                    AppState.worker.postMessage({
+                        action: 'verifyJwks',
+                        data: { jwt, jwks }
+                    });
+                } catch (error) {
+                    showToast('Error', `Failed to parse JWKS: ${error.message}`, 'error');
+                }
+            }
+            
+            function handleJwksVerificationResult(isValid, kid, error) {
+                if (isValid) {
+                    showToast('Success', `Signature verified with key: ${kid}`, 'success');
+                    
+                    // Update signature status
+                    AppState.signatureStatus = 'valid';
+                    
+                    const verifyBadge = document.getElementById('verifyBadge');
+                    if (verifyBadge) {
+                        verifyBadge.textContent = 'Valid';
+                        verifyBadge.className = 'badge valid';
+                    }
+                    
+                    setStatus('Signature verified successfully with JWKS', 'success');
+                } else {
+                    showToast('Error', error || 'Signature verification failed', 'error');
+                    
+                    // Update signature status
+                    AppState.signatureStatus = 'invalid';
+                    
+                    const verifyBadge = document.getElementById('verifyBadge');
+                    if (verifyBadge) {
+                        verifyBadge.textContent = 'Invalid';
+                        verifyBadge.className = 'badge invalid';
+                    }
+                    
+                    setStatus('Invalid signature (JWKS verification failed)', 'error');
+                }
+                
+                // Update token in history
+                updateTokenSignatureStatus(AppState.currentJwt, AppState.signatureStatus);
+            }
+
+            // Token comparison functionality
+            function compareTokens() {
+                const tokenAInput = document.getElementById('compareTokenA').value.trim();
+                const tokenBInput = document.getElementById('compareTokenB').value.trim();
+                
+                if (!tokenAInput || !tokenBInput) {
+                    showToast('Error', 'Please enter both tokens to compare', 'error');
+                    return;
+                }
+                
+                // Use worker for comparison
+                AppState.worker.postMessage({
+                    action: 'compareTokens',
+                    data: { tokenA: tokenAInput, tokenB: tokenBInput }
+                });
+            }
+            
+            function handleComparisonResult(result) {
+                AppState.compareResults = result;
+                
+                const resultsContainer = document.getElementById('comparisonResults');
+                if (!resultsContainer) return;
+                
+                if (!result.headerDiff && !result.payloadDiff && result.signatureDiff) {
+                    resultsContainer.innerHTML = `
+                        <div class="claim-alert success">
+                            <strong>Tokens are identical!</strong> All parts match exactly.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                let html = '<h3>Comparison Results</h3>';
+                
+                // Header differences
+                html += '<div class="collapsible open">';
+                html += '<div class="collapsible-header"><span>Header Differences</span><span>▲</span></div>';
+                html += '<div class="collapsible-content">';
+                
+                if (!result.headerDiff) {
+                    html += '<div class="claim-alert success">Headers are identical</div>';
+                } else {
+                    html += '<table class="comparison-table">';
+                    html += '<tr><th>Field</th><th>Token A</th><th>Token B</th></tr>';
+                    
+                    for (const [key, diff] of Object.entries(result.headerDiff)) {
+                        html += '<tr>';
+                        html += `<td><strong>${escapeHtml(key)}</strong></td>`;
+                        
+                        if (diff.type === 'removed') {
+                            html += `<td class="diff-removal">${escapeHtml(JSON.stringify(diff.value))}</td>`;
+                            html += `<td>Not present</td>`;
+                        } else if (diff.type === 'added') {
+                            html += `<td>Not present</td>`;
+                            html += `<td class="diff-addition">${escapeHtml(JSON.stringify(diff.value))}</td>`;
+                        } else if (diff.type === 'changed') {
+                            html += `<td class="diff-highlight">${escapeHtml(JSON.stringify(diff.oldValue))}</td>`;
+                            html += `<td class="diff-highlight">${escapeHtml(JSON.stringify(diff.newValue))}</td>`;
+                        }
+                        
+                        html += '</tr>';
+                    }
+                    
+                    html += '</table>';
+                }
+                
+                html += '</div>'; // End header differences content
+                html += '</div>'; // End header differences collapsible
+                
+                // Payload differences
+                html += '<div class="collapsible open">';
+                html += '<div class="collapsible-header"><span>Payload Differences</span><span>▲</span></div>';
+                html += '<div class="collapsible-content">';
+                
+                if (!result.payloadDiff) {
+                    html += '<div class="claim-alert success">Payloads are identical</div>';
+                } else {
+                    html += '<table class="comparison-table">';
+                    html += '<tr><th>Claim</th><th>Token A</th><th>Token B</th></tr>';
+                    
+                    for (const [key, diff] of Object.entries(result.payloadDiff)) {
+                        html += '<tr>';
+                        html += `<td><strong>${escapeHtml(key)}</strong></td>`;
+                        
+                        if (diff.type === 'removed') {
+                            html += `<td class="diff-removal">${escapeHtml(JSON.stringify(diff.value))}</td>`;
+                            html += `<td>Not present</td>`;
+                        } else if (diff.type === 'added') {
+                            html += `<td>Not present</td>`;
+                            html += `<td class="diff-addition">${escapeHtml(JSON.stringify(diff.value))}</td>`;
+                        } else if (diff.type === 'changed') {
+                            html += `<td class="diff-highlight">${escapeHtml(JSON.stringify(diff.oldValue))}</td>`;
+                            html += `<td class="diff-highlight">${escapeHtml(JSON.stringify(diff.newValue))}</td>`;
+                        }
+                        
+                        html += '</tr>';
+                    }
+                    
+                    html += '</table>';
+                }
+                
+                html += '</div>'; // End payload differences content
+                html += '</div>'; // End payload differences collapsible
+                
+                // Signature comparison
+                html += '<div class="claim-alert ' + (result.signatureDiff ? 'success' : 'warning') + '">';
+                html += result.signatureDiff 
+                    ? '<strong>Signatures match.</strong>' 
+                    : '<strong>Signatures differ.</strong> The tokens were signed with different keys or algorithms.';
+                html += '</div>';
+                
+                resultsContainer.innerHTML = html;
+                
+                // Initialize collapsibles
+                initializeCollapsibles(resultsContainer);
+            }
+
+            // Token visualization
+            function updateTokenVisualization(jwt) {
+                if (!jwt) return;
+                
+                // Update timeline
+                updateTokenTimeline(jwt.payload);
+                
+                // Update claims analysis
+                updateClaimsAnalysis(jwt.payload);
+            }
+            
+            function updateTokenTimeline(payload) {
+                const timeline = document.getElementById('tokenTimeline');
+                if (!timeline) return;
+                
+                // Clear previous markers
+                const markers = timeline.querySelectorAll('.timeline-marker');
+                markers.forEach(marker => marker.remove());
+                
+                const now = Math.floor(Date.now() / 1000);
+                
+                // Time range: 1 day before earliest claim to 1 day after latest claim
+                let earliestTime = now - 86400;
+                let latestTime = now + 86400;
+                
+                // Identify time claims
+                const timeClaims = {
+                    iat: payload.iat,
+                    nbf: payload.nbf,
+                    exp: payload.exp
+                };
+                
+                // Find earliest and latest times
+                for (const [claim, timestamp] of Object.entries(timeClaims)) {
+                    if (!timestamp) continue;
+                    
+                    earliestTime = Math.min(earliestTime, timestamp - 86400);
+                    latestTime = Math.max(latestTime, timestamp + 86400);
+                }
+                
+                // Calculate timeline range
+                const timeRange = latestTime - earliestTime;
+                
+                // Add markers for each time claim
+                for (const [claim, timestamp] of Object.entries(timeClaims)) {
+                    if (!timestamp) continue;
+                    
+                    // Calculate position on timeline (0-100%)
+                    const position = ((timestamp - earliestTime) / timeRange) * 100;
+                    
+                    // Create marker
+                    const marker = document.createElement('div');
+                    marker.className = `timeline-marker ${claim}`;
+                    marker.style.left = `${position}%`;
+                    marker.setAttribute('data-label', claim.toUpperCase());
+                    marker.setAttribute('data-time', decodeTime(timestamp));
+                    
+                    timeline.appendChild(marker);
+                }
+                
+                // Add "now" marker
+                const nowPosition = ((now - earliestTime) / timeRange) * 100;
+                const nowMarker = timeline.querySelector('.timeline-now');
+                if (nowMarker) {
+                    nowMarker.style.left = `${nowPosition}%`;
+                }
+            }
+            
+            function updateClaimsAnalysis(payload) {
+                const claimsAnalysis = document.getElementById('claimsAnalysis');
+                if (!claimsAnalysis) return;
+                
+                claimsAnalysis.innerHTML = '';
+                
+                // Classify claims by importance/purpose
+                const claimCategories = {
+                    'Identity Claims': ['sub', 'name', 'given_name', 'family_name', 'email', 'preferred_username'],
+                    'Token Metadata': ['iss', 'aud', 'jti', 'scope', 'client_id'],
+                    'Time Constraints': ['iat', 'exp', 'nbf'],
+                    'Authorization': ['roles', 'permissions', 'groups', 'scope', 'authorities'],
+                    'Custom Claims': []
+                };
+                
+                // Determine which category each claim belongs to
+                const categorizedClaims = {};
+                
+                // Initialize categories
+                Object.keys(claimCategories).forEach(category => {
+                    categorizedClaims[category] = [];
+                });
+                
+                // Categorize claims
+                Object.keys(payload).forEach(claim => {
+                    let assigned = false;
+                    
+                    // Check each category
+                    for (const [category, claimTypes] of Object.entries(claimCategories)) {
+                        if (claimTypes.includes(claim)) {
+                            categorizedClaims[category].push(claim);
+                            assigned = true;
+                            break;
+                        }
+                    }
+                    
+                    // If not assigned to any category, put in custom
+                    if (!assigned) {
+                        categorizedClaims['Custom Claims'].push(claim);
+                    }
+                });
+                
+                // Generate HTML for each category
+                for (const [category, claims] of Object.entries(categorizedClaims)) {
+                    if (claims.length === 0) continue;
+                    
+                    const categoryElement = document.createElement('div');
+                    categoryElement.className = 'claim-category';
+                    categoryElement.innerHTML = `<h4>${category}</h4>`;
+                    
+                    // Create claim list
+                    const claimList = document.createElement('div');
+                    claimList.className = 'claim-list';
+                    
+                    claims.forEach(claim => {
+                        const claimElement = document.createElement('div');
+                        claimElement.className = 'claim-item';
+                        
+                        let value = payload[claim];
+                        let displayValue = '';
+                        
+                        if (typeof value === 'object') {
+                            displayValue = JSON.stringify(value);
+                        } else {
+                            displayValue = String(value);
+                        }
+                        
+                        // Add severity indicator based on claim type
+                        let severityClass = 'severity-info';
+                        if (['exp', 'nbf'].includes(claim)) {
+                            severityClass = 'severity-high';
+                        } else if (['iss', 'aud', 'sub'].includes(claim)) {
+                            severityClass = 'severity-medium';
+                        }
+                        
+                        claimElement.innerHTML = `
+                            <div class="claim-header">
+                                <span class="severity-indicator ${severityClass}"></span>
+                                <strong>${claim}</strong>
+                            </div>
+                            <div class="claim-value">${escapeHtml(displayValue)}</div>
+                        `;
+                        
+                        claimList.appendChild(claimElement);
+                    });
+                    
+                    categoryElement.appendChild(claimList);
+                    claimsAnalysis.appendChild(categoryElement);
+                }
+                
+                // Add claim tags
+                const tagContainer = document.createElement('div');
+                tagContainer.className = 'claim-tags';
+                tagContainer.innerHTML = '<h4>Claim Tags</h4><div class="tags-container"></div>';
+                
+                const tagsContainer = tagContainer.querySelector('.tags-container');
+                
+                // Get all unique claims
+                const allClaims = Object.keys(payload);
+                
+                // Add tags for each claim
+                allClaims.forEach(claim => {
+                    const tag = document.createElement('span');
+                    tag.className = 'tag';
+                    tag.textContent = claim;
+                    tagsContainer.appendChild(tag);
+                });
+                
+                claimsAnalysis.appendChild(tagContainer);
+            }
+
+            // History management with IndexedDB
+            function saveJwtToHistory(jwt) {
+                if (!jwt) return;
+                
+                const rawJwt = [jwt.raw.header, jwt.raw.payload, jwt.raw.signature].join('.');
+                const id = generateId(rawJwt);
+                
+                const jwtEntry = {
+                    id,
+                    jwtMasked: maskJwt(rawJwt),
+                    header: jwt.header,
+                    payload: jwt.payload,
+                    signatureValid: AppState.signatureStatus,
+                    timestamp: new Date().toISOString(),
+                    displayDate: new Date().toLocaleString(),
+                    starred: false,
+                    nickname: '',
+                    raw: {
+                        header: jwt.raw.header,
+                        payload: jwt.raw.payload,
+                        signature: jwt.raw.signature
+                    }
+                };
+                
+                // Check if we have IndexedDB available
+                if (AppState.db) {
+                    const transaction = AppState.db.transaction(['tokens'], 'readwrite');
+                    const tokenStore = transaction.objectStore('tokens');
+                    
+                    // Check if token already exists
+                    const getRequest = tokenStore.get(id);
+                    
+                    getRequest.onsuccess = function(event) {
+                        const existingToken = event.target.result;
+                        
+                        if (existingToken) {
+                            // Update existing entry
+                            jwtEntry.starred = existingToken.starred;
+                            jwtEntry.nickname = existingToken.nickname;
+                        }
+                        
+                        // Add/update entry
+                        tokenStore.put(jwtEntry);
+                        
+                        // Refresh history display
+                        loadJwtHistory();
+                    };
+                    
+                    getRequest.onerror = function(event) {
+                        console.error('Error checking token history:', event.target.error);
+                        // Fall back to localStorage
+                        fallbackSaveJwtToHistory(jwtEntry);
+                    };
+                } else {
+                    // Fall back to localStorage
+                    fallbackSaveJwtToHistory(jwtEntry);
+                }
+            }
+            
+            function fallbackSaveJwtToHistory(jwtEntry) {
+                try {
+                    // Load current history
+                    let history = [];
+                    const storedHistory = localStorage.getItem('jwtHistory');
+                    
+                    if (storedHistory) {
+                        history = JSON.parse(storedHistory);
+                    }
+                    
+                    // Check if entry already exists
+                    const existingIndex = history.findIndex(item => item.id === jwtEntry.id);
+                    
+                    if (existingIndex >= 0) {
+                        // Update existing entry
+                        const existing = history[existingIndex];
+                        jwtEntry.starred = existing.starred;
+                        jwtEntry.nickname = existing.nickname;
+                        
+                        // Remove old entry
+                        history.splice(existingIndex, 1);
+                    }
+                    
+                    // Add to beginning
+                    history.unshift(jwtEntry);
+                    
+                    // Limit to 50 entries
+                    if (history.length > 50) {
+                        history = history.slice(0, 50);
+                    }
+                    
+                    // Save back to localStorage
+                    localStorage.setItem('jwtHistory', JSON.stringify(history));
+                    
+                    // Refresh history display
+                    displayJwtHistory(history);
+                } catch (error) {
+                    console.error('Error saving token to history:', error);
+                }
+            }
+            
+            function loadJwtHistory() {
+                if (AppState.db) {
+                    const transaction = AppState.db.transaction(['tokens'], 'readonly');
+                    const tokenStore = transaction.objectStore('tokens');
+                    const index = tokenStore.index('timestamp');
+                    
+                    // Get all tokens sorted by timestamp (descending)
+                    const request = index.openCursor(null, 'prev');
+                    const tokens = [];
+                    
+                    request.onsuccess = function(event) {
+                        const cursor = event.target.result;
+                        
+                        if (cursor) {
+                            tokens.push(cursor.value);
+                            cursor.continue();
+                        } else {
+                            // Sort: starred first, then by timestamp
+                            tokens.sort((a, b) => {
+                                if (a.starred && !b.starred) return -1;
+                                if (!a.starred && b.starred) return 1;
+                                return new Date(b.timestamp) - new Date(a.timestamp);
+                            });
+                            
+                            // Display history
+                            displayJwtHistory(tokens);
+                        }
+                    };
+                    
+                    request.onerror = function(event) {
+                        console.error('Error loading token history:', event.target.error);
+                        // Fall back to localStorage
+                        fallbackLoadJwtHistory();
+                    };
+                } else {
+                    // Fall back to localStorage
+                    fallbackLoadJwtHistory();
+                }
+            }
+            
+            function fallbackLoadJwtHistory() {
+                try {
+                    const storedHistory = localStorage.getItem('jwtHistory');
+                    
+                    if (storedHistory) {
+                        const history = JSON.parse(storedHistory);
+                        
+                        // Sort: starred first, then by timestamp
+                        history.sort((a, b) => {
+                            if (a.starred && !b.starred) return -1;
+                            if (!a.starred && b.starred) return 1;
+                            return new Date(b.timestamp) - new Date(a.timestamp);
+                        });
+                        
+                        // Display history
+                        displayJwtHistory(history);
+                    } else {
+                        displayJwtHistory([]);
+                    }
+                } catch (error) {
+                    console.error('Error loading token history:', error);
+                    displayJwtHistory([]);
+                }
+            }
+            
+            function displayJwtHistory(history, filter = 'all', searchQuery = '') {
+                const historyList = document.getElementById('historyList');
+                if (!historyList) return;
+                
+                historyList.innerHTML = '';
+                
+                // Apply filters
+                let filteredHistory = [...history];
+                
+                if (filter === 'starred') {
+                    filteredHistory = filteredHistory.filter(item => item.starred);
+                } else if (filter === 'valid') {
+                    filteredHistory = filteredHistory.filter(item => item.signatureValid === 'valid');
+                } else if (filter === 'invalid') {
+                    filteredHistory = filteredHistory.filter(item => item.signatureValid === 'invalid');
+                }
+                
+                // Apply search
+                if (searchQuery) {
+                    const query = searchQuery.toLowerCase();
+                    filteredHistory = filteredHistory.filter(item => {
+                        return (
+                            (item.nickname && item.nickname.toLowerCase().includes(query)) ||
+                            (JSON.stringify(item.header).toLowerCase().includes(query)) ||
+                            (JSON.stringify(item.payload).toLowerCase().includes(query))
+                        );
+                    });
+                }
+                
+                if (filteredHistory.length === 0) {
+                    historyList.innerHTML = '<li class="history-item">No history items found</li>';
+                    return;
+                }
+                
+                filteredHistory.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.className = 'history-item';
+                    li.dataset.id = item.id;
+                    
+                    // Mark as selected if it's the selected history item
+                    if (AppState.selectedHistoryItem === index) {
+                        li.classList.add('selected');
+                    }
+                    
+                    const starBtn = document.createElement('button');
+                    starBtn.className = `star-btn ${item.starred ? 'starred' : ''}`;
+                    starBtn.textContent = '★';
+                    starBtn.title = item.starred ? 'Unstar' : 'Star';
+                    starBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        toggleHistoryItemStar(item.id);
+                    };
+                    
+                    const content = document.createElement('div');
+                    content.className = 'history-item-content';
+                    
+                    const title = document.createElement('div');
+                    title.className = 'history-item-title';
+                    title.textContent = item.nickname || item.jwtMasked;
+                    
+                    const date = document.createElement('div');
+                    date.className = 'history-item-date';
+                    date.textContent = item.displayDate;
+                    
+                    // Add signature validity badge
+                    const validityBadge = document.createElement('span');
+                    validityBadge.className = `badge ${item.signatureValid}`;
+                    validityBadge.textContent = item.signatureValid.charAt(0).toUpperCase() + item.signatureValid.slice(1);
+                    
+                    content.appendChild(title);
+                    content.appendChild(date);
+                    
+                    li.appendChild(starBtn);
+                    li.appendChild(content);
+                    li.appendChild(validityBadge);
+                    
+                    // Add double-click to edit nickname
+                    content.ondblclick = (e) => {
+                        const newNickname = prompt('Enter nickname:', item.nickname || '');
+                        if (newNickname !== null) {
+                            updateHistoryItemNickname(item.id, newNickname);
+                        }
+                    };
+                    
+                    // Add click to load
+                    li.onclick = () => {
+                        // Set as selected
+                        AppState.selectedHistoryItem = index;
+                        
+                        // Update UI
+                        const selectedItems = historyList.querySelectorAll('.history-item.selected');
+                        selectedItems.forEach(el => el.classList.remove('selected'));
+                        li.classList.add('selected');
+                        
+                        // Load token
+                        loadHistoryItem(item);
+                    };
+                    
+                    historyList.appendChild(li);
+                });
+            }
+            
+            function loadHistoryItem(item) {
+                if (!item || !item.raw) return;
+                
+                const jwtInput = document.getElementById('jwtInput');
+                if (!jwtInput) return;
+                
+                const jwt = [item.raw.header, item.raw.payload, item.raw.signature].join('.');
+                jwtInput.value = jwt;
+                
+                // Process token
+                processJwt(jwt);
+                
+                // Switch to decoder tab if not already active
+                switchTab('decoder');
+            }
+            
+            function toggleHistoryItemStar(id) {
+                if (AppState.db) {
+                    const transaction = AppState.db.transaction(['tokens'], 'readwrite');
+                    const tokenStore = transaction.objectStore('tokens');
+                    
+                    const getRequest = tokenStore.get(id);
+                    
+                    getRequest.onsuccess = function(event) {
+                        const token = event.target.result;
+                        
+                        if (token) {
+                            // Toggle starred state
+                            token.starred = !token.starred;
+                            
+                            // Update in store
+                            tokenStore.put(token);
+                            
+                            // Refresh display
+                            loadJwtHistory();
+                        }
+                    };
+                } else {
+                    // Fall back to localStorage
+                    try {
+                        const storedHistory = localStorage.getItem('jwtHistory');
+                        
+                        if (storedHistory) {
+                            const history = JSON.parse(storedHistory);
+                            
+                            // Find and update token
+                            const token = history.find(item => item.id === id);
+                            
+                            if (token) {
+                                token.starred = !token.starred;
+                                
+                                // Save back to localStorage
+                                localStorage.setItem('jwtHistory', JSON.stringify(history));
+                                
+                                // Refresh display
+                                displayJwtHistory(history);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error toggling star:', error);
+                    }
+                }
+            }
+            
+            function updateHistoryItemNickname(id, nickname) {
+                if (AppState.db) {
+                    const transaction = AppState.db.transaction(['tokens'], 'readwrite');
+                    const tokenStore = transaction.objectStore('tokens');
+                    
+                    const getRequest = tokenStore.get(id);
+                    
+                    getRequest.onsuccess = function(event) {
+                        const token = event.target.result;
+                        
+                        if (token) {
+                            // Update nickname
+                            token.nickname = nickname;
+                            
+                            // Update in store
+                            tokenStore.put(token);
+                            
+                            // Refresh display
+                            loadJwtHistory();
+                        }
+                    };
+                } else {
+                    // Fall back to localStorage
+                    try {
+                        const storedHistory = localStorage.getItem('jwtHistory');
+                        
+                        if (storedHistory) {
+                            const history = JSON.parse(storedHistory);
+                            
+                            // Find and update token
+                            const token = history.find(item => item.id === id);
+                            
+                            if (token) {
+                                token.nickname = nickname;
+                                
+                                // Save back to localStorage
+                                localStorage.setItem('jwtHistory', JSON.stringify(history));
+                                
+                                // Refresh display
+                                displayJwtHistory(history);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error updating nickname:', error);
+                    }
+                }
+            }
+            
+            function updateTokenSignatureStatus(jwt, status) {
+                if (!jwt) return;
+                
+                const rawJwt = [jwt.raw.header, jwt.raw.payload, jwt.raw.signature].join('.');
+                const id = generateId(rawJwt);
+                
+                if (AppState.db) {
+                    const transaction = AppState.db.transaction(['tokens'], 'readwrite');
+                    const tokenStore = transaction.objectStore('tokens');
+                    
+                    const getRequest = tokenStore.get(id);
+                    
+                    getRequest.onsuccess = function(event) {
+                        const token = event.target.result;
+                        
+                        if (token) {
+                            // Update signature status
+                            token.signatureValid = status;
+                            
+                            // Update in store
+                            tokenStore.put(token);
+                            
+                            // Refresh display
+                            loadJwtHistory();
+                        }
+                    };
+                } else {
+                    // Fall back to localStorage
+                    try {
+                        const storedHistory = localStorage.getItem('jwtHistory');
+                        
+                        if (storedHistory) {
+                            const history = JSON.parse(storedHistory);
+                            
+                            // Find and update token
+                            const token = history.find(item => item.id === id);
+                            
+                            if (token) {
+                                token.signatureValid = status;
+                                
+                                // Save back to localStorage
+                                localStorage.setItem('jwtHistory', JSON.stringify(history));
+                                
+                                // Refresh display
+                                displayJwtHistory(history);
+                            }
+                        }
+                    } catch (error) {
+                        console.error('Error updating signature status:', error);
+                    }
+                }
+            }
+
+            function generateId(text) {
                 // Simple hash function for ID generation
                 // In a real app, you might want to use SHA-256 or similar
                 let hash = 0;
@@ -1281,37 +3099,13 @@
                 
                 return Math.abs(hash).toString(16).substr(0, 16);
             }
-        }
 
-        // Tabs Manager
-        class TabsManager {
-            constructor() {
-                this.tabs = document.querySelectorAll('.tab-button');
-                this.sections = document.querySelectorAll('.tool-section');
-                this.storageKey = 'selectedTool';
+            // UI helpers
+            function switchTab(tabId) {
+                const tabs = document.querySelectorAll('.tab');
+                const contents = document.querySelectorAll('.tab-content');
                 
-                this.initialize();
-            }
-            
-            initialize() {
-                // Set up tab click events
-                this.tabs.forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        const tabId = tab.dataset.tab;
-                        this.switchTab(tabId);
-                    });
-                });
-                
-                // Load last selected tab
-                const lastTab = localStorage.getItem(this.storageKey);
-                if (lastTab) {
-                    this.switchTab(lastTab);
-                }
-            }
-            
-            switchTab(tabId) {
-                // Update tab buttons
-                this.tabs.forEach(tab => {
+                tabs.forEach(tab => {
                     if (tab.dataset.tab === tabId) {
                         tab.classList.add('active');
                     } else {
@@ -1319,61 +3113,567 @@
                     }
                 });
                 
-                // Update sections
-                this.sections.forEach(section => {
-                    if (section.id === `${tabId}Section`) {
-                        section.classList.add('active');
+                contents.forEach(content => {
+                    if (content.id === `${tabId}Tab`) {
+                        content.classList.add('active');
                     } else {
-                        section.classList.remove('active');
+                        content.classList.remove('active');
                     }
                 });
-                
-                // Update history header
-                const historyHeader = document.getElementById('historyHeader');
-                if (historyHeader) {
-                    historyHeader.textContent = tabId === 'jwt' ? 'Recent Tokens' : 'Recent Links';
-                }
-                
-                // Save selection
-                localStorage.setItem(this.storageKey, tabId);
             }
-        }
+            
+            function initializeCollapsibles(parent = document) {
+                parent.querySelectorAll('.collapsible').forEach(coll => {
+                    const header = coll.querySelector('.collapsible-header');
+                    if (!header) return;
+                    
+                    header.addEventListener('click', () => {
+                        coll.classList.toggle('open');
+                        const arrow = header.querySelector('span:last-child');
+                        if (arrow) {
+                            arrow.textContent = coll.classList.contains('open') ? '▲' : '▼';
+                        }
+                    });
+                });
+            }
 
-        // Theme toggle
-        function initializeThemeToggle() {
-            const themeToggle = document.getElementById('themeToggle');
-            if (!themeToggle) return;
-            
-            // Check for saved theme
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'dark') {
-                document.body.setAttribute('data-theme', 'dark');
-                themeToggle.textContent = '☀️';
+            // Keyboard shortcuts
+            function setupKeyboardShortcuts() {
+                document.addEventListener('keydown', (e) => {
+                    // Skip if shortcuts are disabled or if the user is typing in a form field
+                    if (!AppState.keyboardShortcutsEnabled || 
+                        ['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName) ||
+                        document.activeElement.isContentEditable) {
+                        return;
+                    }
+                    
+                    // Navigation shortcuts
+                    if (e.altKey && e.key >= '1' && e.key <= '5') {
+                        e.preventDefault();
+                        const tabIds = ['decoder', 'editor', 'verify', 'compare', 'visualize'];
+                        const tabIndex = parseInt(e.key) - 1;
+                        if (tabIndex < tabIds.length) {
+                            switchTab(tabIds[tabIndex]);
+                        }
+                    }
+                    
+                    // Action shortcuts
+                    if (e.altKey) {
+                        switch (e.key.toLowerCase()) {
+                            case 'j': // Copy JWT
+                                e.preventDefault();
+                                copyJwt();
+                                break;
+                            case 'p': // Copy Payload
+                                e.preventDefault();
+                                copyPayloadJson();
+                                break;
+                            case 'v': // Verify
+                                e.preventDefault();
+                                verifyJwtSignature();
+                                break;
+                            case 's': // Save/Download
+                                e.preventDefault();
+                                downloadJson();
+                                break;
+                            case 'g': // Generate token
+                                e.preventDefault();
+                                generateToken();
+                                break;
+                            case 'n': // Add/edit nickname
+                                e.preventDefault();
+                                editSelectedHistoryItemNickname();
+                                break;
+                        }
+                    }
+                    
+                    // Clear with Escape
+                    if (e.key === 'Escape') {
+                        e.preventDefault();
+                        clearCurrentInput();
+                    }
+                    
+                    // History navigation with j/k
+                    if (e.key === 'j') {
+                        // Next history item
+                        navigateHistory(1);
+                    } else if (e.key === 'k') {
+                        // Previous history item
+                        navigateHistory(-1);
+                    }
+                    
+                    // Star/unstar with 's'
+                    if (e.key === 's' && !e.altKey) {
+                        toggleSelectedHistoryItemStar();
+                    }
+                    
+                    // Load with Enter
+                    if (e.key === 'Enter' && AppState.selectedHistoryItem !== null) {
+                        loadSelectedHistoryItem();
+                    }
+                });
             }
             
-            themeToggle.addEventListener('click', () => {
-                if (document.body.getAttribute('data-theme') === 'dark') {
-                    document.body.removeAttribute('data-theme');
-                    themeToggle.textContent = '🌙';
-                    localStorage.setItem('theme', 'light');
+            function copyJwt() {
+                const jwt = document.getElementById('jwtInput').value.trim();
+                if (jwt) {
+                    copyText(jwt);
+                }
+            }
+            
+            function copyPayloadJson() {
+                if (AppState.currentJwt && AppState.currentJwt.payload) {
+                    const json = JSON.stringify(AppState.currentJwt.payload, null, 2);
+                    copyText(json);
+                }
+            }
+            
+            function downloadJson() {
+                if (AppState.currentJwt) {
+                    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(
+                        JSON.stringify({
+                            header: AppState.currentJwt.header,
+                            payload: AppState.currentJwt.payload
+                        }, null, 2)
+                    );
+                    const downloadAnchor = document.createElement('a');
+                    downloadAnchor.setAttribute("href", dataStr);
+                    downloadAnchor.setAttribute("download", "jwt-decoded.json");
+                    document.body.appendChild(downloadAnchor);
+                    downloadAnchor.click();
+                    downloadAnchor.remove();
+                }
+            }
+            
+            function clearCurrentInput() {
+                const activeTabId = document.querySelector('.tab.active').dataset.tab;
+                
+                if (activeTabId === 'decoder') {
+                    const jwtInput = document.getElementById('jwtInput');
+                    if (jwtInput) {
+                        jwtInput.value = '';
+                        clearDisplay();
+                    }
+                } else if (activeTabId === 'editor') {
+                    const headerEditor = document.getElementById('headerEditor');
+                    const payloadEditor = document.getElementById('payloadEditor');
+                    const secretKey = document.getElementById('secretKey');
+                    
+                    if (headerEditor) headerEditor.textContent = '';
+                    if (payloadEditor) payloadEditor.textContent = '';
+                    if (secretKey) secretKey.value = '';
+                } else if (activeTabId === 'verify') {
+                    const verifySecret = document.getElementById('verifySecret');
+                    const jwksUrl = document.getElementById('jwksUrl');
+                    const jwksInput = document.getElementById('jwksInput');
+                    
+                    if (verifySecret) verifySecret.value = '';
+                    if (jwksUrl) jwksUrl.value = '';
+                    if (jwksInput) jwksInput.value = '';
+                } else if (activeTabId === 'compare') {
+                    const compareTokenA = document.getElementById('compareTokenA');
+                    const compareTokenB = document.getElementById('compareTokenB');
+                    const comparisonResults = document.getElementById('comparisonResults');
+                    
+                    if (compareTokenA) compareTokenA.value = '';
+                    if (compareTokenB) compareTokenB.value = '';
+                    if (comparisonResults) comparisonResults.innerHTML = '';
+                }
+            }
+            
+            function navigateHistory(direction) {
+                const historyItems = document.querySelectorAll('.history-item');
+                if (historyItems.length === 0) return;
+                
+                let newIndex;
+                
+                if (AppState.selectedHistoryItem === null) {
+                    newIndex = direction > 0 ? 0 : historyItems.length - 1;
                 } else {
-                    document.body.setAttribute('data-theme', 'dark');
-                    themeToggle.textContent = '☀️';
-                    localStorage.setItem('theme', 'dark');
+                    newIndex = AppState.selectedHistoryItem + direction;
+                    
+                    // Handle wrapping
+                    if (newIndex < 0) {
+                        newIndex = historyItems.length - 1;
+                    } else if (newIndex >= historyItems.length) {
+                        newIndex = 0;
+                    }
                 }
-            });
-        }
+                
+                // Update selected index
+                AppState.selectedHistoryItem = newIndex;
+                
+                // Update UI
+                historyItems.forEach((item, index) => {
+                    if (index === newIndex) {
+                        item.classList.add('selected');
+                        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } else {
+                        item.classList.remove('selected');
+                    }
+                });
+            }
+            
+            function toggleSelectedHistoryItemStar() {
+                const selectedItem = document.querySelector('.history-item.selected');
+                if (selectedItem) {
+                    const id = selectedItem.dataset.id;
+                    toggleHistoryItemStar(id);
+                }
+            }
+            
+            function editSelectedHistoryItemNickname() {
+                const selectedItem = document.querySelector('.history-item.selected');
+                if (selectedItem) {
+                    const id = selectedItem.dataset.id;
+                    const title = selectedItem.querySelector('.history-item-title');
+                    
+                    if (title) {
+                        const newNickname = prompt('Enter nickname:', title.textContent);
+                        if (newNickname !== null) {
+                            updateHistoryItemNickname(id, newNickname);
+                        }
+                    }
+                }
+            }
+            
+            function loadSelectedHistoryItem() {
+                const selectedItem = document.querySelector('.history-item.selected');
+                if (selectedItem) {
+                    selectedItem.click();
+                }
+            }
 
-        // Initialize everything when DOM is ready
-        document.addEventListener('DOMContentLoaded', () => {
-            window.tabsManager = new TabsManager();
-            window.jwtApp = new JwtApp();
-            
-            // Initialize theme toggle
-            initializeThemeToggle();
-            
-            // URL encoder app would be initialized here in a complete implementation
-            // window.urlApp = new UrlApp();
+            // Initialize everything
+            function initialize() {
+                // Tab-based navigation
+                const toolTabs = document.querySelectorAll('.tool-tabs .tab-button');
+                const toolSections = document.querySelectorAll('.tool-section');
+                
+                toolTabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        const tabId = tab.dataset.tab;
+                        
+                        // Update active tab
+                        toolTabs.forEach(t => {
+                            t.classList.toggle('active', t.dataset.tab === tabId);
+                        });
+                        
+                        // Update active section
+                        toolSections.forEach(section => {
+                            section.classList.toggle('active', section.id === `${tabId}Section`);
+                        });
+                        
+                        // Update history header
+                        const historyHeader = document.getElementById('historyHeader');
+                        if (historyHeader) {
+                            historyHeader.textContent = tabId === 'jwt' ? 'Recent Tokens' : 'Recent Links';
+                        }
+                        
+                        // Save selected tab
+                        localStorage.setItem('selectedTool', tabId);
+                    });
+                });
+                
+                // Initialize collapsibles
+                initializeCollapsibles();
+                
+                // JWT tab navigation
+                const jwtTabs = document.querySelectorAll('.tab');
+                jwtTabs.forEach(tab => {
+                    tab.addEventListener('click', () => {
+                        switchTab(tab.dataset.tab);
+                    });
+                });
+                
+                // JWT input handler
+                const jwtInput = document.getElementById('jwtInput');
+                if (jwtInput) {
+                    jwtInput.addEventListener('input', () => {
+                        const jwt = jwtInput.value.trim();
+                        if (jwt) {
+                            processJwt(jwt);
+                        } else {
+                            clearDisplay();
+                        }
+                    });
+                }
+                
+                // Format and validation buttons
+                const formatHeaderBtn = document.getElementById('formatHeaderBtn');
+                const validateHeaderBtn = document.getElementById('validateHeaderBtn');
+                const formatPayloadBtn = document.getElementById('formatPayloadBtn');
+                const validatePayloadBtn = document.getElementById('validatePayloadBtn');
+                const addClaimBtn = document.getElementById('addClaimBtn');
+                
+                if (formatHeaderBtn) {
+                    formatHeaderBtn.addEventListener('click', () => formatEditorJson('headerEditor'));
+                }
+                
+                if (validateHeaderBtn) {
+                    validateHeaderBtn.addEventListener('click', () => validateEditorJson('headerEditor'));
+                }
+                
+                if (formatPayloadBtn) {
+                    formatPayloadBtn.addEventListener('click', () => formatEditorJson('payloadEditor'));
+                }
+                
+                if (validatePayloadBtn) {
+                    validatePayloadBtn.addEventListener('click', () => validateEditorJson('payloadEditor'));
+                }
+                
+                if (addClaimBtn) {
+                    addClaimBtn.addEventListener('click', () => {
+                        const claimName = prompt('Enter claim name:');
+                        if (!claimName) return;
+                        
+                        const claimValue = prompt('Enter claim value:');
+                        if (claimValue === null) return;
+                        
+                        try {
+                            const payloadEditor = document.getElementById('payloadEditor');
+                            if (!payloadEditor) return;
+                            
+                            let payload = {};
+                            try {
+                                payload = JSON.parse(payloadEditor.textContent);
+                            } catch (error) {
+                                // If payload isn't valid JSON, create a new object
+                            }
+                            
+                            // Try to parse the value as JSON, if it's not valid, use it as string
+                            try {
+                                payload[claimName] = JSON.parse(claimValue);
+                            } catch (error) {
+                                payload[claimName] = claimValue;
+                            }
+                            
+                            payloadEditor.textContent = JSON.stringify(payload, null, 2);
+                        } catch (error) {
+                            showToast('Error', `Failed to add claim: ${error.message}`, 'error');
+                        }
+                    });
+                }
+                
+                // Token generation
+                const generateTokenBtn = document.getElementById('generateTokenBtn');
+                const copyNewTokenBtn = document.getElementById('copyNewTokenBtn');
+                const signingAlgorithm = document.getElementById('signingAlgorithm');
+                
+                if (generateTokenBtn) {
+                    generateTokenBtn.addEventListener('click', generateToken);
+                }
+                
+                if (copyNewTokenBtn) {
+                    copyNewTokenBtn.addEventListener('click', () => {
+                        const jwt = document.getElementById('jwtInput').value.trim();
+                        if (jwt) {
+                            copyText(jwt);
+                        } else {
+                            showToast('Error', 'No token to copy', 'error');
+                        }
+                    });
+                }
+                
+                if (signingAlgorithm) {
+                    signingAlgorithm.addEventListener('change', () => {
+                        const secretKeyGroup = document.getElementById('secretKeyGroup');
+                        if (secretKeyGroup) {
+                            secretKeyGroup.style.display = signingAlgorithm.value === 'none' ? 'none' : 'block';
+                        }
+                    });
+                }
+                
+                // Verification
+                const verifyBtn = document.getElementById('verifyBtn');
+                const fetchJwksBtn = document.getElementById('fetchJwksBtn');
+                const verifyJwksBtn = document.getElementById('verifyJwksBtn');
+                
+                if (verifyBtn) {
+                    verifyBtn.addEventListener('click', verifyJwtSignature);
+                }
+                
+                if (fetchJwksBtn) {
+                    fetchJwksBtn.addEventListener('click', fetchJwks);
+                }
+                
+                if (verifyJwksBtn) {
+                    verifyJwksBtn.addEventListener('click', verifyWithJwks);
+                }
+                
+                // Token comparison
+                const compareTokensBtn = document.getElementById('compareTokensBtn');
+                const pasteCurrentABtn = document.getElementById('pasteCurrentABtn');
+                const pasteCurrentBBtn = document.getElementById('pasteCurrentBBtn');
+                
+                if (compareTokensBtn) {
+                    compareTokensBtn.addEventListener('click', compareTokens);
+                }
+                
+                if (pasteCurrentABtn) {
+                    pasteCurrentABtn.addEventListener('click', () => {
+                        const jwt = document.getElementById('jwtInput').value.trim();
+                        const compareTokenA = document.getElementById('compareTokenA');
+                        
+                        if (jwt && compareTokenA) {
+                            compareTokenA.value = jwt;
+                        } else {
+                            showToast('Error', 'No current token to paste', 'error');
+                        }
+                    });
+                }
+                
+                if (pasteCurrentBBtn) {
+                    pasteCurrentBBtn.addEventListener('click', () => {
+                        const jwt = document.getElementById('jwtInput').value.trim();
+                        const compareTokenB = document.getElementById('compareTokenB');
+                        
+                        if (jwt && compareTokenB) {
+                            compareTokenB.value = jwt;
+                        } else {
+                            showToast('Error', 'No current token to paste', 'error');
+                        }
+                    });
+                }
+                
+                // Action buttons
+                const copyJwtBtn = document.getElementById('copyJwtBtn');
+                const copyJsonBtn = document.getElementById('copyJsonBtn');
+                const downloadJsonBtn = document.getElementById('downloadJsonBtn');
+                const clearJwtBtn = document.getElementById('clearJwtBtn');
+                
+                if (copyJwtBtn) {
+                    copyJwtBtn.addEventListener('click', copyJwt);
+                }
+                
+                if (copyJsonBtn) {
+                    copyJsonBtn.addEventListener('click', copyPayloadJson);
+                }
+                
+                if (downloadJsonBtn) {
+                    downloadJsonBtn.addEventListener('click', downloadJson);
+                }
+                
+                if (clearJwtBtn) {
+                    clearJwtBtn.addEventListener('click', () => {
+                        const jwtInput = document.getElementById('jwtInput');
+                        if (jwtInput) {
+                            jwtInput.value = '';
+                            clearDisplay();
+                        }
+                    });
+                }
+                
+                // History management
+                const historySearch = document.getElementById('historySearch');
+                const categoryFilters = document.querySelectorAll('.category-filter');
+                
+                if (historySearch) {
+                    historySearch.addEventListener('input', () => {
+                        const query = historySearch.value.trim();
+                        const activeFilter = document.querySelector('.category-filter.active').dataset.category;
+                        
+                        // Reload history with search filter
+                        if (AppState.db) {
+                            loadJwtHistory(activeFilter, query);
+                        } else {
+                            const storedHistory = localStorage.getItem('jwtHistory');
+                            if (storedHistory) {
+                                const history = JSON.parse(storedHistory);
+                                displayJwtHistory(history, activeFilter, query);
+                            }
+                        }
+                    });
+                }
+                
+                if (categoryFilters) {
+                    categoryFilters.forEach(filter => {
+                        filter.addEventListener('click', () => {
+                            // Update active state
+                            categoryFilters.forEach(f => f.classList.remove('active'));
+                            filter.classList.add('active');
+                            
+                            const category = filter.dataset.category;
+                            const query = historySearch ? historySearch.value.trim() : '';
+                            
+                            // Reload history with category filter
+                            if (AppState.db) {
+                                loadJwtHistory(category, query);
+                            } else {
+                                const storedHistory = localStorage.getItem('jwtHistory');
+                                if (storedHistory) {
+                                    const history = JSON.parse(storedHistory);
+                                    displayJwtHistory(history, category, query);
+                                }
+                            }
+                        });
+                    });
+                }
+                
+                // Theme toggle
+                const themeToggle = document.getElementById('themeToggle');
+                if (themeToggle) {
+                    // Check for saved theme
+                    const savedTheme = localStorage.getItem('theme');
+                    if (savedTheme === 'dark') {
+                        document.body.setAttribute('data-theme', 'dark');
+                        themeToggle.textContent = '☀️';
+                    }
+                    
+                    themeToggle.addEventListener('click', () => {
+                        if (document.body.getAttribute('data-theme') === 'dark') {
+                            document.body.removeAttribute('data-theme');
+                            themeToggle.textContent = '🌙';
+                            localStorage.setItem('theme', 'light');
+                        } else {
+                            document.body.setAttribute('data-theme', 'dark');
+                            themeToggle.textContent = '☀️';
+                            localStorage.setItem('theme', 'dark');
+                        }
+                    });
+                }
+                
+                // Keyboard shortcuts modal
+                const helpBtn = document.getElementById('helpBtn');
+                const shortcutsModal = document.getElementById('shortcutsModal');
+                const closeShortcutsBtn = document.getElementById('closeShortcutsBtn');
+                
+                if (helpBtn && shortcutsModal) {
+                    helpBtn.addEventListener('click', () => {
+                        shortcutsModal.classList.add('show');
+                    });
+                }
+                
+                if (closeShortcutsBtn && shortcutsModal) {
+                    closeShortcutsBtn.addEventListener('click', () => {
+                        shortcutsModal.classList.remove('show');
+                    });
+                    
+                    // Also close when clicking outside the modal
+                    shortcutsModal.addEventListener('click', (e) => {
+                        if (e.target === shortcutsModal) {
+                            shortcutsModal.classList.remove('show');
+                        }
+                    });
+                }
+                
+                // Load last selected tool
+                const lastTool = localStorage.getItem('selectedTool');
+                if (lastTool) {
+                    const toolTab = document.querySelector(`.tab-button[data-tab="${lastTool}"]`);
+                    if (toolTab) {
+                        toolTab.click();
+                    }
+                }
+                
+                // Setup keyboard shortcuts
+                setupKeyboardShortcuts();
+            }
+
+            // Start the application
+            initializeWorker();
+            initializeDatabase();
+            initialize();
         });
     </script>
 </body>
