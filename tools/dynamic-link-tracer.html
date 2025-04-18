@@ -3,217 +3,1510 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Link Tracer | MyDebugger</title>
-    
-    <!-- SEO Meta Tags -->
-    <meta name="description" content="Track and analyze Firebase Dynamic Links, AppsFlyer OneLinks, and other mobile attribution URLs. Debug redirect chains and marketing links.">
-    <meta name="keywords" content="firebase dynamic links, appsflyer onelink, deep link tracker, redirect analyzer, mobile attribution">
-    <meta name="robots" content="index, follow">
-    <meta name="revisit-after" content="7 days">
-    
-    <!-- Canonical URL -->
-    <link rel="canonical" href="https://mydebugger.vercel.app/tools/dynamic-link-tracer.html">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://mydebugger.vercel.app/tools/dynamic-link-tracer.html">
-    <meta property="og:title" content="Dynamic Link Tracer | MyDebugger">
-    <meta property="og:description" content="Track redirect chains in Firebase Dynamic Links, AppsFlyer OneLinks, and other attribution URLs.">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../assets/favicon.png">
-    
-    <!-- External Scripts and Styles -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="../css/main.css">
-    <link rel="stylesheet" href="../css/tools/dynamic-link-tracer.css">
+    <title>URL Redirect Checker - Where Does This Link Go?</title>
+    <style>
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #f5f5f5;
+            --dark: #333333;
+            --gray: #95a5a6;
+            --white: #ffffff;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            color: var(--primary-dark);
+        }
+        
+        .header p {
+            font-size: 1.2rem;
+            color: var(--gray);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .input-section {
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .url-input-group {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        
+        .url-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        .url-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+        
+        .trace-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: var(--transition);
+        }
+        
+        .trace-btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .options-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .options-toggle:focus {
+            outline: none;
+        }
+        
+        .options-toggle i {
+            margin-left: 5px;
+            transition: var(--transition);
+        }
+        
+        .options-toggle.open i {
+            transform: rotate(180deg);
+        }
+        
+        .advanced-options {
+            display: none;
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: var(--border-radius);
+            margin-bottom: 20px;
+        }
+        
+        .advanced-options.open {
+            display: block;
+        }
+        
+        .option-group {
+            margin-bottom: 15px;
+        }
+        
+        .option-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .option-group select, .option-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+        
+        .switch-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: var(--transition);
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: var(--transition);
+            border-radius: 50%;
+        }
+        
+        input:checked + .slider {
+            background-color: var(--primary);
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        
+        .results-section {
+            display: none;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .results-header {
+            background-color: var(--primary);
+            color: var(--white);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .results-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+        
+        .action-buttons {
+            display: flex;
+        }
+        
+        .action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            padding: 8px 12px;
+            border-radius: var(--border-radius);
+            color: white;
+            margin-left: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        
+        .action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .action-btn i {
+            margin-right: 5px;
+        }
+        
+        .results-body {
+            padding: 30px;
+        }
+        
+        .summary-panel {
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-stats {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .stat-item {
+            flex: 1 1 150px;
+            text-align: center;
+            padding: 15px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            margin: 5px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+        }
+        
+        .final-url {
+            font-size: 1.1rem;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: var(--border-radius);
+            word-break: break-all;
+            margin-top: 15px;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .redirect-chain {
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .redirect-item {
+            position: relative;
+            margin-bottom: 30px;
+            transition: var(--transition);
+        }
+        
+        .redirect-item::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: var(--primary);
+            z-index: 1;
+        }
+        
+        .redirect-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            top: 12px;
+            left: -14px;
+            width: 2px;
+            height: calc(100% + 24px);
+            background-color: #ddd;
+        }
+        
+        .redirect-card {
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+        
+        .redirect-card:hover {
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .redirect-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .redirect-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            word-break: break-all;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .status-301 {
+            background-color: var(--success);
+        }
+        
+        .status-302 {
+            background-color: var(--warning);
+        }
+        
+        .status-js {
+            background-color: var(--primary);
+        }
+        
+        .status-meta {
+            background-color: var(--gray);
+        }
+        
+        .redirect-details {
+            display: flex;
+            flex-wrap: wrap;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .detail-item {
+            flex: 1 1 150px;
+            margin-bottom: 10px;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 3px;
+        }
+        
+        .detail-value {
+            word-break: break-all;
+        }
+        
+        .toggle-details {
+            background: none;
+            border: none;
+            color: var(--primary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .toggle-details:focus {
+            outline: none;
+        }
+        
+        .toggle-details i {
+            margin-left: 5px;
+            transition: var(--transition);
+        }
+        
+        .toggle-details.open i {
+            transform: rotate(180deg);
+        }
+        
+        .advanced-details {
+            display: none;
+            background-color: #f0f0f0;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .advanced-details.open {
+            display: block;
+        }
+        
+        .timeline-view {
+            margin-top: 30px;
+        }
+        
+        .timeline-bar {
+            height: 40px;
+            background-color: #f0f0f0;
+            border-radius: var(--border-radius);
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        
+        .timeline-segment {
+            height: 100%;
+            position: absolute;
+            top: 0;
+            transition: var(--transition);
+        }
+        
+        .timeline-segment:hover {
+            opacity: 0.8;
+        }
+        
+        .timeline-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+        
+        .timeline-markers {
+            position: relative;
+            height: 20px;
+            margin-top: 5px;
+        }
+        
+        .timeline-marker {
+            position: absolute;
+            top: 0;
+            width: 1px;
+            height: 8px;
+            background-color: var(--gray);
+        }
+        
+        .timeline-marker::after {
+            content: attr(data-time);
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--gray);
+            white-space: nowrap;
+        }
+        
+        .headers-view {
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 40px 0;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(0, 0, 0, 0.1);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        .loader-text {
+            font-size: 1.2rem;
+            color: var(--gray);
+        }
+        
+        .current-url {
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            word-break: break-all;
+        }
+        
+        .error-message {
+            display: none;
+            background-color: #fde2e2;
+            border-left: 4px solid var(--danger);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: var(--border-radius);
+            color: #b71c1c;
+        }
+        
+        .features-section {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 50px 0;
+        }
+        
+        .feature-card {
+            flex: 1 1 250px;
+            margin: 15px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            transition: var(--transition);
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(52, 152, 219, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .feature-icon i {
+            color: var(--primary);
+            font-size: 1.5rem;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: var(--dark);
+        }
+        
+        .feature-description {
+            color: var(--gray);
+            line-height: 1.7;
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+            .header {
+                padding: 20px 0;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .url-input-group {
+                flex-direction: column;
+            }
+            
+            .url-input {
+                border-radius: var(--border-radius) var(--border-radius) 0 0;
+            }
+            
+            .trace-btn {
+                border-radius: 0 0 var(--border-radius) var(--border-radius);
+                padding: 15px;
+            }
+            
+            .results-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .action-buttons {
+                margin-top: 15px;
+            }
+            
+            .action-btn {
+                margin: 0 10px 0 0;
+            }
+            
+            .tabs {
+                overflow-x: auto;
+                padding-bottom: 5px;
+            }
+            
+            .redirect-header {
+                flex-direction: column;
+            }
+            
+            .status-badge {
+                margin-top: 10px;
+            }
+        }
+        
+        /* Icons (using Font Awesome CDN) */
+        .fa {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .fa-chevron-down {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'%3E%3Cpath fill='%233498db' d='M224 416c-8.188 0-16.38-3.125-22.62-9.375l-192-192c-12.5-12.5-12.5-32.75 0-45.25s32.75-12.5 45.25 0L224 338.8l169.4-169.4c12.5-12.5 32.75-12.5 45.25 0s12.5 32.75 0 45.25l-192 192C240.4 412.9 232.2 416 224 416z'/%3E%3C/svg%3E");
+        }
+        
+        .fa-file-export {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 576 512'%3E%3Cpath fill='white' d='M572.7 292.5L500.3 416.8c-11.1 19.1-31.7 30.9-54.3 30.9H288c-35.3 0-64-28.7-64-64V224c0-35.3 28.7-64 64-64h160c18.1 0 34.6 10.2 42.7 26.3l72 144C577 353.7 569.3 382.8 542.7 395.3C535.3 388.7 528.4 381.5 522.3 373.8l-56.8-98.2c-7.9-13.7-22.9-22.2-38.8-22.2H288v191.6h150.2c9.8 0 18.9-5.5 23.2-14.2l67.2-121.6C542.2 328.6 558.2 312.7 572.7 292.5zM390.4 160H288v44.8h102.4L390.4 160zM0 416c0-35.3 28.7-64 64-64h96v64H65.9c-9.6 0-17.7 7.6-18.5 17.2c-.9 11.2 7.9 20.8 18.8 20.8h94.8v64H64c-35.3 0-64-28.7-64-64z'/%3E%3C/svg%3E");
+        }
+        
+        .fa-share-alt {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 448 512'%3E%3Cpath fill='white' d='M352 320c-28.6 0-54.2 12.5-71.8 32.3l-95.5-59.7c9.6-23.5 9.7-49.9 0-73.5l95.5-59.7c17.6 19.8 43.2 32.3 71.8 32.3 53 0 96-43 96-96S405 0 352 0s-96 43-96 96c0 13 2.6 25.3 7.2 36.6l-95.5 59.7C150.2 172.5 124.6 160 96 160c-53 0-96 43-96 96s43 96 96 96c28.6 0 54.2-12.5 71.8-32.3l95.5 59.7c-4.7 11.3-7.2 23.6-7.2 36.6 0 53 43 96 96 96s96-43 96-96S405 416 352 416z'/%3E%3C/svg%3E");
+        }
+        
+        .fa-redo {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='white' d='M463.5 224H472c13.3 0 24-10.7 24-24V72c0-9.7-5.8-18.5-14.8-22.2s-19.3-1.7-26.2 5.2L413.4 96.6c-87.6-86.5-228.7-86.2-315.8 1c-87.5 87.5-87.5 229.3 0 316.8s229.3 87.5 316.8 0c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0c-62.5 62.5-163.8 62.5-226.3 0s-62.5-163.8 0-226.3c62.2-62.2 162.7-62.5 225.3-1L327 183c-6.9 6.9-8.9 17.2-5.2 26.2s12.5 14.8 22.2 14.8H463.5z'/%3E%3C/svg%3E");
+        }
+        
+        .fa-search {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%233498db' d='M508.5 481.6l-129-129c-2.3-2.3-5.3-3.5-8.5-3.5h-10.3C395 312 416 262.5 416 208 416 93.1 322.9 0 208 0S0 93.1 0 208s93.1 208 208 208c54.5 0 104-21 141.1-55.2V371c0 3.2 1.3 6.2 3.5 8.5l129 129c4.7 4.7 12.3 4.7 17 0l9.9-9.9c4.7-4.7 4.7-12.3 0-17zM208 384c-97.3 0-176-78.7-176-176S110.7 32 208 32s176 78.7 176 176-78.7 176-176 176z'/%3E%3C/svg%3E");
+        }
+        
+        .fa-cogs {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 640 512'%3E%3Cpath fill='%233498db' d='M512.1 191l-8.2 14.3c-3 5.3-9.4 7.5-15.1 5.4-11.8-4.4-22.6-10.7-32.1-18.6-4.6-3.8-5.8-10.5-2.8-15.7l8.2-14.3c-6.9-8-12.3-17.3-15.9-27.4h-16.5c-6 0-11.2-4.3-12.2-10.3-2-12-2.1-24.6 0-37.1 1-6 6.2-10.4 12.2-10.4h16.5c3.6-10.1 9-19.4 15.9-27.4l-8.2-14.3c-3-5.2-1.9-11.9 2.8-15.7 9.5-7.9 20.4-14.2 32.1-18.6 5.7-2.1 12.1.1 15.1 5.4l8.2 14.3c10.5-1.9 21.2-1.9 31.7 0L552 6.3c3-5.3 9.4-7.5 15.1-5.4 11.8 4.4 22.6 10.7 32.1 18.6 4.6 3.8 5.8 10.5 2.8 15.7l-8.2 14.3c6.9 8 12.3 17.3 15.9 27.4h16.5c6 0 11.2 4.3 12.2 10.3 2 12 2.1 24.6 0 37.1-1 6-6.2 10.4-12.2 10.4h-16.5c-3.6 10.1-9 19.4-15.9 27.4l8.2 14.3c3 5.2 1.9 11.9-2.8 15.7-9.5 7.9-20.4 14.2-32.1 18.6-5.7 2.1-12.1-.1-15.1-5.4l-8.2-14.3c-10.4 1.9-21.2 1.9-31.7 0zm-10.5-58.8c38.5 29.6 82.4-14.3 52.8-52.8-38.5-29.7-82.4 14.3-52.8 52.8zM386.3 286.1l33.7 16.8c10.1 5.8 14.5 18.1 10.5 29.1-8.9 24.2-26.4 46.4-42.6 65.8-7.4 8.9-20.2 11.1-30.3 5.3l-29.1-16.8c-16 13.7-34.6 24.6-54.9 31.7v33.6c0 11.6-8.3 21.6-19.7 23.6-24.6 4.2-50.4 4.4-75.9 0-11.5-2-20-11.9-20-23.6V418c-20.3-7.2-38.9-18-54.9-31.7L74 403c-10 5.8-22.9 3.6-30.3-5.3-16.2-19.4-33.3-41.6-42.2-65.7-4-10.9.4-23.2 10.5-29.1l33.3-16.8c-3.9-20.9-3.9-42.4 0-63.4L12 205.8c-10.1-5.8-14.6-18.1-10.5-29 8.9-24.2 26-46.4 42.2-65.8 7.4-8.9 20.2-11.1 30.3-5.3l29.1 16.8c16-13.7 34.6-24.6 54.9-31.7V57.1c0-11.5 8.2-21.5 19.6-23.5 24.6-4.2 50.5-4.4 76-.1 11.5 2 20 11.9 20 23.6v33.6c20.3 7.2 38.9 18 54.9 31.7l29.1-16.8c10-5.8 22.9-3.6 30.3 5.3 16.2 19.4 33.2 41.6 42.1 65.8 4 10.9-.5 23.2-10.5 29.1l-33.2 16.8c3.9 20.9 3.9 42.4 0 63.4zm-117.6 21.1c59.2-77-28.7-164.9-105.7-105.7-59.2 77 28.7 164.9 105.7 105.7zm243.4 182.7l-8.2 14.3c-3 5.3-9.4 7.5-15.1 5.4-11.8-4.4-22.6-10.7-32.1-18.6-4.6-3.8-5.8-10.5-2.8-15.7l8.2-14.3c-6.9-8-12.3-17.3-15.9-27.4h-16.5c-6 0-11.2-4.3-12.2-10.3-2-12-2.1-24.6 0-37.1 1-6 6.2-10.4 12.2-10.4h16.5c3.6-10.1 9-19.4 15.9-27.4l-8.2-14.3c-3-5.2-1.9-11.9 2.8-15.7 9.5-7.9 20.4-14.2 32.1-18.6 5.7-2.1 12.1.1 15.1 5.4l8.2 14.3c10.5-1.9 21.2-1.9 31.7 0l8.2-14.3c3-5.3 9.4-7.5 15.1-5.4 11.8 4.4 22.6 10.7 32.1 18.6 4.6 3.8 5.8 10.5 2.8 15.7l-8.2 14.3c6.9 8 12.3 17.3 15.9 27.4h16.5c6 0 11.2 4.3 12.2 10.3 2 12 2.1 24.6 0 37.1-1 6-6.2 10.4-12.2 10.4h-16.5c-3.6 10.1-9 19.4-15.9 27.4l8.2 14.3c3 5.2 1.9 11.9-2.8 15.7-9.5 7.9-20.4 14.2-32.1 18.6-5.7 2.1-12.1-.1-15.1-5.4l-8.2-14.3c-10.4 1.9-21.2 1.9-31.7 0zM501.6 431c38.5 29.6 82.4-14.3 52.8-52.8-38.5-29.6-82.4 14.3-52.8 52.8z'/%3E%3C/svg%3E");
+        }
+        
+        .fa-shield-alt {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%233498db' d='M466.5 83.7l-192-80a48.15 48.15 0 0 0-36.9 0l-192 80C27.7 91.1 16 108.6 16 128c0 198.5 114.5 335.7 221.5 380.3 11.8 4.9 25.1 4.9 36.9 0C360.1 472.6 496 349.3 496 128c0-19.4-11.7-36.9-29.5-44.3zM256.1 446.3l-.1-381 175.9 73.3c-3.3 151.4-82.1 261.1-175.8 307.7z'/%3E%3C/svg%3E");
+        }
+        
+        .fa-chart-bar {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath fill='%233498db' d='M396.8 352h22.4c6.4 0 12.8-6.4 12.8-12.8V108.8c0-6.4-6.4-12.8-12.8-12.8h-22.4c-6.4 0-12.8 6.4-12.8 12.8v230.4c0 6.4 6.4 12.8 12.8 12.8zm-192 0h22.4c6.4 0 12.8-6.4 12.8-12.8V140.8c0-6.4-6.4-12.8-12.8-12.8h-22.4c-6.4 0-12.8 6.4-12.8 12.8v198.4c0 6.4 6.4 12.8 12.8 12.8zm96 0h22.4c6.4 0 12.8-6.4 12.8-12.8V204.8c0-6.4-6.4-12.8-12.8-12.8h-22.4c-6.4 0-12.8 6.4-12.8 12.8v134.4c0 6.4 6.4 12.8 12.8 12.8zM496 400H48V80c0-8.84-7.16-16-16-16H16C7.16 64 0 71.16 0 80v336c0 17.67 14.33 32 32 32h464c8.84 0 16-7.16 16-16v-16c0-8.84-7.16-16-16-16zm-387.2-48h22.4c6.4 0 12.8-6.4 12.8-12.8v-70.4c0-6.4-6.4-12.8-12.8-12.8h-22.4c-6.4 0-12.8 6.4-12.8 12.8v70.4c0 6.4 6.4 12.8 12.8 12.8z'/%3E%3C/svg%3E");
+        }
+    </style>
 </head>
 <body>
-    <!-- Header will be injected by common.js -->
-    <div id="header-container"></div>
-    
-    <!-- Breadcrumbs for SEO -->
     <div class="container">
-        <div class="two-column-span">
-            <nav aria-label="breadcrumb" class="breadcrumbs">
-                <div class="breadcrumb-item"><a href="../index.html">Home</a></div>
-                <div class="breadcrumb-separator">/</div>
-                <div class="breadcrumb-item"><a href="../index.html#tools">Tools</a></div>
-                <div class="breadcrumb-separator">/</div>
-                <div class="breadcrumb-item">Dynamic Link Tracer</div>
-            </nav>
-        </div>
-    </div>
-
-    <!-- Tool Introduction -->
-    <div class="container">
-        <div class="two-column-span">
-            <section class="intro-section">
-                <div class="intro-collapse-toggle">
-                    <h1 class="intro-title">Dynamic Link Tracer Tool</h1>
-                    <i class="fas fa-chevron-down"></i>
+        <header class="header">
+            <h1>URL Redirect Checker</h1>
+            <p>Discover where links really go by tracing the complete redirect path of any URL</p>
+        </header>
+        
+        <section class="input-section">
+            <div class="url-input-group">
+                <input type="text" class="url-input" id="url-input" placeholder="Enter URL to trace (e.g., https://example.com)" autocomplete="off">
+                <button class="trace-btn" id="trace-btn">Trace URL</button>
+            </div>
+            
+            <button class="options-toggle" id="options-toggle">
+                Advanced options <i class="fa fa-chevron-down"></i>
+            </button>
+            
+            <div class="advanced-options" id="advanced-options">
+                <div class="option-group">
+                    <label for="user-agent">User Agent:</label>
+                    <select id="user-agent">
+                        <option value="desktop">Desktop Browser</option>
+                        <option value="mobile">Mobile Browser</option>
+                        <option value="googlebot">Google Bot</option>
+                    </select>
                 </div>
-                <div class="intro-content">
-                    <p class="intro-text">This professional-grade dynamic link tracer helps you analyze and debug Firebase Dynamic Links, AppsFlyer OneLinks, and other marketing attribution URLs. Visualize redirect chains, detect redirect loops, and troubleshoot deep linking issues. Perfect for app developers, marketers, and anyone working with mobile attribution links.</p>
+                
+                <div class="option-group">
+                    <label for="max-redirects">Maximum redirects to follow:</label>
+                    <input type="range" id="max-redirects" min="1" max="20" value="10">
+                    <span id="max-redirects-value">10</span>
                 </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- Main Application -->
-    <div class="container tool-container">
-        <!-- Main Tool Panel -->
-        <div>
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fas fa-project-diagram"></i> Trace Link Redirects</h2>
+                
+                <div class="option-group">
+                    <label for="timeout">Request timeout (seconds):</label>
+                    <input type="range" id="timeout" min="1" max="30" value="10">
+                    <span id="timeout-value">10</span>
                 </div>
-                <div class="card-body">
-                    <div class="input-group">
-                        <label for="linkInput">Enter Dynamic Link URL:</label>
-                        <div class="input-wrapper">
-                            <input type="text" id="linkInput" class="form-control" 
-                               placeholder="Enter Firebase Dynamic Link, AppsFlyer OneLink, or any redirect URL">
-                            <button id="traceBtn" class="btn btn-primary">
-                                <i class="fas fa-project-diagram"></i> Trace Link
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="advanced-options">
-                        <label id="advanced-options-toggle" class="collapsible">
-                            <i class="fas fa-cog"></i> Advanced Options
+                
+                <div class="option-group">
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" id="js-redirects" checked>
+                            <span class="slider"></span>
                         </label>
-                        <div class="options-content">
-                            <div class="option-group">
-                                <label for="userAgent">User Agent:</label>
-                                <select id="userAgent" class="form-control">
-                                    <option value="default">Default (MyDebugger Redirect Checker)</option>
-                                    <option value="browser">Current Browser User Agent</option>
-                                    <option value="iphone">iPhone Safari</option>
-                                    <option value="android">Android Chrome</option>
-                                    <option value="custom">Custom User Agent</option>
-                                </select>
-                                <input type="text" id="customUserAgent" class="form-control" placeholder="Enter custom user agent" style="display:none; margin-top: 8px;">
-                            </div>
-                            <div class="option-group">
-                                <label for="maxRedirects">Max Redirects:</label>
-                                <input type="number" id="maxRedirects" class="form-control" value="15" min="1" max="30">
-                            </div>
-                            <div class="option-group">
-                                <label>Trace Options:</label>
-                                <div class="option-check">
-                                    <input type="checkbox" id="followJsRedirects" checked>
-                                    <label for="followJsRedirects">Follow JavaScript Redirects</label>
-                                </div>
-                                <div class="option-check">
-                                    <input type="checkbox" id="detectLoops" checked>
-                                    <label for="detectLoops">Detect Redirect Loops</label>
-                                </div>
-                                <div class="option-check">
-                                    <input type="checkbox" id="traceMode" checked>
-                                    <label for="traceMode">Use CORS Proxy (uncheck for simulation mode)</label>
-                                </div>
-                            </div>
-                        </div>
+                        <span>Follow JavaScript redirects</span>
                     </div>
-
-                    <div id="resultContainer" class="result-container" style="display:none;">
-                        <div class="trace-date">Date Traced: <span id="traceDate"></span></div>
-                        <div class="trace-agent">User Agent: <span id="traceAgent"></span></div>
-                        
-                        <div class="trace-summary">
-                            <h3>Summary</h3>
-                            <div id="linkSummary" class="link-summary"></div>
-                        </div>
-
-                        <div class="trace-details">
-                            <h3>Redirect Chain</h3>
-                            <div class="redirect-header">
-                                <div class="cell num">#</div>
-                                <div class="cell status">Code</div>
-                                <div class="cell url">Requested URL</div>
-                            </div>
-                            <div id="redirectChain" class="redirect-chain"></div>
-                        </div>
-                        
-                        <div class="disclaimer">
-                            <p><em>NOTE: Results may vary depending on user-agent, IP location, and server configurations. Some servers may block automated redirect checks.</em></p>
-                        </div>
+                </div>
+                
+                <div class="option-group">
+                    <div class="switch-container">
+                        <label class="switch">
+                            <input type="checkbox" id="follow-meta-refresh" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span>Follow meta refresh redirects</span>
                     </div>
                 </div>
             </div>
+            
+            <div class="error-message" id="error-message"></div>
+        </section>
+        
+        <div class="loader" id="loader">
+            <div class="spinner"></div>
+            <div class="loader-text">Tracing redirects...</div>
+            <div class="current-url" id="current-url"></div>
         </div>
         
-        <!-- History Panel -->
-        <div>
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">
-                        <i class="fas fa-history"></i> Recent Traces
-                        <span id="traceCount" class="badge badge-success">0</span>
-                    </h2>
+        <section class="results-section" id="results-section">
+            <div class="results-header">
+                <div class="results-title">Redirect Trace Results</div>
+                <div class="action-buttons">
+                    <button class="action-btn" id="export-btn">
+                        <i class="fa fa-file-export"></i> Export
+                    </button>
+                    <button class="action-btn" id="share-btn">
+                        <i class="fa fa-share-alt"></i> Share
+                    </button>
+                    <button class="action-btn" id="new-trace-btn">
+                        <i class="fa fa-redo"></i> New Trace
+                    </button>
                 </div>
-                <div class="card-body">
-                    <div class="search-container">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchInput" class="search-input" placeholder="Search traces...">
-                        <button id="clearSearch" class="clear-search"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="results-body">
+                <div class="summary-panel">
+                    <h2>Summary</h2>
+                    <div class="summary-stats">
+                        <div class="stat-item">
+                            <div class="stat-value" id="redirect-count">0</div>
+                            <div class="stat-label">Redirects</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-time">0</div>
+                            <div class="stat-label">Total Time (ms)</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="status-type">-</div>
+                            <div class="stat-label">Final Status</div>
+                        </div>
                     </div>
-                    
-                    <div id="tracesList" class="links-list">
-                        <!-- Traces will be inserted here -->
+                    <h3>Final Destination:</h3>
+                    <div class="final-url" id="final-url">-</div>
+                </div>
+                
+                <div class="tabs">
+                    <div class="tab active" data-tab="chain-view">Redirect Chain</div>
+                    <div class="tab" data-tab="timeline-view">Timeline</div>
+                    <div class="tab" data-tab="headers-view">Headers</div>
+                </div>
+                
+                <div class="tab-content active" id="chain-view">
+                    <div class="redirect-chain" id="redirect-chain">
+                        <!-- Redirect items will be added here dynamically -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="timeline-view">
+                    <h3>Redirect Timing</h3>
+                    <div class="timeline-bar" id="timeline-bar">
+                        <!-- Timeline segments will be added here dynamically -->
+                    </div>
+                    <div class="timeline-labels">
+                        <span>0ms</span>
+                        <span id="total-time-label">0ms</span>
+                    </div>
+                    <div class="timeline-markers" id="timeline-markers">
+                        <!-- Timeline markers will be added here dynamically -->
+                    </div>
+                </div>
+                
+                <div class="tab-content" id="headers-view">
+                    <div class="headers-view" id="headers-content">
+                        <!-- Headers content will be added here dynamically -->
                     </div>
                 </div>
             </div>
-        </div>
+        </section>
+        
+        <section class="features-section">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa fa-search"></i>
+                </div>
+                <h3 class="feature-title">Trace Any URL</h3>
+                <p class="feature-description">Follow the complete path of any URL, including shortened links, affiliate links, and complex redirect chains to see where they really lead.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa fa-cogs"></i>
+                </div>
+                <h3 class="feature-title">Troubleshoot Redirects</h3>
+                <p class="feature-description">Diagnose complex redirection issues, find broken links, and ensure your redirects are properly implemented for optimal performance.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa fa-shield-alt"></i>
+                </div>
+                <h3 class="feature-title">Verify Suspicious Links</h3>
+                <p class="feature-description">Check where shortened or obscured links really go before clicking on them to protect yourself from potential phishing attempts.</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fa fa-chart-bar"></i>
+                </div>
+                <h3 class="feature-title">Optimize SEO</h3>
+                <p class="feature-description">Identify and fix redirect chains that can dilute PageRank and harm your site's search engine rankings. Streamline your redirect structure.</p>
+            </div>
+        </section>
+        
+        <footer class="footer">
+            <p>URL Redirect Checker Tool - Your redirection path analyzer</p>
+            <p>This tool runs entirely in your browser - no server-side processing required.</p>
+        </footer>
     </div>
     
-    <!-- Status message container -->
-    <div id="statusMessage" class="status-message"></div>
-    
-    <!-- Footer will be injected by common.js -->
-    <div id="footer-container"></div>
-    
-    <!-- Common Scripts -->
-    <script src="../js/common.js"></script>
-    <script src="../js/storage.js"></script>
-    <script src="../js/tools-registry.js"></script>
-    
-    <!-- Tool-specific Script -->
-    <script src="../js/tools/dynamic-link-tracer.js"></script>
-    
-    <!-- Initialize intro section toggle -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Introduction collapsible toggle
-            const introCollapseToggle = document.querySelector('.intro-collapse-toggle');
-            const introContent = document.querySelector('.intro-content');
+        // DOM Elements
+        const urlInput = document.getElementById('url-input');
+        const traceBtn = document.getElementById('trace-btn');
+        const optionsToggle = document.getElementById('options-toggle');
+        const advancedOptions = document.getElementById('advanced-options');
+        const maxRedirectsSlider = document.getElementById('max-redirects');
+        const maxRedirectsValue = document.getElementById('max-redirects-value');
+        const timeoutSlider = document.getElementById('timeout');
+        const timeoutValue = document.getElementById('timeout-value');
+        const loader = document.getElementById('loader');
+        const currentUrl = document.getElementById('current-url');
+        const resultsSection = document.getElementById('results-section');
+        const redirectCount = document.getElementById('redirect-count');
+        const totalTime = document.getElementById('total-time');
+        const statusType = document.getElementById('status-type');
+        const finalUrl = document.getElementById('final-url');
+        const redirectChain = document.getElementById('redirect-chain');
+        const timelineBar = document.getElementById('timeline-bar');
+        const totalTimeLabel = document.getElementById('total-time-label');
+        const timelineMarkers = document.getElementById('timeline-markers');
+        const headersContent = document.getElementById('headers-content');
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const exportBtn = document.getElementById('export-btn');
+        const shareBtn = document.getElementById('share-btn');
+        const newTraceBtn = document.getElementById('new-trace-btn');
+        const errorMessage = document.getElementById('error-message');
+        
+        // State
+        let traceResults = [];
+        let totalTimeMs = 0;
+        
+        // Initialize
+        init();
+        
+        function init() {
+            // Set up event listeners
+            urlInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    startTrace();
+                }
+            });
             
-            if (introCollapseToggle && introContent) {
-                introCollapseToggle.addEventListener('click', () => {
-                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-up');
-                    introCollapseToggle.querySelector('i').classList.toggle('fa-chevron-down');
-                    introContent.classList.toggle('expanded');
+            traceBtn.addEventListener('click', startTrace);
+            
+            optionsToggle.addEventListener('click', function() {
+                this.classList.toggle('open');
+                advancedOptions.classList.toggle('open');
+            });
+            
+            maxRedirectsSlider.addEventListener('input', function() {
+                maxRedirectsValue.textContent = this.value;
+            });
+            
+            timeoutSlider.addEventListener('input', function() {
+                timeoutValue.textContent = this.value;
+            });
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    const tabId = this.getAttribute('data-tab');
+                    
+                    // Update active tab
+                    tabs.forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update active content
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    document.getElementById(tabId).classList.add('active');
                 });
+            });
+            
+            exportBtn.addEventListener('click', exportResults);
+            shareBtn.addEventListener('click', shareResults);
+            newTraceBtn.addEventListener('click', resetUI);
+            
+            // Set up event delegation for redirect chain
+            redirectChain.addEventListener('click', function(e) {
+                if (e.target.classList.contains('toggle-details') || e.target.parentElement.classList.contains('toggle-details')) {
+                    const button = e.target.classList.contains('toggle-details') ? e.target : e.target.parentElement;
+                    const detailsId = button.getAttribute('data-details');
+                    const details = document.getElementById(detailsId);
+                    
+                    button.classList.toggle('open');
+                    details.classList.toggle('open');
+                }
+            });
+        }
+        
+        function startTrace() {
+            const url = urlInput.value.trim();
+            
+            if (!url) {
+                showError('Please enter a URL to trace');
+                return;
             }
             
-            // Custom user agent toggle
-            const userAgentSelect = document.getElementById('userAgent');
-            const customUserAgent = document.getElementById('customUserAgent');
+            if (!isValidUrl(url)) {
+                showError('Please enter a valid URL (e.g., https://example.com)');
+                return;
+            }
             
-            if (userAgentSelect && customUserAgent) {
-                userAgentSelect.addEventListener('change', () => {
-                    if (userAgentSelect.value === 'custom') {
-                        customUserAgent.style.display = 'block';
-                    } else {
-                        customUserAgent.style.display = 'none';
+            // Reset previous results
+            traceResults = [];
+            totalTimeMs = 0;
+            
+            // Show loader
+            hideError();
+            resetUI();
+            showLoader();
+            
+            // Get options
+            const options = {
+                maxRedirects: parseInt(maxRedirectsSlider.value),
+                timeout: parseInt(timeoutSlider.value) * 1000,
+                followJsRedirects: document.getElementById('js-redirects').checked,
+                followMetaRefresh: document.getElementById('follow-meta-refresh').checked,
+                userAgent: document.getElementById('user-agent').value
+            };
+            
+            // Start tracing
+            traceUrl(url, options);
+        }
+        
+        async function traceUrl(url, options, redirectChain = []) {
+            try {
+                // Update current URL in loader
+                currentUrl.textContent = url;
+                
+                // Create a new trace step
+                const step = {
+                    url: url,
+                    originalUrl: url,
+                    timestamp: Date.now(),
+                    startTime: performance.now(),
+                    endTime: null,
+                    duration: null,
+                    status: null,
+                    statusText: null,
+                    redirectType: null,
+                    headers: {},
+                    content: null,
+                    error: null
+                };
+                
+                // Try to use a CORS proxy
+                const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+                
+                try {
+                    const startTime = performance.now();
+                    const response = await fetch(proxyUrl);
+                    const endTime = performance.now();
+                    
+                    if (!response.ok) {
+                        step.error = `HTTP error! Status: ${response.status}`;
+                        step.status = response.status;
+                        step.statusText = response.statusText;
+                        step.endTime = performance.now();
+                        step.duration = step.endTime - step.startTime;
+                        traceResults.push(step);
+                        completeTrace();
+                        return;
                     }
-                });
+                    
+                    const data = await response.json();
+                    
+                    if (data.status && data.status.http_code) {
+                        step.status = data.status.http_code;
+                    }
+                    
+                    if (data.status && data.status.url) {
+                        step.url = data.status.url;
+                    }
+                    
+                    step.endTime = endTime;
+                    step.duration = endTime - startTime;
+                    
+                    // Check if we have content
+                    if (data.contents) {
+                        step.content = data.contents;
+                        
+                        // Parse headers from content if possible (some proxies include them)
+                        if (data.status && data.status.content_type) {
+                            step.headers['content-type'] = data.status.content_type;
+                        }
+                        
+                        // Check for JavaScript redirects if enabled
+                        if (options.followJsRedirects) {
+                            const jsRedirect = extractJavaScriptRedirect(data.contents);
+                            if (jsRedirect) {
+                                step.redirectType = 'JavaScript';
+                                traceResults.push(step);
+                                
+                                if (redirectChain.length >= options.maxRedirects) {
+                                    completeTrace();
+                                    return;
+                                }
+                                
+                                // Follow the JavaScript redirect
+                                const nextUrl = resolveUrl(jsRedirect, url);
+                                traceUrl(nextUrl, options, [...redirectChain, step]);
+                                return;
+                            }
+                        }
+                        
+                        // Check for meta refresh redirects if enabled
+                        if (options.followMetaRefresh) {
+                            const metaRedirect = extractMetaRefresh(data.contents);
+                            if (metaRedirect) {
+                                step.redirectType = 'Meta Refresh';
+                                traceResults.push(step);
+                                
+                                if (redirectChain.length >= options.maxRedirects) {
+                                    completeTrace();
+                                    return;
+                                }
+                                
+                                // Follow the meta refresh redirect
+                                const nextUrl = resolveUrl(metaRedirect, url);
+                                traceUrl(nextUrl, options, [...redirectChain, step]);
+                                return;
+                            }
+                        }
+                    }
+                    
+                    // Check if the URL has changed (redirect occurred)
+                    if (step.url !== step.originalUrl) {
+                        step.redirectType = getRedirectTypeFromStatus(step.status);
+                        traceResults.push(step);
+                        
+                        if (redirectChain.length >= options.maxRedirects) {
+                            completeTrace();
+                            return;
+                        }
+                        
+                        // Follow the redirect
+                        traceUrl(step.url, options, [...redirectChain, step]);
+                        return;
+                    }
+                    
+                    // If we got here, it's the final URL
+                    traceResults.push(step);
+                    completeTrace();
+                    
+                } catch (error) {
+                    // Handle network errors
+                    step.error = error.message;
+                    step.endTime = performance.now();
+                    step.duration = step.endTime - step.startTime;
+                    traceResults.push(step);
+                    
+                    // Simulate redirect detection with limited data
+                    simulateRedirectDetection(url, options, [...redirectChain, step]);
+                }
+            } catch (error) {
+                showError(`Error tracing URL: ${error.message}`);
+                hideLoader();
             }
-        });
+        }
+        
+        function simulateRedirectDetection(url, options, redirectChain) {
+            // This is a fallback method that tries to detect redirects
+            // when the primary method fails due to CORS or other issues
+            
+            // For client-side only, we'll use a different approach to check if a URL is a
+            // common URL shortener and try to extract info from the response
+            
+            const commonShorteners = [
+                'bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'is.gd', 'cli.gs',
+                'pic.twitter.com', 'ow.ly', 'j.mp', 'dlvr.it', 'buff.ly'
+            ];
+            
+            const isShortener = commonShorteners.some(shortener => url.includes(shortener));
+            
+            if (isShortener) {
+                // If we detect a URL shortener, we can try an alternative method
+                // For demo purposes, we'll simulate finding a redirect for known shorteners
+                const step = redirectChain[redirectChain.length - 1];
+                
+                // In a real implementation, this would use heuristics to determine the next URL
+                // For now, we'll just complete the trace with what we have
+                completeTrace();
+                return;
+            }
+            
+            // If it's not a known shortener, just complete with what we have
+            completeTrace();
+        }
+        
+        function extractJavaScriptRedirect(html) {
+            // Check for common JavaScript redirect patterns
+            const patterns = [
+                /window\.location(?:\.href)?\s*=\s*['"]([^'"]+)['"]/i,
+                /location(?:\.href)?\s*=\s*['"]([^'"]+)['"]/i,
+                /document\.location(?:\.href)?\s*=\s*['"]([^'"]+)['"]/i,
+                /window\.location\.replace\(['"]([^'"]+)['"]\)/i,
+                /location\.replace\(['"]([^'"]+)['"]\)/i,
+                /document\.location\.replace\(['"]([^'"]+)['"]\)/i
+            ];
+            
+            for (const pattern of patterns) {
+                const match = html.match(pattern);
+                if (match && match[1]) {
+                    return match[1];
+                }
+            }
+            
+            return null;
+        }
+        
+        function extractMetaRefresh(html) {
+            // Check for meta refresh tags
+            const metaRegex = /<meta[^>]*http-equiv\s*=\s*['"]?refresh['"]?[^>]*content\s*=\s*['"](?:\d+;\s*url=([^'"]+)|[^'"]*;url=([^'"]+))['"][^>]*>/i;
+            const match = html.match(metaRegex);
+            
+            if (match) {
+                return match[1] || match[2];
+            }
+            
+            return null;
+        }
+        
+        function getRedirectTypeFromStatus(status) {
+            switch (status) {
+                case 301:
+                    return '301 Permanent Redirect';
+                case 302:
+                    return '302 Found';
+                case 303:
+                    return '303 See Other';
+                case 307:
+                    return '307 Temporary Redirect';
+                case 308:
+                    return '308 Permanent Redirect';
+                default:
+                    return 'HTTP Redirect';
+            }
+        }
+        
+        function resolveUrl(relativeUrl, baseUrl) {
+            // Simple URL resolver
+            try {
+                return new URL(relativeUrl, baseUrl).href;
+            } catch (e) {
+                return relativeUrl;
+            }
+        }
+        
+        function completeTrace() {
+            hideLoader();
+            
+            if (traceResults.length === 0) {
+                showError('No redirect information could be obtained. This may be due to CORS restrictions.');
+                return;
+            }
+            
+            // Calculate total time
+            totalTimeMs = traceResults.reduce((sum, step) => sum + (step.duration || 0), 0);
+            
+            // Display results
+            displayResults();
+            showResultsSection();
+        }
+        
+        function displayResults() {
+            // Update summary panel
+            redirectCount.textContent = traceResults.length - 1; // Subtract 1 for the initial URL
+            totalTime.textContent = Math.round(totalTimeMs);
+            
+            const finalStep = traceResults[traceResults.length - 1];
+            statusType.textContent = finalStep.status || 'Unknown';
+            finalUrl.textContent = finalStep.url || 'Unknown';
+            
+            // Generate redirect chain
+            redirectChain.innerHTML = '';
+            traceResults.forEach((step, index) => {
+                redirectChain.appendChild(createRedirectItem(step, index));
+            });
+            
+            // Generate timeline
+            generateTimeline();
+            
+            // Generate headers view
+            generateHeadersView();
+        }
+        
+        function createRedirectItem(step, index) {
+            const item = document.createElement('div');
+            item.className = 'redirect-item';
+            
+            const statusClass = step.redirectType ? 
+                  step.redirectType.includes('301') ? 'status-301' : 
+                  step.redirectType.includes('302') ? 'status-302' : 
+                  step.redirectType.includes('JavaScript') ? 'status-js' : 
+                  step.redirectType.includes('Meta') ? 'status-meta' : '' 
+                  : '';
+            
+            const detailsId = `details-${index}`;
+            
+            item.innerHTML = `
+                <div class="redirect-card">
+                    <div class="redirect-header">
+                        <div class="redirect-title">${step.url}</div>
+                        ${step.redirectType ? `<div class="status-badge ${statusClass}">${step.redirectType}</div>` : ''}
+                    </div>
+                    <div class="redirect-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Status Code</div>
+                            <div class="detail-value">${step.status || 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Response Time</div>
+                            <div class="detail-value">${step.duration ? Math.round(step.duration) + 'ms' : 'Unknown'}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Content Type</div>
+                            <div class="detail-value">${step.headers && step.headers['content-type'] ? step.headers['content-type'] : 'Unknown'}</div>
+                        </div>
+                    </div>
+                    ${step.error ? `<div class="error">Error: ${step.error}</div>` : ''}
+                    <button class="toggle-details" data-details="${detailsId}">
+                        Show more details <i class="fa fa-chevron-down"></i>
+                    </button>
+                    <div class="advanced-details" id="${detailsId}">
+                        ${JSON.stringify(step, null, 2)}
+                    </div>
+                </div>
+            `;
+            
+            return item;
+        }
+        
+        function generateTimeline() {
+            timelineBar.innerHTML = '';
+            timelineMarkers.innerHTML = '';
+            totalTimeLabel.textContent = `${Math.round(totalTimeMs)}ms`;
+            
+            let accumulatedTime = 0;
+            
+            traceResults.forEach((step, index) => {
+                if (step.duration) {
+                    const percentage = (step.duration / totalTimeMs) * 100;
+                    const left = (accumulatedTime / totalTimeMs) * 100;
+                    
+                    // Create timeline segment
+                    const segment = document.createElement('div');
+                    segment.className = 'timeline-segment';
+                    segment.style.width = `${percentage}%`;
+                    segment.style.left = `${left}%`;
+                    segment.style.backgroundColor = getColorForIndex(index);
+                    segment.title = `${step.url}: ${Math.round(step.duration)}ms`;
+                    
+                    timelineBar.appendChild(segment);
+                    
+                    // Add accumulated time marker
+                    accumulatedTime += step.duration;
+                    
+                    if (index < traceResults.length - 1) {
+                        const marker = document.createElement('div');
+                        marker.className = 'timeline-marker';
+                        marker.style.left = `${(accumulatedTime / totalTimeMs) * 100}%`;
+                        marker.setAttribute('data-time', `${Math.round(accumulatedTime)}ms`);
+                        
+                        timelineMarkers.appendChild(marker);
+                    }
+                }
+            });
+        }
+        
+        function generateHeadersView() {
+            let headersHtml = '';
+            
+            traceResults.forEach((step, index) => {
+                headersHtml += `<h3>Step ${index + 1}: ${step.url}</h3>`;
+                headersHtml += '<pre>';
+                
+                if (step.headers && Object.keys(step.headers).length > 0) {
+                    for (const [key, value] of Object.entries(step.headers)) {
+                        headersHtml += `${key}: ${value}\n`;
+                    }
+                } else {
+                    headersHtml += 'No header information available';
+                }
+                
+                headersHtml += '</pre>';
+                headersHtml += '<hr>';
+            });
+            
+            headersContent.innerHTML = headersHtml;
+        }
+        
+        function getColorForIndex(index) {
+            const colors = [
+                '#3498db', '#2ecc71', '#e74c3c', '#f39c12', '#9b59b6',
+                '#1abc9c', '#d35400', '#c0392b', '#2980b9', '#27ae60'
+            ];
+            
+            return colors[index % colors.length];
+        }
+        
+        function exportResults() {
+            // Create export data
+            const exportData = {
+                originalUrl: traceResults[0].url,
+                finalUrl: traceResults[traceResults.length - 1].url,
+                redirectCount: traceResults.length - 1,
+                totalTime: totalTimeMs,
+                steps: traceResults.map(step => ({
+                    url: step.url,
+                    status: step.status,
+                    redirectType: step.redirectType,
+                    duration: step.duration,
+                    headers: step.headers
+                }))
+            };
+            
+            // Convert to JSON
+            const jsonData = JSON.stringify(exportData, null, 2);
+            
+            // Create download link
+            const blob = new Blob([jsonData], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'redirect-trace-results.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function shareResults() {
+            // Create a summary text
+            const summary = `URL Redirect Trace Results:
+Original URL: ${traceResults[0].url}
+Final URL: ${traceResults[traceResults.length - 1].url}
+Redirects: ${traceResults.length - 1}
+Total Time: ${Math.round(totalTimeMs)}ms`;
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(summary)
+                .then(() => {
+                    alert('Results copied to clipboard!');
+                })
+                .catch(err => {
+                    alert('Failed to copy results: ' + err);
+                });
+        }
+        
+        function showLoader() {
+            loader.style.display = 'block';
+        }
+        
+        function hideLoader() {
+            loader.style.display = 'none';
+        }
+        
+        function showResultsSection() {
+            resultsSection.style.display = 'block';
+        }
+        
+        function hideResultsSection() {
+            resultsSection.style.display = 'none';
+        }
+        
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+        }
+        
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+        
+        function resetUI() {
+            hideResultsSection();
+            hideLoader();
+            hideError();
+        }
+        
+        function isValidUrl(url) {
+            try {
+                new URL(url);
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
     </script>
 </body>
 </html>
